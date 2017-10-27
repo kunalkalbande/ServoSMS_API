@@ -1,0 +1,40 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Servosms", "http://localhost/Servosms", "{5FB3EC9E-C596-4F35-B270-4A4B0A2822C5}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "false"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6.1"
+		Debug.AspNetCompiler.VirtualPath = "/Servosms"
+		Debug.AspNetCompiler.PhysicalPath = "..\Servosms\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Servosms\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/Servosms"
+		Release.AspNetCompiler.PhysicalPath = "..\Servosms\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\Servosms\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "..\Servosms\"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|.NET = Debug|.NET
+		Release|.NET = Release|.NET
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FB3EC9E-C596-4F35-B270-4A4B0A2822C5}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{5FB3EC9E-C596-4F35-B270-4A4B0A2822C5}.Debug|.NET.Build.0 = Debug|Any CPU
+		{5FB3EC9E-C596-4F35-B270-4A4B0A2822C5}.Release|.NET.ActiveCfg = Debug|Any CPU
+		{5FB3EC9E-C596-4F35-B270-4A4B0A2822C5}.Release|.NET.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,191 @@
+<%@ Page language="c#" Codebehind="CustomerMechEntry.aspx.cs" AutoEventWireup="false" Inherits="Servosms.Forms.Parties.CustomerMechEntry" %>
+<%@ Register TagPrefix="uc1" TagName="Footer" Src="../../Footer.ascx" %>
+<%@ Register TagPrefix="uc1" TagName="Header" Src="../../Header.ascx" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<HTML>
+	<HEAD>
+		<title>CustomerMechEntry</title>
+		<meta name="GENERATOR" Content="Microsoft Visual Studio .NET 7.1">
+		<meta name="CODE_LANGUAGE" Content="C#">
+		<meta name="vs_defaultClientScript" content="JavaScript">
+		<LINK href="../../Styles.css" type="text/css" rel="stylesheet">
+		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
+	</HEAD>
+	<body MS_POSITIONING="GridLayout">
+		<form id="Form1" method="post" runat="server">
+			<uc1:header id="Header1" runat="server"></uc1:header>
+			<asp:TextBox id="TextBox1" style="Z-INDEX: 101; LEFT: 144px; POSITION: absolute; TOP: 16px" runat="server"
+				Width="8px" Visible="False"></asp:TextBox>
+			<table height="274" width="778" align=center>
+				<TR>
+					<TH align="center">
+						Customer Mechanic Entry
+						<hr>
+					</TH>
+				</TR>
+				<TR>
+					<td align="center">
+						<TABLE width="500">
+							<TR>
+								<TD colSpan="1" style="WIDTH: 83px; HEIGHT: 20px"><FONT color="black">Customer&nbsp;ID 
+										:</FONT></TD>
+								<TD colSpan="5" style="WIDTH: 229px; HEIGHT: 20px"><FONT color="#ff0000">
+										<asp:DropDownList id="DropID" runat="server" Visible="False" AutoPostBack="True">
+											<asp:ListItem Value="Select" Selected="True">Select</asp:ListItem>
+										</asp:DropDownList>
+										<asp:Button id="btnselect" runat="server" Text="Select" ToolTip="Click here to edit" Width="56px"
+											ForeColor="White" BackColor="DarkGreen"></asp:Button>
+										<asp:TextBox id="txtcustid" runat="server" Width="65px"></asp:TextBox></FONT></TD>
+							</TR>
+							<TR>
+								<TD colspan="1" style="WIDTH: 83px; HEIGHT: 20px">
+									Customer&nbsp;&nbsp;Name :</TD>
+								<TD colspan="5" style="HEIGHT: 20px">
+									<asp:dropdownlist id="DropCustomerName" runat="server" Width="234px">
+										<asp:ListItem Value="Select">Select</asp:ListItem>
+									</asp:dropdownlist></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 22px">
+									1.MechanicName</TD>
+								<TD style="HEIGHT: 22px"><asp:textbox id="txtname1" Width="152px" runat="server" BorderStyle="Groove" BackColor="FloralWhite"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 22px">
+									Type</TD>
+								<TD style="HEIGHT: 22px">
+									<asp:DropDownList id="Droptype1" runat="server" Width="107px" BackColor="FloralWhite"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 22px">
+									City</TD>
+								<TD style="HEIGHT: 22px">
+									<asp:DropDownList id="Dropcity1" runat="server" Width="120px" BackColor="FloralWhite"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 20px">
+									2.MechanicName</TD>
+								<TD style="HEIGHT: 20px"><asp:textbox id="txtname2" Width="152px" runat="server" BorderStyle="Groove"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 20px">
+									Type</TD>
+								<TD style="HEIGHT: 20px">
+									<asp:DropDownList id="Droptype2" runat="server" Width="104px"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 20px">
+									City</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Dropcity2" runat="server" Width="120px"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 23px">
+									3.MechanicName</TD>
+								<TD style="HEIGHT: 23px"><asp:textbox id="txtname3" Width="152px" runat="server" BorderStyle="Groove" BackColor="FloralWhite"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 23px">
+									Type</TD>
+								<TD style="HEIGHT: 23px">
+									<asp:DropDownList id="Droptype3" runat="server" Width="104px" BackColor="FloralWhite"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 23px">
+									City</TD>
+								<TD style="HEIGHT: 23px">
+									<asp:DropDownList id="Dropcity3" runat="server" Width="120px" BackColor="FloralWhite"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 30px">
+									4.MechanicName</TD>
+								<TD style="HEIGHT: 30px"><asp:textbox id="txtname4" Width="152px" runat="server" BorderStyle="Groove"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 30px">
+									Type</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Droptype4" runat="server" Width="104px"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 30px">
+									City</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Dropcity4" runat="server" Width="120px"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 30px">
+									5.MechanicName</TD>
+								<TD style="HEIGHT: 30px"><asp:textbox id="txtname5" Width="152px" runat="server" BorderStyle="Groove" BackColor="FloralWhite"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 30px">
+									Type</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Droptype5" runat="server" Width="104px" BackColor="FloralWhite"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 30px">
+									City</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Dropcity5" runat="server" Width="120px" BackColor="FloralWhite"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 30px">
+									6.MechanicName</TD>
+								<TD style="HEIGHT: 30px"><asp:textbox id="txtname6" Width="152px" runat="server" BorderStyle="Groove"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 30px">
+									Type</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Droptype6" runat="server" Width="104px"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 30px">
+									City</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Dropcity6" runat="server" Width="120px"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 30px">
+									7.MechanicName</TD>
+								<TD style="HEIGHT: 30px"><asp:textbox id="txtname7" Width="152px" runat="server" BorderStyle="Groove" BackColor="FloralWhite"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 30px">
+									Type</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Droptype7" runat="server" Width="104px" BackColor="FloralWhite"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 30px">
+									City</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Dropcity7" runat="server" Width="120px" BackColor="FloralWhite"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH:83px; HEIGHT:17px">
+									8.MechanicName</TD>
+								<TD style="HEIGHT: 17px"><asp:textbox id="txtname8" Width="152px" runat="server" BorderStyle="Groove"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 17px">
+									Type</TD>
+								<TD style="HEIGHT: 17px">
+									<asp:DropDownList id="Droptype8" runat="server" Width="104px"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 17px">
+									City</TD>
+								<TD style="HEIGHT: 17px">
+									<asp:DropDownList id="Dropcity8" runat="server" Width="120px"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 30px">
+									9.MechanicName</TD>
+								<TD style="HEIGHT: 30px"><asp:textbox id="txtname9" Width="152px" runat="server" BorderStyle="Groove" BackColor="FloralWhite"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 30px">
+									Type</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Droptype9" runat="server" Width="104px" BackColor="FloralWhite"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 30px">
+									City</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Dropcity9" runat="server" Width="120px" BackColor="FloralWhite"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD style="WIDTH: 83px; HEIGHT: 30px">
+									10.MechanicName</TD>
+								<TD style="HEIGHT: 30px"><asp:textbox id="txtname10" Width="152px" runat="server" BorderStyle="Groove"></asp:textbox></TD>
+								<TD style="WIDTH: 41px; HEIGHT: 30px">
+									Type</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Droptype10" runat="server" Width="104px"></asp:DropDownList></TD>
+								<TD style="WIDTH: 33px; HEIGHT: 30px">
+									City</TD>
+								<TD style="HEIGHT: 30px">
+									<asp:DropDownList id="Dropcity10" runat="server" Width="118px"></asp:DropDownList></TD>
+							</TR>
+							<TR>
+								<TD align="center" colSpan="6">
+									<HR color="#000099" SIZE="1">
+									<asp:button id="btnadd" runat="server" Width="52px" Text="Add" ForeColor="White" BackColor="DarkGreen"></asp:button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<asp:Button id="btnedit" runat="server" Width="54px" Text="Edit" ForeColor="White" BackColor="DarkGreen"></asp:Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<asp:Button id="btnDelete" runat="server" Text="Delete" ForeColor="White" BackColor="DarkGreen"></asp:Button></TD>
+							</TR>
+						</TABLE>
+						<asp:validationsummary id="ValidationSummary1" runat="server" Height="81px" ShowSummary="False" ShowMessageBox="True"></asp:validationsummary></td>
+				</TR>
+			</table>
+			<uc1:footer id="Footer1" runat="server"></uc1:footer></form>
+	</body>
+</HTML>

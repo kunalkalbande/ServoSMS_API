@@ -1,0 +1,370 @@
+                       Version Release Information : ServoSMS
+                       --------------------------------------
+
+1. Release Version:  SSMS V 2.0.0 Dated 01.08.2009
+   Done By: Vikas Sharma Setup Made On: 01.08.2009 Time 17.00 PM
+
+   Changes/ Updation:-
+
+   a. Change In Product Promo Scheme Discount Report. We can See Minimum One Day Record But before it not Possible.
+ 
+   b. In Header and Header1 Add one leble to Show Relesing Date and Version also. and also make a Text file name is
+      'Version Info' in Module\Help. and also add a HiperLink in About Us to See this Text file. is has contain all the
+      Information which is done.
+
+   c. In Expenses Report These Record are not show which has 0 (zero) Total.
+
+   d. In Party wise Seles Report Add 'District' in Search by DropDown and also fetch Value option Dropdown.
+|---------------------------------------------------------------------------------------------------------------------------|
+
+2. Release Version:  SSMS V 2.0.2 Dated 13.08.2009
+   Done By: Vikas Sharma Setup Made On: 13.08.2009 Time 16.00 PM
+
+   Changes/ Updation:-
+
+   a. Sales Invoice Edit Mode Not Giving aPrintout due to Credit Limit & Cash Limit. in Cash Billing Message
+      "This is Cash Payment Invoice. Due to Non Available of Credit Balance in Party A/c Bill Not Done"
+
+   b. In Performa Invoice Remove Challan No., Challan Date, Current Balance, Due Date, Credit Limit, Vehicle No.
+
+   c. Master List Total Counter List.
+
+   d. Purchases Book % Claim Make Working Proper.
+|---------------------------------------------------------------------------------------------------------------------------|
+
+3. Release Version:  SSMS V 2.0.4 Dated 14.08.2009
+   Done By: Vikas Sharma Setup Made On: 14.08.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Primary/Secondry Sales Discount Report Add % Discount in Sales Side.
+
+   b. In Performa Invoice Remove Border of place TextBox. and Change in Printing Also.
+|---------------------------------------------------------------------------------------------------------------------------|
+
+4. Release Version:  SSMS V 2.0.6 Dated 02.09.2009
+   Done By: Vikas Sharma Setup Made On: 02.09.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. In Scheme/Discount Entry Enable type Dropdown.
+
+   b. SSR Wise Sales figure Zero Condition Assending & Decending is Work Properly.
+
+   c. In Voucher aspx Add Plce with name of party in DropDown.
+|---------------------------------------------------------------------------------------------------------------------------|
+
+5. Release Version:  SSMS V 2.0.8 Dated 02.09.2009
+   Done By: Vikas Sharma Setup Made On: 02.09.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Add a checkBox for Daily Record Based on SSR in SalesBook. 
+
+   b. Add a new Report Name is 4T Zoom And Cummulative Sales Report. For Show record only 4T oil.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+6. Release Version:  SSMS V 2.0.10 Dated 03.09.2009
+   Done By: Vikas Sharma Setup Made On:  03.09.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. 4T oil sales Show Correct in Invoice wise.
+
+   b. in Yearly Wise condition Show only those Record Wich are more Zeero.
+
+   c. In dropdown Show All Record When we select the type.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+7. Release Version:  SSMS V 2.0.12 Dated 09.09.2009
+   Done By: Vikas Sharma Setup Made On:  09.09.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. In VoucerEntry.aspx Show All Ledger In DorpDown in the condition of Credit Note and Debit Note.
+
+   b. In Credit Analysis Report Create a blank Row between city name not same.and also add Contact Person and Mobile No.
+
+   c. Change header in Customer Updation form.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+8. Release Version:  SSMS V 2.0.14 Dated 11.09.2009
+   Done By: Vikas Sharma Setup Made On:  11.09.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Add Another Dropdown in schemelist.aspx. and also add two radio button.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+9. Release Version:  SSMS V 2.2.6 Dated 12.09.2009
+   Done By: Vikas Sharma Setup Made On: 12.09.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Work on Payment_Receipt.aspx and SalesInvoice.aspx forms To Validte the Credit Limit Condition.
+
+   b. in SchemeList.aspx add One Condition for Customer Name.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+10.Release Version:  SSMS V 2.2.8 Dated 01.10.2009
+   Done By: Vikas Sharma Setup Made On: 01.10.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. In Product Promo Report if data not Available then Show Message Box. 
+
+   b. in Credit Analysis Report Remove State from Dropdown and Ordering of SSR Name in Searchable DropDown.
+
+   c. Work on Product_Entry.aspx form For maintain Batch_Transaction.
+
+   d. Work on Purchase_Invoice.aspx form For maintain Batch_Transaction.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+11.Release Version:  SSMS V 2.4.0 Dated 23.10.2009
+   Done By: Vikas Sharma Setup Made On: 23.10.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Sr.no. will be add in all Report showing party name with place. 1 4T Zoom, 2. FOC Management Report, 
+      3. Party Wise sales figure, 4 Quaterly target, 5 Yearly target.
+
+   b. Voucher Entry> Cash Discount and other discount is not fetched in credit note or debit note.
+
+   c. Product Report > in excel report not showing productid. now showing. 
+
+   d. sales book > Godown report adjusted.
+
+   e. Stock ledger report > Show shipping party with place in view and print both.
+
+   f. Quaterly Targets report > change the condition if the party last year base is there or currently year
+      volume is there in both condition party volume is shown.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+12.Release Version:  SSMS V 2.4.2 Dated 24.10.2009
+   Done By: Vikas Sharma Setup Made On: 24.10.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. MAke FOC_Management Report in Dynamic way becouse it did not show full data.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+13.Release Version:  SSMS V 2.4.4 Dated 25.10.2009
+   Done By: Vikas Sharma Setup Made On: 25.10.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Add a check box in sales book name monthly Sale in this condition show total sale of particular customer in
+      particular period for perticular product.
+   
+   b. Remove Id from Quaterly target report.
+  
+   c. Add Palce in Stock Ledger Report with party name.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+14.Release Version:  SSMS V 2.4.6 Dated 04.11.2009
+   Done By: Vikas Sharma Setup Made On: 04.11.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Increase space of Customer name and product name in Godown Report and Monthly sales
+   
+   b. Manage sales invoice printing after showing message.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+
+15.Release Version:  SSMS V 2.4.8 Dated 14.11.2009
+   Done By: Vikas Sharma Setup Made On: 14.11.2009 Time 18.00 PM
+
+   Changes/ Updation:-
+
+   a. Remove java Script Error on product Report.
+   
+   b. in quaterly Target Report data not show in drop down as per selecte option but now is show.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+16. Release Version: SSMS V 2.5.4 Dated 23.10.2012
+    Done By: Vikas Sharma Setup Made On 23.10.2012 Time 20.30 PM 
+
+    Changes/Updation:-
+    
+    a. Add "Group" and "Sub Group" in "Customer Type Entry" Form and Database also. Finally customer type is user friendly.
+    
+    b. Work on "Attendance Register" Asending and Deseding in Edit Time.
+
+    c. Work on "Scheme Discount Entry" for add Group Provision by Child Windows and also provision for "Secondry Free Scheme" 
+       Add unit for Scheme apply on Ltr.
+
+    e. Work on "Employee Entry form" and "Employee Update form" for Employee Active or Not.
+
+    f. Work on "SSR Incentive Sheet Report" show only Active Employee and also add Basic Salary and Total (Salary+ Incentive)
+
+    g. Work on "Purchase Invoice" Add Provision for Show Fixd Discount on Form and in Preview Button. 
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+17. Release Version: SSMS V 2.5.6 Dated 20.11.2012
+    Done By: Vikas Sharma Setup Made On 20.11.2012 Time 12.30 PM 
+
+    Changes/Updation:-
+    
+    a. Work on "Scheme Discount Entry" add new as "Combo Pack" and working also properly.
+    
+    b. Work on "Sales Invoice" Also for "Combo Pack".
+
+    c. Work on "Order Collection" Form Maintain A Table "OVD" for Back Order Process.
+
+    e. Work on "Sales Invoice" for Order Collection Execute Properly in Sales Invoice.
+
+    f. Work on "Scheme List Report" Add filter for Group Wise and Sale/Purchase wise.
+
+    g. Work on "Secondry Sales Claim" Report add new and Existing Condition. 
+
+    h. Work on "Set Discount" Set Daynamic Period for Early Bird Dis.
+    
+    i. Work on "Attendance Register" Change Working.
+    
+    j. Add No "Selling Customer Report"
+    
+    k. Work on "Salary Statement" Change as per as Directed.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+18. Release Version: SSMS V 3.1.2 Dated 18.12.2012
+    Done By: Vikas Sharma Setup Made On 18.12.2012 Time 18.00 PM 
+
+    Changes/Updation:-
+    
+    a. Work on "SRSM Report".
+    
+    b. Work on "FOC Management Report".
+
+    c. Work on "Nill Selling Customer Report.
+
+    e. Work on "Reward Report".
+
+    f. Work on "Back Order Process" and "Back Order Report".
+
+    g. Work on "Purchase Statment IOCL". 
+
+    h. Work on "PerformaInvoice Invoice".
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+19. Release Version: SSMS V 3.1.2 Dated 20.3.2013
+    Done By: Vikas Sharma Setup Made On 20.3.2013 Time 20.00 PM 
+
+    Changes/Updation:-
+    
+    a. Work on "SSR Performance Sheet" Match Amount as per as "Customer Outsatnding Report".
+    
+    b. Work on "Product Wise Sales Report" add Multiple Pack Selection.
+
+    c. Work on "Ledger Report" Show Closing Balance of Selected Party Without Select Period.
+
+    d. Work on "Party Wise Sales Report" Add "Customer Type" in Serch Derop doun.
+
+    e. Work on "Sales Invoice" When save in Credit Mode then not calculate Cr. Limit Proper.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+20. Release Version: SSMS V 3.3 Dated 03.4.2013
+    Done By: Vikas Sharma Setup Made On 03.4.2013 Time 13.00 AM 
+
+    Changes/Updation:-
+    
+   a. Work on "Sales Invoice" When save in Credit Mode then not calculate Cr. Limit Proper.
+
+   b. Work on "Product Wise Sales Report" Add Two Chile Window for Pack Wise and SSR Name Use Multiple Selection.
+
+   C. Work on "Part Wise Sales Report" Add Another Condition "Customer Type" for Searching.
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+21. Release Version: SSMS V 3.3 Dated 08.4.2013
+    Done By: Vikas Sharma Setup Made On 08.4.2013 Time 15.00 PM 
+
+    Changes/Updation:-
+    
+   a. Work on "Price Calculation Report" Show Entry Tax and Sales Rate in DataGrid Print and Excel file.
+
+   b. Work on "Price List Report" Add New Condition With Existing Condition.
+
+   C. Work on "Party Wise Sales Report" Add Another Column Name is "Lube Sale".
+
+   d. Work on "Product Wise Sales Report" Add Multiple Selection in "Product With Pack" and "Prod Type".
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+22. Release Version: SSMS V 3.3 Dated 25.4.2013
+    Done By: Vikas Sharma Setup Made On 25.4.2013 Time 17.00 PM 
+
+    Changes/Updation:-
+    
+   a. Work on "Party Wise Sales Report" Show Lube Sale in Footer "Cust Type" Wise.
+
+   b. Work on "Purchase Statement for IOCL Report" Fixed Discount Total Show Wrong.
+
+   C. Work on "Receipt Form" When Delete Discount it not deleted".
+
+   d. Work on "SRSM Report" Check and Correct Report".
+
+   e. Work on "Yearwise Sadhwavna Report" Check and Correct Report".
+
+   f. Work on "Module Management" Use Stored Procdure for fast Update All Customer's Balance".
+
+   g. Work on "Credit Analysis Sheet Report" Match As per as "Customer Outsatnding Report" and "SSR Performance Report"".
+
+   h. Work on "Customer Outsatnding Report" Add a Check box for Show Cedit Balance Or Not".
+
+   i. Work on "Credit Period Analysis Sheet Report" This Report Match With OutStanding Report and SSR Performance Report".
+
+   j. Work on "Voucher Entry" in This form in Edit Time in Credit NOte Condition All Account Not show in Drop Down".
+
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+23. Release Version: SSMS V 3.3 Dated 9.5.2013
+    Done By: Vikas Sharma Setup Made On 9.5.2013 Time 12.00 PM 
+
+    Changes/Updation:-
+    
+   a. Work on "Sale Book" and "Purchase Book" Add Like Condition in Customer and Product With Pack.
+
+   b. Work on "Party Wise Sales Figure Report" Make Space between Total and Cust Type Show in Footer.
+
+   c. Work on "VAT Report" Remove Error When Select Apr Data.
+   
+|---------------------------------------------------------------------------------------------------------------------------|
+  
+24. Release Version: SSMS V 3.3 Dated 25.10.2013
+    Done By: Vikas Sharma Setup Made On 25.10.2013 Time 12.00 PM 
+
+    Changes/Updation:-
+    
+   a. Add Report "VAT Return Debtors Report" Given By Deepak Soni.
+
+   b. Add New Report Type in Scheme Secondry Sales Report.
+|---------------------------------------------------------------------------------------------------------------------------|
+
+25. Release Version: SSMS V 3.3 Dated 16.03.2014
+    Done By: Vikas Sharma Setup Made On 16.03.2014 Time 18.00 PM 
+
+    Changes/Updation:-
+    
+   a. Work On Salebook Make Multiple Selection.
+
+   b. Work on Purchase Statement IOCL.
+
+   c. Work on Customer Update and Customer entry form.
+
+   D. Work on Secoundry Sales Claim Report.
+

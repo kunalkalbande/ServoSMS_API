@@ -1,0 +1,355 @@
+﻿Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Rolling back assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Restoring event log to previous state for source ServoSMS_WindowsService.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Rolling back assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Restoring event log to previous state for source ServoSMS_WindowsService.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Rolling back assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Restoring event log to previous state for source ServoSMS_WindowsService.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+An exception occurred during the uninstallation of the System.ServiceProcess.ServiceInstaller installer.
+System.ComponentModel.Win32Exception: The specified service does not exist as an installed service
+An exception occurred while uninstalling. This exception will be ignored and the uninstall will continue. However, the application might not be fully uninstalled after the uninstall is complete.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Warning: The source ServoSMS_WindowsService is not registered on the local machine.
+Service ServoSMS_WindowsService is being removed from the system...
+An exception occurred during the uninstallation of the System.ServiceProcess.ServiceInstaller installer.
+System.ComponentModel.Win32Exception: The specified service does not exist as an installed service
+An exception occurred while uninstalling. This exception will be ignored and the uninstall will continue. However, the application might not be fully uninstalled after the uninstall is complete.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+An exception occurred during the uninstallation of the System.ServiceProcess.ServiceInstaller installer.
+System.ComponentModel.Win32Exception: The specified service does not exist as an installed service
+An exception occurred while uninstalling. This exception will be ignored and the uninstall will continue. However, the application might not be fully uninstalled after the uninstall is complete.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Attempt to stop service ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Uninstalling assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Removing EventLog source ServoSMS_WindowsService.
+Service ServoSMS_WindowsService is being removed from the system...
+Service ServoSMS_WindowsService was successfully removed from the system.
+Installing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog
+Installing service ServoSMS_WindowsService...
+Service ServoSMS_WindowsService has been successfully installed.
+Creating EventLog source ServoSMS_WindowsService in log Application...
+Committing assembly 'c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe'.
+Affected parameters are:
+   assemblypath = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.exe
+   logfile = c:\inetpub\wwwroot\servosms\sysitem\servosmsprintservices\servosms_windowsservice.InstallLog

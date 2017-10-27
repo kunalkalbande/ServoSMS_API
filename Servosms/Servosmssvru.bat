@@ -1,0 +1,1 @@
+C:\WINdows\Microsoft.NET\Framework\v1.1.4322\installutil /u c:\inetpub\wwwroot\Servosms\Sysitem\Servosmsprintservices\ServoSMS_windowsservice.exe

@@ -1,0 +1,1278 @@
+﻿This report shows the steps taken to convert your Web application from ASP.NET 1.1 to ASP.NET 2.0. 
+There may be some unresolved conversion issues you will need to manually fix. 
+For more information, please refer to http://go.microsoft.com/fwlink/?LinkId=46995 or search for the help topic "Converting from Visual Studio .NET 2002 or 2003".
+Conversion Started on project file Servosms.csproj at May 30 2017, 14:36:02.
+
+=========================ERRORS===================
+
+=========================WARNINGS=================
+The following files were excluded from the website because they were not found in the project file or the associated 'BuildAction' is set to 'None'.
+File List == backup\servosms\module\reports\taxreport.aspx,backup\servosms\module\reports\sadbhavnaschememonthwise.aspx,
+backup\servosms\module\reports\quaterly_targets.aspx,backup\servosms\module\admin\organisationdetails.aspx,backup\servosms\module\reports\ssrwisetargets.aspx,
+backup\servosms\module\help\contactdetails.aspx,backup\servosms\module\master\customertype.aspx,backup\servosms\module\reports\specificpacks.aspx,
+backup\servosms\module\accounts\taxentry_master.aspx,backup\servosms\module\reports\districtwisereport.aspx,backup\servosms\module\reports\hsd_customer_sale.aspx,
+backup\servosms\module\admin\modulemanagement\modulemanage.aspx,backup\servosms\module\inventory\ly_ps_sales.aspx,
+backup\servosms\module\admin\modulemanagement\customerledgerupdation.aspx,backup\servosms\headerfooter\header1.ascx,backup\servosms\module\master\custdatamining_printpreview.aspx,
+backup\servosms\module\reports\schemesecondrysales.aspx,backup\servosms\module\employee\ot_compensation.aspx,backup\servosms\module\inventory\batchno.aspx,
+backup\servosms\module\reports\salesbook_printpreview.aspx,backup\servosms\sysitem\service.aspx,backup\servosms\module\master\salespersonassignment.aspx,
+backup\servosms\module\reports\hash.aspx,backup\servosms\module\accounts\payment.aspx,backup\servosms\module\master\customermechanicentry.aspx,
+backup\servosms\module\inventory\salesinvoice.aspx,backup\servosms\module\reports\vat_report.aspx,backup\servosms\module\reports\specificpackssales.aspx,
+backup\servosms\module\reports\pwsdcreport.aspx,backup\servosms\module\reports\primsecdiscount.aspx,backup\servosms\module\master\customer_update.aspx,
+backup\servosms\module\reports\marketpotentialreport.aspx,backup\servosms\module\reports\claimanalysis.aspx,backup\servosms\module\reports\claimsheet.aspx,
+backup\servosms\loginhome\login.aspx,backup\servosms\module\inventory\purchaseinvoice.aspx,backup\servosms\module\reports\stockreorderreport.aspx,
+backup\servosms\module\reports\targetvsachivement.aspx,backup\servosms\module\reports\backorder_report.aspx,backup\servosms\module\inventory\purchasereturn.aspx,
+backup\servosms\module\logistics\vechile_entryform.aspx,backup\servosms\module\logistics\vehicle.aspx,backup\servosms\module\reports\documentcancelreport.aspx,
+backup\servosms\module\master\oilscheme.aspx,backup\servosms\module\master\supplier_update.aspx,backup\servosms\module\reports\mechanicreport.aspx,
+backup\servosms\module\reports\balancesheet.aspx,module\master\customermechentry.aspx,backup\servosms\module\master\customerupdation.aspx,
+backup\servosms\sysitem\accessdeny.aspx,backup\servosms\module\employee\employee_entry.aspx,backup\servosms\module\reports\customer_bill_ageing.aspx,
+backup\servosms\module\master\prod_promo_dis_entry.aspx,backup\servosms\module\reports\reward_report.aspx,backup\servosms\module\reports\lubeindent.aspx,
+backup\servosms\headerfooter\header.ascx,backup\servosms\module\reports\stockmovement.aspx,backup\servosms\module\reports\schemelist.aspx,
+backup\servosms\module\help\aboutus.aspx,backup\servosms\module\reports\childwincas.aspx,backup\servosms\module\master\customermechentry.aspx,
+backup\servosms\headerfooter\header2.ascx,backup\servosms\module\reports\ledgerreport.aspx,backup\servosms\module\employee\salary_statement.aspx,
+backup\servosms\module\reports\prod_promo_dis_claim_report.aspx,backup\servosms\module\master\marketcustentry.aspx,backup\servosms\module\employee\leave_register.aspx,
+backup\servosms\module\reports\ly_ps_salesreport.aspx,backup\servosms\module\inventory\performainvoice.aspx,backup\servosms\module\inventory\ordercollection.aspx,
+backup\servosms\module\reports\ssrperforma.aspx,backup\servosms\module\master\customermapping.aspx,backup\servosms\module\reports\customerwisesalesreport.aspx,
+backup\servosms\module\reports\yearly_targets.aspx,backup\servosms\module\reports\monwiseprodsal.aspx,backup\servosms\module\inventory\salesreturn.aspx,
+backup\servosms\module\reports\proposedlubeindent.aspx,backup\servosms\module\reports\daybookreport.aspx,backup\servosms\module\employee\employee_list.aspx,
+backup\servosms\loginhome\homepage.aspx,backup\servosms\module\reports\customerdatamining.aspx,backup\servosms\module\reports\monthlyclaimlatter.aspx,
+backup\servosms\module\reports\stockledgerreport.aspx,backup\servosms\module\reports\profitanalysis1.aspx,backup\servosms\module\inventory\credit_bill.aspx,
+backup\servosms\module\reports\batchwisestock.aspx,backup\servosms\module\reports\purchasebook.aspx,backup\servosms\module\reports\back_order_process.aspx,
+backup\servosms\module\reports\partywisesalesfigure.aspx,backup\servosms\module\reports\foc_management_report.aspx,backup\servosms\module\reports\fleetoediscountreport.aspx,
+backup\servosms\module\accounts\voucher.aspx,backup\servosms\module\reports\productreport.aspx,backup\servosms\module\reports\pricelist.aspx,
+backup\servosms\module\reports\hsd_ms_report.aspx,backup\servosms\module\admin\backuprestore.aspx,backup\servosms\module\inventory\payment_receipt.aspx,
+backup\servosms\module\employee\mechanic.aspx,backup\servosms\module\reports\return_report.aspx,backup\servosms\module\reports\districtwisechannelsales.aspx,
+backup\servosms\module\reports\stockreport.aspx,backup\servosms\module\admin\roles.aspx,backup\servosms\module\reports\leavereport.aspx,
+backup\servosms\module\logistics\routeedit.aspx,backup\servosms\module\reports\nillsellingro_report.aspx,backup\servosms\module\admin\user_profile.aspx,
+backup\servosms\headerfooter\header3.ascx,backup\servosms\module\employee\leave_assignment.aspx,backup\servosms\module\reports\stockmovement_batch.aspx,
+backup\servosms\headerfooter\footer.ascx,backup\servosms\module\logistics\vehicle_logbook.aspx,backup\servosms\module\reports\ssrwisesales.aspx,
+backup\servosms\module\reports\salesreport1.aspx,backup\servosms\sysitem\error.aspx,backup\servosms\module\employee\attandance_register.aspx,
+backup\servosms\module\inventory\servostockistdiscountentry.aspx,backup\servosms\module\reports\bankreconcillation.aspx,backup\servosms\sysitem\errorpage.aspx,
+backup\servosms\module\master\customer_list.aspx,backup\servosms\module\inventory\stockadjustment.aspx,backup\servosms\module\master\customervehicleentry.aspx,
+backup\servosms\module\reports\tradingaccount.aspx,backup\servosms\module\master\beatmaster_entry.aspx,backup\servosms\module\reports\salebook.aspx,
+backup\servosms\module\reports\ssrincentivesheet.aspx,backup\servosms\module\master\supplier_list.aspx,backup\servosms\module\reports\specificpacks1.aspx,
+backup\servosms\module\reports\productwisesales.aspx,backup\servosms\module\reports\servosadbhavnalist.aspx,backup\servosms\module\reports\primarysecsalesanalysis.aspx,
+backup\servosms\module\reports\vatrdreport.aspx,backup\servosms\module\help\help\help.aspx,backup\servosms\module\reports\fourtzoom_report.aspx,
+backup\servosms\module\admin\privileges.aspx,backup\servosms\module\reports\creditperiodanalysissheetreport.aspx,backup\servosms\sysitem\global.asax,
+backup\servosms\module\reports\purchaselistiocl.aspx,backup\servosms\module\employee\employee_update.aspx,backup\servosms\module\reports\sadbhavnaschemeyearwise.aspx,
+backup\servosms\module\reports\purchasebook_printpreview.aspx,backup\servosms\module\reports\customerwiseoutstanding.aspx,backup\servosms\module\inventory\product_entry.aspx,
+backup\servosms\module\master\customer_entry.aspx,backup\servosms\module\inventory\price_updation.aspx,backup\servosms\module\inventory\schemediscount.aspx,
+backup\servosms\module\inventory\fleet_oediscountentry.aspx,backup\servosms\module\reports\attendencereport.aspx,
+backup\servosms\module\admin\modulemanagement\stockledgerupdation.aspx,backup\servosms\module\reports\vehiclelogreport.aspx,backup\servosms\module\reports\srsm_format_report.aspx,
+backup\servosms\module\inventory\modvatcenvatinvoice.aspx,backup\servosms\module\accounts\ledger.aspx,backup\servosms\module\reports\pricecalculation.aspx,
+backup\servosms\module\admin\modulemanagement\setdiscount.aspx,backup\servosms\module\inventory\groupchild.aspx,backup\servosms\module\inventory\schemediscountentry.aspx,
+backup\servosms\module\reports\expences_details.aspx,backup\servosms\module\reports\batchwisestockledger.aspx,backup\servosms\module\inventory\cashsalesinvoice.aspx,
+backup\servosms\module\master\supplier_entry.aspx.
+
+=========================COMMENTS=================
+Web.Config: Added 'xhtmlConformance' attribute.
+Web.Config: added a reference for assembly System.Management.
+Removed attribute TargetSchema from file HeaderFooter\Footer.ascx.
+Removed attribute AutoEventWireup from file HeaderFooter\Footer.ascx.
+Removed attribute Codebehind from file HeaderFooter\Footer.ascx.
+Access level of 'Page_Load' changed to 'protected' in file HeaderFooter\Footer.ascx.cs (Line 26).
+Removed attribute TargetSchema from file HeaderFooter\Header.ascx.
+Removed attribute AutoEventWireup from file HeaderFooter\Header.ascx.
+Removed attribute Codebehind from file HeaderFooter\Header.ascx.
+Access level of 'Page_Load' changed to 'protected' in file HeaderFooter\Header.ascx.cs (Line 29).
+Removed attribute TargetSchema from file HeaderFooter\Header1.ascx.
+Removed attribute AutoEventWireup from file HeaderFooter\Header1.ascx.
+Removed attribute Codebehind from file HeaderFooter\Header1.ascx.
+Access level of 'Page_Load' changed to 'protected' in file HeaderFooter\Header1.ascx.cs (Line 30).
+Removed attribute TargetSchema from file HeaderFooter\Header2.ascx.
+Removed attribute AutoEventWireup from file HeaderFooter\Header2.ascx.
+Removed attribute Codebehind from file HeaderFooter\Header2.ascx.
+Access level of 'Page_Load' changed to 'protected' in file HeaderFooter\Header2.ascx.cs (Line 16).
+Removed attribute TargetSchema from file HeaderFooter\Header3.ascx.
+Removed attribute AutoEventWireup from file HeaderFooter\Header3.ascx.
+Removed attribute Codebehind from file HeaderFooter\Header3.ascx.
+Access level of 'Page_Load' changed to 'protected' in file HeaderFooter\Header3.ascx.cs (Line 16).
+Removed attribute AutoEventWireup from file LoginHome\HomePage.aspx.
+Removed the id attribute from the <form> tag in file LoginHome\HomePage.aspx.
+Removed attribute Codebehind from file LoginHome\HomePage.aspx.
+Access level of 'Page_Load' changed to 'protected' in file LoginHome\HomePage.aspx.cs (Line 41).
+Removed attribute AutoEventWireup from file LoginHome\login.aspx.
+Removed attribute Codebehind from file LoginHome\login.aspx.
+Access level of 'Page_Load' changed to 'protected' in file LoginHome\login.aspx.cs (Line 43).
+Removed attribute AutoEventWireup from file Module\Accounts\Ledger.aspx.
+Removed attribute Codebehind from file Module\Accounts\Ledger.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Accounts\Ledger.aspx.cs (Line 56).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Accounts\Ledger.aspx.cs (Line 297).
+Access level of 'btnEdit1_Click' changed to 'protected' in file Module\Accounts\Ledger.aspx.cs (Line 473).
+Access level of 'dropLedgerName_SelectedIndexChanged' changed to 'protected' in file Module\Accounts\Ledger.aspx.cs (Line 509).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Accounts\Ledger.aspx.cs (Line 598).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Accounts\Ledger.aspx.cs (Line 754).
+Removed attribute AutoEventWireup from file Module\Accounts\Payment.aspx.
+Removed attribute Codebehind from file Module\Accounts\Payment.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 50).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 187).
+Access level of 'btnEdit1_Click' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 469).
+Access level of 'DropLedgerName1_SelectedIndexChanged' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 502).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 590).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 720).
+Access level of 'DropBy_SelectedIndexChanged' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 767).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Accounts\Payment.aspx.cs (Line 785).
+Removed attribute AutoEventWireup from file Module\Accounts\Taxentry_Master.aspx.
+Removed attribute Codebehind from file Module\Accounts\Taxentry_Master.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Accounts\Taxentry_Master.aspx.cs (Line 44).
+Access level of 'Button2_Click' changed to 'protected' in file Module\Accounts\Taxentry_Master.aspx.cs (Line 130).
+Access level of 'drp_pname_SelectedIndexChanged' changed to 'protected' in file Module\Accounts\Taxentry_Master.aspx.cs (Line 214).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Accounts\Taxentry_Master.aspx.cs (Line 332).
+Access level of 'Button3_Click' changed to 'protected' in file Module\Accounts\Taxentry_Master.aspx.cs (Line 422).
+Removed attribute AutoEventWireup from file Module\Accounts\voucher.aspx.
+Removed attribute Codebehind from file Module\Accounts\voucher.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 52).
+Access level of 'Dropdownlist10_SelectedIndexChanged' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 524).
+Access level of 'btnAdd_Click' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 534).
+Access level of 'btnEdit1_Click' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 928).
+Access level of 'DropDownID_SelectedIndexChanged' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 964).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 1137).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 1235).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 1272).
+Access level of 'DropVoucherName_SelectedIndexChanged' changed to 'protected' in file Module\Accounts\voucher.aspx.cs (Line 1293).
+Removed attribute AutoEventWireup from file Module\Admin\BackupRestore.aspx.
+Removed attribute Codebehind from file Module\Admin\BackupRestore.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\BackupRestore.aspx.cs (Line 45).
+'Reference' tag with reference to '~/Module/Admin/Privileges.aspx' added to file Module\Admin\BackupRestore.aspx.
+Access level of 'btnBackup_Click' changed to 'protected' in file Module\Admin\BackupRestore.aspx.cs (Line 91).
+Access level of 'btnRestore_Click' changed to 'protected' in file Module\Admin\BackupRestore.aspx.cs (Line 326).
+Removed attribute AutoEventWireup from file Module\Admin\OrganisationDetails.aspx.
+Removed attribute Codebehind from file Module\Admin\OrganisationDetails.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 46).
+'Reference' tag with reference to '~/Module/Admin/Privileges.aspx' added to file Module\Admin\OrganisationDetails.aspx.
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 306).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 461).
+Access level of 'Drop_SelectedIndexChanged' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 580).
+Access level of 'DropDealerShip_SelectedIndexChanged' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 671).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 689).
+Access level of 'txtDealerName_TextChanged' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 694).
+Access level of 'txtdummy_TextChanged' changed to 'protected' in file Module\Admin\OrganisationDetails.aspx.cs (Line 699).
+Removed attribute AutoEventWireup from file Module\Admin\Privileges.aspx.
+Removed attribute Codebehind from file Module\Admin\Privileges.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 43).
+Access level of 'DropUserID_SelectedIndexChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 108).
+Access level of 'btnAllocate_Click' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 263).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 294).
+Access level of 'chkAccount_CheckedChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 365).
+Access level of 'chkEmployee_CheckedChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 394).
+Access level of 'chkMaster_CheckedChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 423).
+Access level of 'chkInventory_CheckedChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 453).
+Access level of 'chkAdmin_CheckedChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 483).
+Access level of 'chkView11_CheckedChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 509).
+Access level of 'checkLogistics_CheckedChanged' changed to 'protected' in file Module\Admin\Privileges.aspx.cs (Line 517).
+Removed attribute AutoEventWireup from file Module\Admin\Roles.aspx.
+Removed attribute Codebehind from file Module\Admin\Roles.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\Roles.aspx.cs (Line 42).
+'Reference' tag with reference to '~/Module/Admin/Privileges.aspx' added to file Module\Admin\Roles.aspx.
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Admin\Roles.aspx.cs (Line 126).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Admin\Roles.aspx.cs (Line 175).
+Access level of 'dropRoleID_SelectedIndexChanged' changed to 'protected' in file Module\Admin\Roles.aspx.cs (Line 206).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Admin\Roles.aspx.cs (Line 235).
+Removed attribute AutoEventWireup from file Module\Admin\User_Profile.aspx.
+Removed attribute Codebehind from file Module\Admin\User_Profile.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\User_Profile.aspx.cs (Line 42).
+'Reference' tag with reference to '~/Module/Admin/Privileges.aspx' added to file Module\Admin\User_Profile.aspx.
+'Reference' tag with reference to '~/Module/Admin/Roles.aspx' added to file Module\Admin\User_Profile.aspx.
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Admin\User_Profile.aspx.cs (Line 153).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Admin\User_Profile.aspx.cs (Line 348).
+Access level of 'dropUserID_SelectedIndexChanged' changed to 'protected' in file Module\Admin\User_Profile.aspx.cs (Line 379).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Admin\User_Profile.aspx.cs (Line 426).
+Removed attribute AutoEventWireup from file Module\Admin\ModuleManagement\customerledgerupdation.aspx.
+Removed attribute Codebehind from file Module\Admin\ModuleManagement\customerledgerupdation.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\ModuleManagement\customerledgerupdation.aspx.cs (Line 31).
+Removed attribute AutoEventWireup from file Module\Admin\ModuleManagement\ModuleManage.aspx.
+Removed attribute Codebehind from file Module\Admin\ModuleManagement\ModuleManage.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\ModuleManagement\ModuleManage.aspx.cs (Line 47).
+'Reference' tag with reference to '~/Module/Admin/Privileges.aspx' added to file Module\Admin\ModuleManagement\ModuleManage.aspx.
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Admin\ModuleManagement\ModuleManage.aspx.cs (Line 92).
+Removed attribute AutoEventWireup from file Module\Admin\ModuleManagement\SetDiscount.aspx.
+Removed attribute Codebehind from file Module\Admin\ModuleManagement\SetDiscount.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\ModuleManagement\SetDiscount.aspx.cs (Line 43).
+'Reference' tag with reference to '~/Module/Admin/Privileges.aspx' added to file Module\Admin\ModuleManagement\SetDiscount.aspx.
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Admin\ModuleManagement\SetDiscount.aspx.cs (Line 139).
+Access level of 'RadSales_CheckedChanged' changed to 'protected' in file Module\Admin\ModuleManagement\SetDiscount.aspx.cs (Line 480).
+Access level of 'RadPurchase_CheckedChanged' changed to 'protected' in file Module\Admin\ModuleManagement\SetDiscount.aspx.cs (Line 539).
+Access level of 'RadModCen_CheckedChanged' changed to 'protected' in file Module\Admin\ModuleManagement\SetDiscount.aspx.cs (Line 596).
+Access level of 'RadSSrInc_CheckedChanged' changed to 'protected' in file Module\Admin\ModuleManagement\SetDiscount.aspx.cs (Line 654).
+Removed attribute AutoEventWireup from file Module\Admin\ModuleManagement\stockledgerupdation.aspx.
+Removed attribute Codebehind from file Module\Admin\ModuleManagement\stockledgerupdation.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Admin\ModuleManagement\stockledgerupdation.aspx.cs (Line 37).
+Removed attribute AutoEventWireup from file Module\Employee\Attandance_Register.aspx.
+Removed attribute Codebehind from file Module\Employee\Attandance_Register.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Attandance_Register.aspx.cs (Line 40).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Employee\Attandance_Register.aspx.cs (Line 91).
+Access level of 'Btnsave_Click' changed to 'protected' in file Module\Employee\Attandance_Register.aspx.cs (Line 97).
+Removed attribute AutoEventWireup from file Module\Employee\Employee_Entry.aspx.
+Removed attribute Codebehind from file Module\Employee\Employee_Entry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Employee_Entry.aspx.cs (Line 53).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Employee\Employee_Entry.aspx.cs (Line 227).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Employee_Entry.aspx.cs (Line 368).
+Access level of 'DropDesig_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Employee_Entry.aspx.cs (Line 401).
+Access level of 'DropVehicleNo_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Employee_Entry.aspx.cs (Line 446).
+Access level of 'txtMName_TextChanged' changed to 'protected' in file Module\Employee\Employee_Entry.aspx.cs (Line 451).
+Removed attribute AutoEventWireup from file Module\Employee\Employee_List.aspx.
+Removed attribute Codebehind from file Module\Employee\Employee_List.aspx.
+Access level of 'btnSearch_Click' changed to 'protected' in file Module\Employee\Employee_List.aspx.cs (Line 63).
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Employee_List.aspx.cs (Line 166).
+Access level of 'GridSearch_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Employee_List.aspx.cs (Line 267).
+Removed attribute AutoEventWireup from file Module\Employee\Employee_Update.aspx.
+Removed attribute Codebehind from file Module\Employee\Employee_Update.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Employee_Update.aspx.cs (Line 42).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Employee\Employee_Update.aspx.cs (Line 301).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Employee_Update.aspx.cs (Line 402).
+Access level of 'txtAddress_TextChanged' changed to 'protected' in file Module\Employee\Employee_Update.aspx.cs (Line 407).
+Access level of 'DropState_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Employee_Update.aspx.cs (Line 411).
+Access level of 'DropDesig_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Employee_Update.aspx.cs (Line 420).
+Removed attribute AutoEventWireup from file Module\Employee\Leave_Assignment.aspx.
+Removed attribute Codebehind from file Module\Employee\Leave_Assignment.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Leave_Assignment.aspx.cs (Line 37).
+Removed attribute AutoEventWireup from file Module\Employee\Leave_Register.aspx.
+Removed the id attribute from the <form> tag in file Module\Employee\Leave_Register.aspx.
+Removed attribute Codebehind from file Module\Employee\Leave_Register.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Leave_Register.aspx.cs (Line 42).
+Access level of 'btnApply_Click' changed to 'protected' in file Module\Employee\Leave_Register.aspx.cs (Line 154).
+Access level of 'txtDateFrom_TextChanged' changed to 'protected' in file Module\Employee\Leave_Register.aspx.cs (Line 215).
+Removed attribute AutoEventWireup from file Module\Employee\Mechanic.aspx.
+Removed attribute Codebehind from file Module\Employee\Mechanic.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Mechanic.aspx.cs (Line 44).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Mechanic.aspx.cs (Line 103).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Employee\Mechanic.aspx.cs (Line 147).
+Removed attribute AutoEventWireup from file Module\Employee\OT_Compensation.aspx.
+Removed attribute Codebehind from file Module\Employee\OT_Compensation.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\OT_Compensation.aspx.cs (Line 43).
+Access level of 'btnApply_Click' changed to 'protected' in file Module\Employee\OT_Compensation.aspx.cs (Line 155).
+Access level of 'txtDateFrom_TextChanged' changed to 'protected' in file Module\Employee\OT_Compensation.aspx.cs (Line 253).
+Removed attribute AutoEventWireup from file Module\Employee\Salary_Statement.aspx.
+Removed attribute Codebehind from file Module\Employee\Salary_Statement.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Employee\Salary_Statement.aspx.cs (Line 44).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Employee\Salary_Statement.aspx.cs (Line 112).
+'Reference' tag with reference to '~/Module/Employee/OT_Compensation.aspx' added to file Module\Employee\Salary_Statement.aspx.
+Access level of 'DropMonth_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Salary_Statement.aspx.cs (Line 692).
+Access level of 'GridMachineReport_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Salary_Statement.aspx.cs (Line 697).
+Access level of 'btnprint_Click' changed to 'protected' in file Module\Employee\Salary_Statement.aspx.cs (Line 707).
+Access level of 'dropyear_SelectedIndexChanged' changed to 'protected' in file Module\Employee\Salary_Statement.aspx.cs (Line 2053).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Employee\Salary_Statement.aspx.cs (Line 2058).
+Removed attribute AutoEventWireup from file Module\help\AboutUs.aspx.
+Removed attribute Codebehind from file Module\help\AboutUs.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\help\AboutUs.aspx.cs (Line 30).
+Removed attribute AutoEventWireup from file Module\help\ContactDetails.aspx.
+Removed attribute Codebehind from file Module\help\ContactDetails.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\help\ContactDetails.aspx.cs (Line 30).
+Removed attribute AutoEventWireup from file Module\help\Help\Help.aspx.
+Removed attribute Codebehind from file Module\help\Help\Help.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\help\Help\Help.aspx.cs (Line 29).
+Removed attribute AutoEventWireup from file Module\Inventory\BatchNo.aspx.
+Removed attribute Codebehind from file Module\Inventory\BatchNo.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\BatchNo.aspx.cs (Line 45).
+Access level of 'btnBatch_Click' changed to 'protected' in file Module\Inventory\BatchNo.aspx.cs (Line 161).
+Removed attribute AutoEventWireup from file Module\Inventory\CashSalesInvoice.aspx.
+Removed attribute Codebehind from file Module\Inventory\CashSalesInvoice.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\CashSalesInvoice.aspx.cs (Line 40).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\CashSalesInvoice.aspx.cs (Line 177).
+Removed attribute AutoEventWireup from file Module\Inventory\Credit_Bill.aspx.
+Removed attribute Codebehind from file Module\Inventory\Credit_Bill.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\Credit_Bill.aspx.cs (Line 43).
+Access level of 'DropCustID_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Credit_Bill.aspx.cs (Line 202).
+Access level of 'txtDateFrom_TextChanged' changed to 'protected' in file Module\Inventory\Credit_Bill.aspx.cs (Line 491).
+Access level of 'printBtn_Click' changed to 'protected' in file Module\Inventory\Credit_Bill.aspx.cs (Line 496).
+Access level of 'GridCreditBill_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Credit_Bill.aspx.cs (Line 545).
+Access level of 'DropVehicleNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Credit_Bill.aspx.cs (Line 549).
+Removed attribute AutoEventWireup from file Module\Inventory\Fleet_OEDiscountEntry.aspx.
+Removed attribute Codebehind from file Module\Inventory\Fleet_OEDiscountEntry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 42).
+Access level of 'DropShiftID_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 187).
+Access level of 'btnIn_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 221).
+Access level of 'buttonout_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 329).
+Access level of 'btnOut_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 364).
+Access level of 'btschid_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 424).
+Access level of 'dropschid_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 466).
+Access level of 'ListEmpAvailable_DoubleClick' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 578).
+Access level of 'btnupdate_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 589).
+Access level of 'Checkfoe_CheckedChanged' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 776).
+Access level of 'btngo_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 818).
+Access level of 'btnback_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 829).
+Access level of 'btnall_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 863).
+Access level of 'btnsave_Click' changed to 'protected' in file Module\Inventory\Fleet_OEDiscountEntry.aspx.cs (Line 906).
+Removed attribute AutoEventWireup from file Module\Inventory\groupchild.aspx.
+Removed attribute Codebehind from file Module\Inventory\groupchild.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\groupchild.aspx.cs (Line 26).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Inventory\groupchild.aspx.cs (Line 88).
+Removed attribute AutoEventWireup from file Module\Inventory\LY_PS_SALES.aspx.
+Removed attribute Codebehind from file Module\Inventory\LY_PS_SALES.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\LY_PS_SALES.aspx.cs (Line 50).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Inventory\LY_PS_SALES.aspx.cs (Line 260).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Inventory\LY_PS_SALES.aspx.cs (Line 296).
+Removed attribute AutoEventWireup from file Module\Inventory\ModvatCenvatInvoice.aspx.
+Removed attribute Codebehind from file Module\Inventory\ModvatCenvatInvoice.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\ModvatCenvatInvoice.aspx.cs (Line 96).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Inventory\ModvatCenvatInvoice.aspx.cs (Line 851).
+Access level of 'dropInvoiceNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\ModvatCenvatInvoice.aspx.cs (Line 881).
+Removed attribute AutoEventWireup from file Module\Inventory\OrderCollection.aspx.
+Removed attribute Codebehind from file Module\Inventory\OrderCollection.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\OrderCollection.aspx.cs (Line 96).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\OrderCollection.aspx.cs (Line 541).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Inventory\OrderCollection.aspx.cs (Line 1504).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Inventory\OrderCollection.aspx.cs (Line 2088).
+Access level of 'dropInvoiceNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\OrderCollection.aspx.cs (Line 2117).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Inventory\OrderCollection.aspx.cs (Line 2446).
+Removed attribute AutoEventWireup from file Module\Inventory\Payment_Receipt.aspx.
+Removed attribute Codebehind from file Module\Inventory\Payment_Receipt.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 56).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 925).
+Access level of 'DropMode_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 1504).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 1523).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 1545).
+Access level of 'DropReceiptNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 1593).
+Access level of 'GridDuePayment_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 1893).
+Access level of 'btnDel_Click' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 1904).
+Access level of 'DropCustName_ServerChange' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 1951).
+Access level of 'DropDiscount2_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Payment_Receipt.aspx.cs (Line 2161).
+Removed attribute AutoEventWireup from file Module\Inventory\PerformaInvoice.aspx.
+Removed attribute Codebehind from file Module\Inventory\PerformaInvoice.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\PerformaInvoice.aspx.cs (Line 100).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Inventory\PerformaInvoice.aspx.cs (Line 1380).
+Removed attribute AutoEventWireup from file Module\Inventory\Price_Updation.aspx.
+Removed attribute Codebehind from file Module\Inventory\Price_Updation.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\Price_Updation.aspx.cs (Line 38).
+Removed attribute AutoEventWireup from file Module\Inventory\Product_Entry.aspx.
+Removed attribute Codebehind from file Module\Inventory\Product_Entry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 52).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 393).
+Access level of 'DropPackage_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 960).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 1031).
+Access level of 'dropProdID_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 1076).
+Access level of 'txtPack1_TextChanged' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 1198).
+Access level of 'DropUnit_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 1203).
+Access level of 'DropCategory_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 1208).
+Access level of 'txtBox_TextChanged' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 1213).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Inventory\Product_Entry.aspx.cs (Line 1218).
+Removed attribute AutoEventWireup from file Module\Inventory\PurchaseInvoice.aspx.
+Removed attribute Codebehind from file Module\Inventory\PurchaseInvoice.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 244).
+Access level of 'DropVendorID_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 574).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 925).
+Access level of 'BtnEdit_Click' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 2877).
+Access level of 'DropInvoiceNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 2913).
+Access level of 'txtVehicleNo_TextChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3258).
+Access level of 'DropModeType_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3261).
+Access level of 'Dropdownlist1_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3267).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3276).
+Access level of 'txtfixed_TextChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3290).
+Access level of 'txtentry_TextChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3295).
+Access level of 'txtVAT_TextChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3300).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 3558).
+Access level of 'btnPreview_Click' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 4488).
+Access level of 'txtTotalCashDisc_TextChanged' changed to 'protected' in file Module\Inventory\PurchaseInvoice.aspx.cs (Line 4690).
+Removed attribute AutoEventWireup from file Module\Inventory\PurchaseReturn.aspx.
+Removed attribute Codebehind from file Module\Inventory\PurchaseReturn.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\PurchaseReturn.aspx.cs (Line 48).
+Access level of 'dropInvoiceNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\PurchaseReturn.aspx.cs (Line 155).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\PurchaseReturn.aspx.cs (Line 374).
+Access level of 'CheckAll_ServerChange' changed to 'protected' in file Module\Inventory\PurchaseReturn.aspx.cs (Line 889).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Inventory\PurchaseReturn.aspx.cs (Line 899).
+Removed attribute AutoEventWireup from file Module\Inventory\SalesInvoice.aspx.
+Removed attribute Codebehind from file Module\Inventory\SalesInvoice.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 119).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 1310).
+Access level of 'DropSalesType_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 3781).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 3802).
+Access level of 'dropInvoiceNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 3850).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 7115).
+Access level of 'Yes_CheckedChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 7258).
+Access level of 'No_CheckedChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 7262).
+Access level of 'txtVAT_TextChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 7266).
+Access level of 'DropOrderInvoice_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 8029).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 8444).
+Access level of 'txtfoe1_TextChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 8448).
+Access level of 'DropType11_ServerChange' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 8453).
+Access level of 'txtPromoScheme_TextChanged' changed to 'protected' in file Module\Inventory\SalesInvoice.aspx.cs (Line 8458).
+Removed attribute AutoEventWireup from file Module\Inventory\SalesReturn.aspx.
+Removed attribute Codebehind from file Module\Inventory\SalesReturn.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\SalesReturn.aspx.cs (Line 50).
+Access level of 'dropInvoiceNo_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SalesReturn.aspx.cs (Line 165).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Inventory\SalesReturn.aspx.cs (Line 357).
+Access level of 'Check2_ServerChange' changed to 'protected' in file Module\Inventory\SalesReturn.aspx.cs (Line 1299).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Inventory\SalesReturn.aspx.cs (Line 1308).
+Access level of 'txtProdName1_ServerChange' changed to 'protected' in file Module\Inventory\SalesReturn.aspx.cs (Line 1313).
+Removed attribute AutoEventWireup from file Module\Inventory\SchemeDiscount.aspx.
+Removed attribute Codebehind from file Module\Inventory\SchemeDiscount.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\SchemeDiscount.aspx.cs (Line 23).
+Removed attribute AutoEventWireup from file Module\Inventory\SchemeDiscountentry.aspx.
+Removed attribute Codebehind from file Module\Inventory\SchemeDiscountentry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 52).
+Access level of 'DropShiftID_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 283).
+Access level of 'btnIn_Click' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 335).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 373).
+Access level of 'buttonout_Click' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 601).
+Access level of 'btnOut_Click' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 666).
+Access level of 'btschid_Click' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 727).
+Access level of 'dropschid_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 772).
+Access level of 'ListEmpAvailable_DoubleClick' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 893).
+Access level of 'btnupdate_Click' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 904).
+Access level of 'ListEmpAssigned_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 1217).
+Access level of 'DropType_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\SchemeDiscountentry.aspx.cs (Line 1222).
+Removed attribute AutoEventWireup from file Module\Inventory\ServoStockistDiscountEntry.aspx.
+Removed attribute Codebehind from file Module\Inventory\ServoStockistDiscountEntry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 43).
+Access level of 'btnIn_Click' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 175).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 185).
+Access level of 'btnout_Click' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 335).
+Access level of 'btn1_Click' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 393).
+Access level of 'btnupdate_Click' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 430).
+Access level of 'btschid_Click' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 554).
+Access level of 'dropschid_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\ServoStockistDiscountEntry.aspx.cs (Line 588).
+Removed attribute AutoEventWireup from file Module\Inventory\StockAdjustment.aspx.
+Removed attribute Codebehind from file Module\Inventory\StockAdjustment.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Inventory\StockAdjustment.aspx.cs (Line 52).
+Access level of 'TextBox4_TextChanged' changed to 'protected' in file Module\Inventory\StockAdjustment.aspx.cs (Line 252).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Inventory\StockAdjustment.aspx.cs (Line 261).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Inventory\StockAdjustment.aspx.cs (Line 1260).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Inventory\StockAdjustment.aspx.cs (Line 1270).
+Access level of 'DropSavID_SelectedIndexChanged' changed to 'protected' in file Module\Inventory\StockAdjustment.aspx.cs (Line 1295).
+Removed attribute AutoEventWireup from file Module\Logistics\Routeedit.aspx.
+Removed the id attribute from the <form> tag in file Module\Logistics\Routeedit.aspx.
+Removed attribute Codebehind from file Module\Logistics\Routeedit.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Logistics\Routeedit.aspx.cs (Line 50).
+Access level of 'DropDownList1_SelectedIndexChanged' changed to 'protected' in file Module\Logistics\Routeedit.aspx.cs (Line 170).
+Access level of 'btnsave_Click' changed to 'protected' in file Module\Logistics\Routeedit.aspx.cs (Line 215).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Logistics\Routeedit.aspx.cs (Line 302).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Logistics\Routeedit.aspx.cs (Line 415).
+Access level of 'btnDel_Click' changed to 'protected' in file Module\Logistics\Routeedit.aspx.cs (Line 446).
+Access level of 'txtrkm_TextChanged' changed to 'protected' in file Module\Logistics\Routeedit.aspx.cs (Line 494).
+Removed attribute AutoEventWireup from file Module\Logistics\Vechile_entryform.aspx.
+Removed the id attribute from the <form> tag in file Module\Logistics\Vechile_entryform.aspx.
+Removed attribute Codebehind from file Module\Logistics\Vechile_entryform.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 56).
+'Reference' tag with reference to '~/Module/Logistics/Vehicle.aspx' added to file Module\Logistics\Vechile_entryform.aspx.
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 368).
+Access level of 'DropFuelused_SelectedIndexChanged' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 569).
+Access level of 'Dropgear_SelectedIndexChanged' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 573).
+Access level of 'btnEdit1_Click' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 582).
+Access level of 'DropVehicleID_SelectedIndexChanged' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 615).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 776).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 972).
+Access level of 'DropVechileType2_SelectedIndexChanged' changed to 'protected' in file Module\Logistics\Vechile_entryform.aspx.cs (Line 1006).
+Removed attribute AutoEventWireup from file Module\Logistics\Vehicle.aspx.
+Removed the id attribute from the <form> tag in file Module\Logistics\Vehicle.aspx.
+Removed attribute Codebehind from file Module\Logistics\Vehicle.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Logistics\Vehicle.aspx.cs (Line 47).
+Access level of 'Dropvech_SelectedIndexChanged' changed to 'protected' in file Module\Logistics\Vehicle.aspx.cs (Line 127).
+Access level of 'btneditsave_Click' changed to 'protected' in file Module\Logistics\Vehicle.aspx.cs (Line 159).
+Access level of 'btnaddnew_Click' changed to 'protected' in file Module\Logistics\Vehicle.aspx.cs (Line 204).
+Access level of 'btnDel_Click' changed to 'protected' in file Module\Logistics\Vehicle.aspx.cs (Line 262).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Logistics\Vehicle.aspx.cs (Line 314).
+Removed attribute AutoEventWireup from file Module\Logistics\Vehicle_logbook.aspx.
+Removed the id attribute from the <form> tag in file Module\Logistics\Vehicle_logbook.aspx.
+Removed attribute Codebehind from file Module\Logistics\Vehicle_logbook.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Logistics\Vehicle_logbook.aspx.cs (Line 49).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Logistics\Vehicle_logbook.aspx.cs (Line 327).
+Access level of 'btnEdit1_Click' changed to 'protected' in file Module\Logistics\Vehicle_logbook.aspx.cs (Line 481).
+Access level of 'DropVDLBID_SelectedIndexChanged' changed to 'protected' in file Module\Logistics\Vehicle_logbook.aspx.cs (Line 515).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Logistics\Vehicle_logbook.aspx.cs (Line 655).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Logistics\Vehicle_logbook.aspx.cs (Line 985).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Logistics\Vehicle_logbook.aspx.cs (Line 1025).
+Removed attribute AutoEventWireup from file Module\Master\BeatMaster_Entry.aspx.
+Removed attribute Codebehind from file Module\Master\BeatMaster_Entry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\BeatMaster_Entry.aspx.cs (Line 43).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Master\BeatMaster_Entry.aspx.cs (Line 168).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Master\BeatMaster_Entry.aspx.cs (Line 204).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Master\BeatMaster_Entry.aspx.cs (Line 256).
+Access level of 'DropBeatNo_SelectedIndexChanged' changed to 'protected' in file Module\Master\BeatMaster_Entry.aspx.cs (Line 295).
+Access level of 'Edit1_Click' changed to 'protected' in file Module\Master\BeatMaster_Entry.aspx.cs (Line 340).
+Removed attribute AutoEventWireup from file Module\Master\CustDataMining_PrintPreview.aspx.
+Removed attribute Codebehind from file Module\Master\CustDataMining_PrintPreview.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\CustDataMining_PrintPreview.aspx.cs (Line 29).
+Removed attribute AutoEventWireup from file Module\Master\Customer_Entry.aspx.
+Removed attribute Codebehind from file Module\Master\Customer_Entry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\Customer_Entry.aspx.cs (Line 45).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Master\Customer_Entry.aspx.cs (Line 250).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Master\Customer_Entry.aspx.cs (Line 439).
+Access level of 'txtAddress_TextChanged' changed to 'protected' in file Module\Master\Customer_Entry.aspx.cs (Line 466).
+Access level of 'DropType_SelectedIndexChanged' changed to 'protected' in file Module\Master\Customer_Entry.aspx.cs (Line 470).
+Access level of 'txtFName_TextChanged' changed to 'protected' in file Module\Master\Customer_Entry.aspx.cs (Line 474).
+Removed attribute AutoEventWireup from file Module\Master\Customer_List.aspx.
+Removed attribute Codebehind from file Module\Master\Customer_List.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\Customer_List.aspx.cs (Line 44).
+Access level of 'btnSearch_Click' changed to 'protected' in file Module\Master\Customer_List.aspx.cs (Line 152).
+Access level of 'GridSearch_SelectedIndexChanged' changed to 'protected' in file Module\Master\Customer_List.aspx.cs (Line 290).
+Removed attribute AutoEventWireup from file Module\Master\Customer_Update.aspx.
+Removed attribute Codebehind from file Module\Master\Customer_Update.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\Customer_Update.aspx.cs (Line 46).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Master\Customer_Update.aspx.cs (Line 263).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Master\Customer_Update.aspx.cs (Line 416).
+Access level of 'lblName_TextChanged' changed to 'protected' in file Module\Master\Customer_Update.aspx.cs (Line 567).
+Removed attribute AutoEventWireup from file Module\Master\CustomerMapping.aspx.
+Removed attribute Codebehind from file Module\Master\CustomerMapping.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\CustomerMapping.aspx.cs (Line 44).
+Access level of 'btnIn_Click' changed to 'protected' in file Module\Master\CustomerMapping.aspx.cs (Line 186).
+Access level of 'btnout_Click' changed to 'protected' in file Module\Master\CustomerMapping.aspx.cs (Line 207).
+Access level of 'btn1_Click' changed to 'protected' in file Module\Master\CustomerMapping.aspx.cs (Line 228).
+Access level of 'DropSSRName_SelectedIndexChanged' changed to 'protected' in file Module\Master\CustomerMapping.aspx.cs (Line 267).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Master\CustomerMapping.aspx.cs (Line 293).
+Removed attribute AutoEventWireup from file Module\Master\CustomerMechanicEntry.aspx.
+Removed attribute Codebehind from file Module\Master\CustomerMechanicEntry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\CustomerMechanicEntry.aspx.cs (Line 41).
+Access level of 'btnadd_Click' changed to 'protected' in file Module\Master\CustomerMechanicEntry.aspx.cs (Line 258).
+Access level of 'btnedit_Click' changed to 'protected' in file Module\Master\CustomerMechanicEntry.aspx.cs (Line 566).
+Access level of 'DropID_SelectedIndexChanged' changed to 'protected' in file Module\Master\CustomerMechanicEntry.aspx.cs (Line 992).
+Access level of 'btnselect_Click' changed to 'protected' in file Module\Master\CustomerMechanicEntry.aspx.cs (Line 1193).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Master\CustomerMechanicEntry.aspx.cs (Line 1246).
+Removed attribute AutoEventWireup from file Module\Master\customertype.aspx.
+Removed attribute Codebehind from file Module\Master\customertype.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\customertype.aspx.cs (Line 43).
+Access level of 'btnAdd_Click' changed to 'protected' in file Module\Master\customertype.aspx.cs (Line 253).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Master\customertype.aspx.cs (Line 375).
+Access level of 'dropid_SelectedIndexChanged' changed to 'protected' in file Module\Master\customertype.aspx.cs (Line 521).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Master\customertype.aspx.cs (Line 578).
+Removed attribute AutoEventWireup from file Module\Master\CustomerUpdation.aspx.
+Removed attribute Codebehind from file Module\Master\CustomerUpdation.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\CustomerUpdation.aspx.cs (Line 50).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Master\CustomerUpdation.aspx.cs (Line 190).
+Access level of 'txtview_Click' changed to 'protected' in file Module\Master\CustomerUpdation.aspx.cs (Line 412).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Master\CustomerUpdation.aspx.cs (Line 467).
+Removed attribute AutoEventWireup from file Module\Master\CustomerVehicleEntry.aspx.
+Removed attribute Codebehind from file Module\Master\CustomerVehicleEntry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\CustomerVehicleEntry.aspx.cs (Line 44).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Master\CustomerVehicleEntry.aspx.cs (Line 149).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Master\CustomerVehicleEntry.aspx.cs (Line 205).
+Access level of 'DropID_SelectedIndexChanged' changed to 'protected' in file Module\Master\CustomerVehicleEntry.aspx.cs (Line 231).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Master\CustomerVehicleEntry.aspx.cs (Line 271).
+Access level of 'btnDelete_Click' changed to 'protected' in file Module\Master\CustomerVehicleEntry.aspx.cs (Line 319).
+Removed attribute AutoEventWireup from file Module\Master\MarketCustEntry.aspx.
+Removed attribute Codebehind from file Module\Master\MarketCustEntry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 41).
+Access level of 'btnadd_Click' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 193).
+Access level of 'btnedit_Click' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 308).
+Access level of 'dropid_SelectedIndexChanged' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 382).
+Access level of 'btnselect_Click' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 451).
+Access level of 'btndelete_Click' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 505).
+Access level of 'droptype_SelectedIndexChanged' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 547).
+Access level of 'dropregcust_SelectedIndexChanged' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 552).
+Access level of 'txtdetail_TextChanged' changed to 'protected' in file Module\Master\MarketCustEntry.aspx.cs (Line 557).
+Removed attribute AutoEventWireup from file Module\Master\OilScheme.aspx.
+Removed attribute Codebehind from file Module\Master\OilScheme.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\OilScheme.aspx.cs (Line 28).
+Removed attribute AutoEventWireup from file Module\Master\Prod_Promo_Dis_Entry.aspx.
+Removed attribute Codebehind from file Module\Master\Prod_Promo_Dis_Entry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 41).
+Access level of 'btnIn_Click' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 175).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 185).
+Access level of 'btnout_Click' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 300).
+Access level of 'btn1_Click' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 358).
+Access level of 'btnupdate_Click' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 395).
+Access level of 'btschid_Click' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 512).
+Access level of 'dropschid_SelectedIndexChanged' changed to 'protected' in file Module\Master\Prod_Promo_Dis_Entry.aspx.cs (Line 547).
+Removed attribute AutoEventWireup from file Module\Master\SalespersonAssignment.aspx.
+Removed attribute Codebehind from file Module\Master\SalespersonAssignment.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\SalespersonAssignment.aspx.cs (Line 42).
+Access level of 'btnIn_Click' changed to 'protected' in file Module\Master\SalespersonAssignment.aspx.cs (Line 185).
+Access level of 'btnout_Click' changed to 'protected' in file Module\Master\SalespersonAssignment.aspx.cs (Line 206).
+Access level of 'btn1_Click' changed to 'protected' in file Module\Master\SalespersonAssignment.aspx.cs (Line 227).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Master\SalespersonAssignment.aspx.cs (Line 265).
+Access level of 'DropSSRname_SelectedIndexChanged' changed to 'protected' in file Module\Master\SalespersonAssignment.aspx.cs (Line 321).
+Removed attribute AutoEventWireup from file Module\Master\Supplier_Entry.aspx.
+Removed attribute Codebehind from file Module\Master\Supplier_Entry.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\Supplier_Entry.aspx.cs (Line 44).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Master\Supplier_Entry.aspx.cs (Line 211).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Master\Supplier_Entry.aspx.cs (Line 367).
+Access level of 'txtPhoneOff_TextChanged' changed to 'protected' in file Module\Master\Supplier_Entry.aspx.cs (Line 390).
+Removed attribute AutoEventWireup from file Module\Master\Supplier_List.aspx.
+Removed attribute Codebehind from file Module\Master\Supplier_List.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\Supplier_List.aspx.cs (Line 43).
+Access level of 'btnSearch_Click' changed to 'protected' in file Module\Master\Supplier_List.aspx.cs (Line 188).
+Access level of 'GridSearch_SelectedIndexChanged' changed to 'protected' in file Module\Master\Supplier_List.aspx.cs (Line 279).
+Removed attribute AutoEventWireup from file Module\Master\Supplier_Update.aspx.
+Removed attribute Codebehind from file Module\Master\Supplier_Update.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Master\Supplier_Update.aspx.cs (Line 45).
+Access level of 'btnUpdate_Click' changed to 'protected' in file Module\Master\Supplier_Update.aspx.cs (Line 216).
+Access level of 'DropCity_SelectedIndexChanged' changed to 'protected' in file Module\Master\Supplier_Update.aspx.cs (Line 338).
+Access level of 'DropState_SelectedIndexChanged' changed to 'protected' in file Module\Master\Supplier_Update.aspx.cs (Line 430).
+Removed attribute AutoEventWireup from file Module\Reports\AttendenceReport.aspx.
+Removed attribute Codebehind from file Module\Reports\AttendenceReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\AttendenceReport.aspx.cs (Line 50).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\AttendenceReport.aspx.cs (Line 126).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\AttendenceReport.aspx.cs (Line 171).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\AttendenceReport.aspx.cs (Line 510).
+Removed attribute AutoEventWireup from file Module\Reports\Back_Order_Process.aspx.
+Removed attribute Codebehind from file Module\Reports\Back_Order_Process.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Back_Order_Process.aspx.cs (Line 51).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Back_Order_Process.aspx.cs (Line 137).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\Back_Order_Process.aspx.cs (Line 147).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\Back_Order_Process.aspx.cs (Line 206).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Back_Order_Process.aspx.cs (Line 811).
+Access level of 'btnPrecess_Click' changed to 'protected' in file Module\Reports\Back_Order_Process.aspx.cs (Line 997).
+Removed attribute AutoEventWireup from file Module\Reports\BackOrder_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\BackOrder_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\BackOrder_Report.aspx.cs (Line 52).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\BackOrder_Report.aspx.cs (Line 136).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\BackOrder_Report.aspx.cs (Line 146).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\BackOrder_Report.aspx.cs (Line 261).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\BackOrder_Report.aspx.cs (Line 419).
+Removed attribute AutoEventWireup from file Module\Reports\BalanceSheet.aspx.
+Removed attribute Codebehind from file Module\Reports\BalanceSheet.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\BalanceSheet.aspx.cs (Line 49).
+Access level of 'Textbox1_TextChanged' changed to 'protected' in file Module\Reports\BalanceSheet.aspx.cs (Line 111).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\BalanceSheet.aspx.cs (Line 174).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\BalanceSheet.aspx.cs (Line 362).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\BalanceSheet.aspx.cs (Line 839).
+Removed attribute AutoEventWireup from file Module\Reports\BankReconcillation.aspx.
+Removed attribute Codebehind from file Module\Reports\BankReconcillation.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\BankReconcillation.aspx.cs (Line 49).
+Unable to convert event handler btnView_Click in file Module\Reports\BankReconcillation.aspx.
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\BankReconcillation.aspx.cs (Line 130).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\BankReconcillation.aspx.cs (Line 299).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\BankReconcillation.aspx.cs (Line 481).
+Removed attribute AutoEventWireup from file Module\Reports\BatchWiseStock.aspx.
+Removed attribute Codebehind from file Module\Reports\BatchWiseStock.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\BatchWiseStock.aspx.cs (Line 47).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\BatchWiseStock.aspx.cs (Line 352).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\BatchWiseStock.aspx.cs (Line 1448).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\BatchWiseStock.aspx.cs (Line 1544).
+Removed attribute AutoEventWireup from file Module\Reports\batchWiseStockLedger.aspx.
+Removed attribute Codebehind from file Module\Reports\batchWiseStockLedger.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\batchWiseStockLedger.aspx.cs (Line 48).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\batchWiseStockLedger.aspx.cs (Line 129).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\batchWiseStockLedger.aspx.cs (Line 488).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\batchWiseStockLedger.aspx.cs (Line 881).
+Removed attribute AutoEventWireup from file Module\Reports\ChildWinCAS.aspx.
+Removed attribute Codebehind from file Module\Reports\ChildWinCAS.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\ChildWinCAS.aspx.cs (Line 26).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Reports\ChildWinCAS.aspx.cs (Line 67).
+Removed attribute AutoEventWireup from file Module\Reports\ClaimAnalysis.aspx.
+Removed attribute Codebehind from file Module\Reports\ClaimAnalysis.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\ClaimAnalysis.aspx.cs (Line 46).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\ClaimAnalysis.aspx.cs (Line 112).
+Access level of 'prnButton_Click' changed to 'protected' in file Module\Reports\ClaimAnalysis.aspx.cs (Line 122).
+'Reference' tag with reference to '~/HeaderFooter/Header.ascx' added to file Module\Reports\ClaimAnalysis.aspx.
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\ClaimAnalysis.aspx.cs (Line 629).
+Removed attribute AutoEventWireup from file Module\Reports\Claimsheet.aspx.
+Removed attribute Codebehind from file Module\Reports\Claimsheet.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Claimsheet.aspx.cs (Line 47).
+Access level of 'prnButton_Click' changed to 'protected' in file Module\Reports\Claimsheet.aspx.cs (Line 541).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\Claimsheet.aspx.cs (Line 814).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Claimsheet.aspx.cs (Line 1760).
+Removed attribute AutoEventWireup from file Module\Reports\CreditPeriodAnalysisSheetReport.aspx.
+Removed attribute Codebehind from file Module\Reports\CreditPeriodAnalysisSheetReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\CreditPeriodAnalysisSheetReport.aspx.cs (Line 48).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\CreditPeriodAnalysisSheetReport.aspx.cs (Line 190).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\CreditPeriodAnalysisSheetReport.aspx.cs (Line 230).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\CreditPeriodAnalysisSheetReport.aspx.cs (Line 276).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\CreditPeriodAnalysisSheetReport.aspx.cs (Line 927).
+Removed attribute AutoEventWireup from file Module\Reports\Customer_Bill_Ageing.aspx.
+Removed attribute Codebehind from file Module\Reports\Customer_Bill_Ageing.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Customer_Bill_Ageing.aspx.cs (Line 50).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\Customer_Bill_Ageing.aspx.cs (Line 898).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\Customer_Bill_Ageing.aspx.cs (Line 935).
+Access level of 'InterestText_TextChanged' changed to 'protected' in file Module\Reports\Customer_Bill_Ageing.aspx.cs (Line 1011).
+Access level of 'Update1_Click' changed to 'protected' in file Module\Reports\Customer_Bill_Ageing.aspx.cs (Line 1021).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Customer_Bill_Ageing.aspx.cs (Line 1064).
+Access level of 'DropSearch_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Customer_Bill_Ageing.aspx.cs (Line 1268).
+Removed attribute AutoEventWireup from file Module\Reports\CustomerDataMining.aspx.
+Removed attribute Codebehind from file Module\Reports\CustomerDataMining.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\CustomerDataMining.aspx.cs (Line 49).
+Access level of 'txtview_Click' changed to 'protected' in file Module\Reports\CustomerDataMining.aspx.cs (Line 266).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\CustomerDataMining.aspx.cs (Line 287).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\CustomerDataMining.aspx.cs (Line 607).
+Removed attribute AutoEventWireup from file Module\Reports\CustomerWiseOutstanding.aspx.
+Removed attribute Codebehind from file Module\Reports\CustomerWiseOutstanding.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\CustomerWiseOutstanding.aspx.cs (Line 51).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\CustomerWiseOutstanding.aspx.cs (Line 1464).
+Access level of 'grdLeg_SelectedIndexChanged' changed to 'protected' in file Module\Reports\CustomerWiseOutstanding.aspx.cs (Line 1686).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\CustomerWiseOutstanding.aspx.cs (Line 1698).
+Access level of 'Datagrid2_SelectedIndexChanged' changed to 'protected' in file Module\Reports\CustomerWiseOutstanding.aspx.cs (Line 1765).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\CustomerWiseOutstanding.aspx.cs (Line 1779).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\CustomerWiseOutstanding.aspx.cs (Line 1802).
+Removed attribute AutoEventWireup from file Module\Reports\CustomerwiseSalesReport.aspx.
+Removed attribute Codebehind from file Module\Reports\CustomerwiseSalesReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\CustomerwiseSalesReport.aspx.cs (Line 49).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\CustomerwiseSalesReport.aspx.cs (Line 336).
+Access level of 'GridReport_SelectedIndexChanged' changed to 'protected' in file Module\Reports\CustomerwiseSalesReport.aspx.cs (Line 678).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\CustomerwiseSalesReport.aspx.cs (Line 686).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\CustomerwiseSalesReport.aspx.cs (Line 758).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\CustomerwiseSalesReport.aspx.cs (Line 965).
+Removed attribute AutoEventWireup from file Module\Reports\DayBookReport.aspx.
+Removed attribute Codebehind from file Module\Reports\DayBookReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\DayBookReport.aspx.cs (Line 48).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\DayBookReport.aspx.cs (Line 291).
+Access level of 'Btnprint_Click' changed to 'protected' in file Module\Reports\DayBookReport.aspx.cs (Line 400).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\DayBookReport.aspx.cs (Line 558).
+Removed attribute AutoEventWireup from file Module\Reports\DistrictWiseChannelSales.aspx.
+Removed attribute Codebehind from file Module\Reports\DistrictWiseChannelSales.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\DistrictWiseChannelSales.aspx.cs (Line 46).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\DistrictWiseChannelSales.aspx.cs (Line 115).
+'Reference' tag with reference to '~/HeaderFooter/Header.ascx' added to file Module\Reports\DistrictWiseChannelSales.aspx.
+'Reference' tag with reference to '~/HeaderFooter/Header1.ascx' added to file Module\Reports\DistrictWiseChannelSales.aspx.
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\DistrictWiseChannelSales.aspx.cs (Line 452).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\DistrictWiseChannelSales.aspx.cs (Line 620).
+Removed attribute AutoEventWireup from file Module\Reports\districtWiseReport.aspx.
+Removed attribute Codebehind from file Module\Reports\districtWiseReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\districtWiseReport.aspx.cs (Line 45).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\districtWiseReport.aspx.cs (Line 1817).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\districtWiseReport.aspx.cs (Line 1888).
+Removed attribute AutoEventWireup from file Module\Reports\DocumentCancelReport.aspx.
+Removed attribute Codebehind from file Module\Reports\DocumentCancelReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\DocumentCancelReport.aspx.cs (Line 51).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\DocumentCancelReport.aspx.cs (Line 121).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\DocumentCancelReport.aspx.cs (Line 280).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\DocumentCancelReport.aspx.cs (Line 658).
+Removed attribute AutoEventWireup from file Module\Reports\Expences_Details.aspx.
+Removed attribute Codebehind from file Module\Reports\Expences_Details.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Expences_Details.aspx.cs (Line 58).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\Expences_Details.aspx.cs (Line 145).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Expences_Details.aspx.cs (Line 440).
+Removed attribute AutoEventWireup from file Module\Reports\FleetOeDiscountReport.aspx.
+Removed attribute Codebehind from file Module\Reports\FleetOeDiscountReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\FleetOeDiscountReport.aspx.cs (Line 49).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\FleetOeDiscountReport.aspx.cs (Line 387).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\FleetOeDiscountReport.aspx.cs (Line 1724).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\FleetOeDiscountReport.aspx.cs (Line 1797).
+Removed attribute AutoEventWireup from file Module\Reports\FOC_Management_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\FOC_Management_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\FOC_Management_Report.aspx.cs (Line 41).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\FOC_Management_Report.aspx.cs (Line 661).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\FOC_Management_Report.aspx.cs (Line 677).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\FOC_Management_Report.aspx.cs (Line 1096).
+Removed attribute AutoEventWireup from file Module\Reports\FourTZoom_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\FourTZoom_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\FourTZoom_Report.aspx.cs (Line 65).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\FourTZoom_Report.aspx.cs (Line 437).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\FourTZoom_Report.aspx.cs (Line 1032).
+Removed attribute AutoEventWireup from file Module\Reports\Hash.aspx.
+Removed attribute Codebehind from file Module\Reports\Hash.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Hash.aspx.cs (Line 28).
+Removed attribute AutoEventWireup from file Module\Reports\HSD_Customer_Sale.aspx.
+Removed attribute Codebehind from file Module\Reports\HSD_Customer_Sale.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\HSD_Customer_Sale.aspx.cs (Line 61).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\HSD_Customer_Sale.aspx.cs (Line 306).
+Access level of 'btnEdit_Click' changed to 'protected' in file Module\Reports\HSD_Customer_Sale.aspx.cs (Line 319).
+Access level of 'dropName_SelectedIndexChanged' changed to 'protected' in file Module\Reports\HSD_Customer_Sale.aspx.cs (Line 342).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Reports\HSD_Customer_Sale.aspx.cs (Line 365).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\HSD_Customer_Sale.aspx.cs (Line 535).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\HSD_Customer_Sale.aspx.cs (Line 600).
+Removed attribute AutoEventWireup from file Module\Reports\HSD_MS_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\HSD_MS_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\HSD_MS_Report.aspx.cs (Line 52).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\HSD_MS_Report.aspx.cs (Line 136).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\HSD_MS_Report.aspx.cs (Line 146).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\HSD_MS_Report.aspx.cs (Line 262).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\HSD_MS_Report.aspx.cs (Line 357).
+Removed attribute AutoEventWireup from file Module\Reports\LeaveReport.aspx.
+Removed attribute Codebehind from file Module\Reports\LeaveReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\LeaveReport.aspx.cs (Line 50).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\LeaveReport.aspx.cs (Line 118).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\LeaveReport.aspx.cs (Line 234).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\LeaveReport.aspx.cs (Line 401).
+Removed attribute AutoEventWireup from file Module\Reports\LedgerReport.aspx.
+Removed attribute Codebehind from file Module\Reports\LedgerReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\LedgerReport.aspx.cs (Line 55).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\LedgerReport.aspx.cs (Line 1006).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\LedgerReport.aspx.cs (Line 1030).
+Access level of 'txtDateFrom_TextChanged' changed to 'protected' in file Module\Reports\LedgerReport.aspx.cs (Line 1464).
+Access level of 'txtDateTo_TextChanged' changed to 'protected' in file Module\Reports\LedgerReport.aspx.cs (Line 1469).
+Access level of 'Datagrid1_SelectedIndexChanged' changed to 'protected' in file Module\Reports\LedgerReport.aspx.cs (Line 1474).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\LedgerReport.aspx.cs (Line 1487).
+Removed attribute AutoEventWireup from file Module\Reports\LubeIndent.aspx.
+Removed attribute Codebehind from file Module\Reports\LubeIndent.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\LubeIndent.aspx.cs (Line 49).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\LubeIndent.aspx.cs (Line 329).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\LubeIndent.aspx.cs (Line 394).
+Removed attribute AutoEventWireup from file Module\Reports\LY_PS_SalesReport.aspx.
+Removed attribute Codebehind from file Module\Reports\LY_PS_SalesReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\LY_PS_SalesReport.aspx.cs (Line 47).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\LY_PS_SalesReport.aspx.cs (Line 645).
+Removed attribute AutoEventWireup from file Module\Reports\Marketpotentialreport.aspx.
+Removed attribute Codebehind from file Module\Reports\Marketpotentialreport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Marketpotentialreport.aspx.cs (Line 43).
+Access level of 'btnview_Click' changed to 'protected' in file Module\Reports\Marketpotentialreport.aspx.cs (Line 177).
+Access level of 'btnprint_Click' changed to 'protected' in file Module\Reports\Marketpotentialreport.aspx.cs (Line 350).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Marketpotentialreport.aspx.cs (Line 421).
+Removed attribute AutoEventWireup from file Module\Reports\MechanicReport.aspx.
+Removed attribute Codebehind from file Module\Reports\MechanicReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\MechanicReport.aspx.cs (Line 44).
+Access level of 'btnview_Click' changed to 'protected' in file Module\Reports\MechanicReport.aspx.cs (Line 177).
+Access level of 'btnprint_Click' changed to 'protected' in file Module\Reports\MechanicReport.aspx.cs (Line 335).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\MechanicReport.aspx.cs (Line 407).
+Removed attribute AutoEventWireup from file Module\Reports\MonthlyClaimLatter.aspx.
+Removed attribute Codebehind from file Module\Reports\MonthlyClaimLatter.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\MonthlyClaimLatter.aspx.cs (Line 47).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\MonthlyClaimLatter.aspx.cs (Line 143).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\MonthlyClaimLatter.aspx.cs (Line 507).
+Access level of 'LinkButton1_Click' changed to 'protected' in file Module\Reports\MonthlyClaimLatter.aspx.cs (Line 924).
+Access level of 'btnLinkSave_Click' changed to 'protected' in file Module\Reports\MonthlyClaimLatter.aspx.cs (Line 999).
+Access level of 'btnLinkPrintText_Click' changed to 'protected' in file Module\Reports\MonthlyClaimLatter.aspx.cs (Line 1036).
+Removed attribute AutoEventWireup from file Module\Reports\Monwiseprodsal.aspx.
+Removed attribute Codebehind from file Module\Reports\Monwiseprodsal.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Monwiseprodsal.aspx.cs (Line 159).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\Monwiseprodsal.aspx.cs (Line 260).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Monwiseprodsal.aspx.cs (Line 3999).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Monwiseprodsal.aspx.cs (Line 4066).
+Removed attribute AutoEventWireup from file Module\Reports\NillSellingRO_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\NillSellingRO_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\NillSellingRO_Report.aspx.cs (Line 46).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\NillSellingRO_Report.aspx.cs (Line 2398).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\NillSellingRO_Report.aspx.cs (Line 2472).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\NillSellingRO_Report.aspx.cs (Line 2488).
+Removed attribute AutoEventWireup from file Module\Reports\PartyWiseSalesFigure.aspx.
+Removed attribute Codebehind from file Module\Reports\PartyWiseSalesFigure.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PartyWiseSalesFigure.aspx.cs (Line 52).
+Access level of 'btnview_Click' changed to 'protected' in file Module\Reports\PartyWiseSalesFigure.aspx.cs (Line 120).
+Access level of 'btnprint_Click' changed to 'protected' in file Module\Reports\PartyWiseSalesFigure.aspx.cs (Line 726).
+Access level of 'DropSelectOption_SelectedIndexChanged' changed to 'protected' in file Module\Reports\PartyWiseSalesFigure.aspx.cs (Line 2082).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PartyWiseSalesFigure.aspx.cs (Line 2115).
+Removed attribute AutoEventWireup from file Module\Reports\PriceCalculation.aspx.
+Removed attribute Codebehind from file Module\Reports\PriceCalculation.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PriceCalculation.aspx.cs (Line 47).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\PriceCalculation.aspx.cs (Line 135).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\PriceCalculation.aspx.cs (Line 706).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PriceCalculation.aspx.cs (Line 1423).
+Removed attribute AutoEventWireup from file Module\Reports\PriceList.aspx.
+Removed attribute Codebehind from file Module\Reports\PriceList.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PriceList.aspx.cs (Line 60).
+Access level of 'Btnprint_Click' changed to 'protected' in file Module\Reports\PriceList.aspx.cs (Line 725).
+Access level of 'Button1_Click' changed to 'protected' in file Module\Reports\PriceList.aspx.cs (Line 1078).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PriceList.aspx.cs (Line 1156).
+Access level of 'DropSearch_SelectedIndexChanged' changed to 'protected' in file Module\Reports\PriceList.aspx.cs (Line 1209).
+Removed attribute AutoEventWireup from file Module\Reports\PrimarySecSalesAnalysis.aspx.
+Removed attribute Codebehind from file Module\Reports\PrimarySecSalesAnalysis.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PrimarySecSalesAnalysis.aspx.cs (Line 36).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\PrimarySecSalesAnalysis.aspx.cs (Line 104).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\PrimarySecSalesAnalysis.aspx.cs (Line 355).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PrimarySecSalesAnalysis.aspx.cs (Line 591).
+Removed attribute AutoEventWireup from file Module\Reports\PrimSecDiscount.aspx.
+Removed attribute Codebehind from file Module\Reports\PrimSecDiscount.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PrimSecDiscount.aspx.cs (Line 35).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\PrimSecDiscount.aspx.cs (Line 176).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\PrimSecDiscount.aspx.cs (Line 590).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PrimSecDiscount.aspx.cs (Line 661).
+Removed attribute AutoEventWireup from file Module\Reports\Prod_Promo_Dis_Claim_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\Prod_Promo_Dis_Claim_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Prod_Promo_Dis_Claim_Report.aspx.cs (Line 33).
+Access level of 'btnview_Click' changed to 'protected' in file Module\Reports\Prod_Promo_Dis_Claim_Report.aspx.cs (Line 110).
+Access level of 'btnprint_Click' changed to 'protected' in file Module\Reports\Prod_Promo_Dis_Claim_Report.aspx.cs (Line 129).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Prod_Promo_Dis_Claim_Report.aspx.cs (Line 262).
+Removed attribute AutoEventWireup from file Module\Reports\ProductReport.aspx.
+Removed attribute Codebehind from file Module\Reports\ProductReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\ProductReport.aspx.cs (Line 35).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\ProductReport.aspx.cs (Line 105).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\ProductReport.aspx.cs (Line 337).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\ProductReport.aspx.cs (Line 571).
+Removed attribute AutoEventWireup from file Module\Reports\ProductWiseSales.aspx.
+Removed attribute Codebehind from file Module\Reports\ProductWiseSales.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\ProductWiseSales.aspx.cs (Line 48).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\ProductWiseSales.aspx.cs (Line 1590).
+Access level of 'grdLeg_SelectedIndexChanged' changed to 'protected' in file Module\Reports\ProductWiseSales.aspx.cs (Line 1650).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\ProductWiseSales.aspx.cs (Line 1660).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\ProductWiseSales.aspx.cs (Line 1722).
+Removed attribute AutoEventWireup from file Module\Reports\ProfitAnalysis1.aspx.
+Removed attribute Codebehind from file Module\Reports\ProfitAnalysis1.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\ProfitAnalysis1.aspx.cs (Line 49).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\ProfitAnalysis1.aspx.cs (Line 282).
+Access level of 'prnButton_Click' changed to 'protected' in file Module\Reports\ProfitAnalysis1.aspx.cs (Line 460).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\ProfitAnalysis1.aspx.cs (Line 531).
+Removed attribute AutoEventWireup from file Module\Reports\ProposedLubeIndent.aspx.
+Removed attribute Codebehind from file Module\Reports\ProposedLubeIndent.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\ProposedLubeIndent.aspx.cs (Line 55).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\ProposedLubeIndent.aspx.cs (Line 178).
+Access level of 'DropMonth_SelectedIndexChanged' changed to 'protected' in file Module\Reports\ProposedLubeIndent.aspx.cs (Line 239).
+Removed attribute AutoEventWireup from file Module\Reports\PurchaseBook.aspx.
+Removed attribute Codebehind from file Module\Reports\PurchaseBook.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PurchaseBook.aspx.cs (Line 49).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\PurchaseBook.aspx.cs (Line 396).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\PurchaseBook.aspx.cs (Line 1142).
+Access level of 'GridReport_SelectedIndexChanged' changed to 'protected' in file Module\Reports\PurchaseBook.aspx.cs (Line 1209).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PurchaseBook.aspx.cs (Line 1216).
+Removed attribute AutoEventWireup from file Module\Reports\PurchaseBook_PrintPreview.aspx.
+Removed attribute Codebehind from file Module\Reports\PurchaseBook_PrintPreview.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PurchaseBook_PrintPreview.aspx.cs (Line 30).
+Removed attribute AutoEventWireup from file Module\Reports\PurchaseListIOCL.aspx.
+Removed attribute Codebehind from file Module\Reports\PurchaseListIOCL.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PurchaseListIOCL.aspx.cs (Line 59).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\PurchaseListIOCL.aspx.cs (Line 415).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\PurchaseListIOCL.aspx.cs (Line 1310).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PurchaseListIOCL.aspx.cs (Line 1383).
+Removed attribute AutoEventWireup from file Module\Reports\PWSDCReport.aspx.
+Removed attribute Codebehind from file Module\Reports\PWSDCReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\PWSDCReport.aspx.cs (Line 68).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\PWSDCReport.aspx.cs (Line 181).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\PWSDCReport.aspx.cs (Line 673).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\PWSDCReport.aspx.cs (Line 876).
+Removed attribute AutoEventWireup from file Module\Reports\Quaterly_Targets.aspx.
+Removed attribute Codebehind from file Module\Reports\Quaterly_Targets.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Quaterly_Targets.aspx.cs (Line 66).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\Quaterly_Targets.aspx.cs (Line 153).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Quaterly_Targets.aspx.cs (Line 769).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Quaterly_Targets.aspx.cs (Line 975).
+Removed attribute AutoEventWireup from file Module\Reports\Return_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\Return_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Return_Report.aspx.cs (Line 67).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\Return_Report.aspx.cs (Line 644).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\Return_Report.aspx.cs (Line 789).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Return_Report.aspx.cs (Line 1157).
+Removed attribute AutoEventWireup from file Module\Reports\Reward_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\Reward_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Reward_Report.aspx.cs (Line 72).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\Reward_Report.aspx.cs (Line 254).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\Reward_Report.aspx.cs (Line 1454).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Reward_Report.aspx.cs (Line 1529).
+Removed attribute AutoEventWireup from file Module\Reports\SadbhavnaSchemeMonthWise.aspx.
+Removed attribute Codebehind from file Module\Reports\SadbhavnaSchemeMonthWise.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SadbhavnaSchemeMonthWise.aspx.cs (Line 51).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\SadbhavnaSchemeMonthWise.aspx.cs (Line 604).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\SadbhavnaSchemeMonthWise.aspx.cs (Line 631).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SadbhavnaSchemeMonthWise.aspx.cs (Line 701).
+Removed attribute AutoEventWireup from file Module\Reports\SadbhavnaSchemeYearWise.aspx.
+Removed attribute Codebehind from file Module\Reports\SadbhavnaSchemeYearWise.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SadbhavnaSchemeYearWise.aspx.cs (Line 126).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\SadbhavnaSchemeYearWise.aspx.cs (Line 841).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\SadbhavnaSchemeYearWise.aspx.cs (Line 1875).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SadbhavnaSchemeYearWise.aspx.cs (Line 1950).
+Removed attribute AutoEventWireup from file Module\Reports\SaleBook.aspx.
+Removed attribute Codebehind from file Module\Reports\SaleBook.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SaleBook.aspx.cs (Line 78).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\SaleBook.aspx.cs (Line 993).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\SaleBook.aspx.cs (Line 2964).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SaleBook.aspx.cs (Line 3061).
+Removed attribute AutoEventWireup from file Module\Reports\SalesBook_PrintPreview.aspx.
+Removed attribute Codebehind from file Module\Reports\SalesBook_PrintPreview.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SalesBook_PrintPreview.aspx.cs (Line 32).
+Removed attribute AutoEventWireup from file Module\Reports\Salesreport1.aspx.
+Removed attribute Codebehind from file Module\Reports\Salesreport1.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Salesreport1.aspx.cs (Line 60).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\Salesreport1.aspx.cs (Line 147).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Salesreport1.aspx.cs (Line 474).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Salesreport1.aspx.cs (Line 604).
+Removed attribute AutoEventWireup from file Module\Reports\Schemelist.aspx.
+Removed attribute Codebehind from file Module\Reports\Schemelist.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 44).
+Access level of 'btnview_Click' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 425).
+Access level of 'DataGrid1_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 485).
+Access level of 'btnprint_Click' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 945).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 1023).
+Access level of 'RadBtnScheme_CheckedChanged' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 1105).
+Access level of 'RadBtnReSale_CheckedChanged' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 1124).
+Access level of 'dropsalpur_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Schemelist.aspx.cs (Line 1143).
+Removed attribute AutoEventWireup from file Module\Reports\SchemeSecondrySales.aspx.
+Removed attribute Codebehind from file Module\Reports\SchemeSecondrySales.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SchemeSecondrySales.aspx.cs (Line 46).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\SchemeSecondrySales.aspx.cs (Line 163).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SchemeSecondrySales.aspx.cs (Line 393).
+Removed attribute AutoEventWireup from file Module\Reports\ServoSadbhavnalist.aspx.
+Removed attribute Codebehind from file Module\Reports\ServoSadbhavnalist.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\ServoSadbhavnalist.aspx.cs (Line 56).
+Access level of 'btnview_Click' changed to 'protected' in file Module\Reports\ServoSadbhavnalist.aspx.cs (Line 143).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\ServoSadbhavnalist.aspx.cs (Line 1671).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\ServoSadbhavnalist.aspx.cs (Line 1744).
+Removed attribute AutoEventWireup from file Module\Reports\SpecificPacks.aspx.
+Removed attribute Codebehind from file Module\Reports\SpecificPacks.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SpecificPacks.aspx.cs (Line 26).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Reports\SpecificPacks.aspx.cs (Line 88).
+Removed attribute AutoEventWireup from file Module\Reports\SpecificPacks1.aspx.
+Removed attribute Codebehind from file Module\Reports\SpecificPacks1.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SpecificPacks1.aspx.cs (Line 26).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Reports\SpecificPacks1.aspx.cs (Line 88).
+Removed attribute AutoEventWireup from file Module\Reports\SpecificPacksSales.aspx.
+Removed attribute Codebehind from file Module\Reports\SpecificPacksSales.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SpecificPacksSales.aspx.cs (Line 26).
+Access level of 'btnSubmit_Click' changed to 'protected' in file Module\Reports\SpecificPacksSales.aspx.cs (Line 68).
+Removed attribute AutoEventWireup from file Module\Reports\SRSM_Format_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\SRSM_Format_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SRSM_Format_Report.aspx.cs (Line 180).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\SRSM_Format_Report.aspx.cs (Line 1649).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Reports\SRSM_Format_Report.aspx.cs (Line 1935).
+Access level of 'dropType_SelectedIndexChanged' changed to 'protected' in file Module\Reports\SRSM_Format_Report.aspx.cs (Line 1964).
+Access level of 'btneExcel_Click' changed to 'protected' in file Module\Reports\SRSM_Format_Report.aspx.cs (Line 1999).
+Removed attribute AutoEventWireup from file Module\Reports\SSRIncentiveSheet.aspx.
+Removed attribute Codebehind from file Module\Reports\SSRIncentiveSheet.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SSRIncentiveSheet.aspx.cs (Line 44).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\SSRIncentiveSheet.aspx.cs (Line 321).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\SSRIncentiveSheet.aspx.cs (Line 329).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SSRIncentiveSheet.aspx.cs (Line 491).
+Removed attribute AutoEventWireup from file Module\Reports\SSRPerforma.aspx.
+Removed attribute Codebehind from file Module\Reports\SSRPerforma.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SSRPerforma.aspx.cs (Line 46).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\SSRPerforma.aspx.cs (Line 293).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SSRPerforma.aspx.cs (Line 435).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\SSRPerforma.aspx.cs (Line 510).
+Removed attribute AutoEventWireup from file Module\Reports\SSRWiseSales.aspx.
+Removed attribute Codebehind from file Module\Reports\SSRWiseSales.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SSRWiseSales.aspx.cs (Line 48).
+Access level of 'btnview_Click' changed to 'protected' in file Module\Reports\SSRWiseSales.aspx.cs (Line 381).
+Access level of 'btnprint_Click' changed to 'protected' in file Module\Reports\SSRWiseSales.aspx.cs (Line 625).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SSRWiseSales.aspx.cs (Line 1287).
+Removed attribute AutoEventWireup from file Module\Reports\SSRWiseTargets.aspx.
+Removed attribute Codebehind from file Module\Reports\SSRWiseTargets.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\SSRWiseTargets.aspx.cs (Line 55).
+Access level of 'btnSave_Click' changed to 'protected' in file Module\Reports\SSRWiseTargets.aspx.cs (Line 184).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\SSRWiseTargets.aspx.cs (Line 725).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\SSRWiseTargets.aspx.cs (Line 1384).
+Removed attribute AutoEventWireup from file Module\Reports\StockLedgerReport.aspx.
+Removed attribute Codebehind from file Module\Reports\StockLedgerReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\StockLedgerReport.aspx.cs (Line 47).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\StockLedgerReport.aspx.cs (Line 333).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\StockLedgerReport.aspx.cs (Line 438).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\StockLedgerReport.aspx.cs (Line 841).
+Removed attribute AutoEventWireup from file Module\Reports\StockMovement.aspx.
+Removed attribute Codebehind from file Module\Reports\StockMovement.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\StockMovement.aspx.cs (Line 48).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\StockMovement.aspx.cs (Line 776).
+Access level of 'grdLeg_SelectedIndexChanged' changed to 'protected' in file Module\Reports\StockMovement.aspx.cs (Line 952).
+Access level of 'prnButton_Click' changed to 'protected' in file Module\Reports\StockMovement.aspx.cs (Line 1032).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\StockMovement.aspx.cs (Line 1524).
+Access level of 'RadSJ_CheckedChanged' changed to 'protected' in file Module\Reports\StockMovement.aspx.cs (Line 1622).
+Removed attribute AutoEventWireup from file Module\Reports\StockMovement_Batch.aspx.
+Removed attribute Codebehind from file Module\Reports\StockMovement_Batch.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\StockMovement_Batch.aspx.cs (Line 48).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\StockMovement_Batch.aspx.cs (Line 938).
+Access level of 'prnButton_Click' changed to 'protected' in file Module\Reports\StockMovement_Batch.aspx.cs (Line 1089).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\StockMovement_Batch.aspx.cs (Line 1556).
+Removed attribute AutoEventWireup from file Module\Reports\StockReOrderReport.aspx.
+Removed attribute Codebehind from file Module\Reports\StockReOrderReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\StockReOrderReport.aspx.cs (Line 45).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\StockReOrderReport.aspx.cs (Line 190).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\StockReOrderReport.aspx.cs (Line 210).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\StockReOrderReport.aspx.cs (Line 352).
+Removed attribute AutoEventWireup from file Module\Reports\StockReport.aspx.
+Removed attribute Codebehind from file Module\Reports\StockReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\StockReport.aspx.cs (Line 47).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\StockReport.aspx.cs (Line 385).
+Access level of 'grdLeg_SelectedIndexChanged' changed to 'protected' in file Module\Reports\StockReport.aspx.cs (Line 1167).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\StockReport.aspx.cs (Line 1174).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\StockReport.aspx.cs (Line 1247).
+Access level of 'grdMRP_SelectedIndexChanged' changed to 'protected' in file Module\Reports\StockReport.aspx.cs (Line 1292).
+Removed attribute AutoEventWireup from file Module\Reports\TargetVsAchivement.aspx.
+Removed attribute Codebehind from file Module\Reports\TargetVsAchivement.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\TargetVsAchivement.aspx.cs (Line 48).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\TargetVsAchivement.aspx.cs (Line 113).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\TargetVsAchivement.aspx.cs (Line 338).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\TargetVsAchivement.aspx.cs (Line 406).
+Removed attribute AutoEventWireup from file Module\Reports\TaxReport.aspx.
+Removed attribute Codebehind from file Module\Reports\TaxReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\TaxReport.aspx.cs (Line 45).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\TaxReport.aspx.cs (Line 107).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\TaxReport.aspx.cs (Line 136).
+Removed attribute AutoEventWireup from file Module\Reports\TradingAccount.aspx.
+Removed attribute Codebehind from file Module\Reports\TradingAccount.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\TradingAccount.aspx.cs (Line 47).
+Access level of 'btnShow_Click' changed to 'protected' in file Module\Reports\TradingAccount.aspx.cs (Line 128).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\TradingAccount.aspx.cs (Line 241).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\TradingAccount.aspx.cs (Line 585).
+Removed attribute AutoEventWireup from file Module\Reports\VAT_Report.aspx.
+Removed attribute Codebehind from file Module\Reports\VAT_Report.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\VAT_Report.aspx.cs (Line 61).
+Access level of 'cmdrpt_Click' changed to 'protected' in file Module\Reports\VAT_Report.aspx.cs (Line 778).
+Access level of 'BtnPrint_Click' changed to 'protected' in file Module\Reports\VAT_Report.aspx.cs (Line 909).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\VAT_Report.aspx.cs (Line 1587).
+Access level of 'RadSummarized_CheckedChanged' changed to 'protected' in file Module\Reports\VAT_Report.aspx.cs (Line 1774).
+Access level of 'RadDetails_CheckedChanged' changed to 'protected' in file Module\Reports\VAT_Report.aspx.cs (Line 1782).
+Removed attribute AutoEventWireup from file Module\Reports\VATRDReport.aspx.
+Removed attribute Codebehind from file Module\Reports\VATRDReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\VATRDReport.aspx.cs (Line 68).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\VATRDReport.aspx.cs (Line 181).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\VATRDReport.aspx.cs (Line 672).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\VATRDReport.aspx.cs (Line 875).
+Removed attribute AutoEventWireup from file Module\Reports\VehicleLogReport.aspx.
+Removed attribute Codebehind from file Module\Reports\VehicleLogReport.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\VehicleLogReport.aspx.cs (Line 46).
+Access level of 'grdLog_SelectedIndexChanged' changed to 'protected' in file Module\Reports\VehicleLogReport.aspx.cs (Line 124).
+Access level of 'btnView_Click' changed to 'protected' in file Module\Reports\VehicleLogReport.aspx.cs (Line 206).
+Access level of 'btnPrint_Click' changed to 'protected' in file Module\Reports\VehicleLogReport.aspx.cs (Line 239).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\VehicleLogReport.aspx.cs (Line 509).
+Removed attribute AutoEventWireup from file Module\Reports\Yearly_Targets.aspx.
+Removed attribute Codebehind from file Module\Reports\Yearly_Targets.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Module\Reports\Yearly_Targets.aspx.cs (Line 59).
+Access level of 'btnview1_Click' changed to 'protected' in file Module\Reports\Yearly_Targets.aspx.cs (Line 146).
+Access level of 'btnExcel_Click' changed to 'protected' in file Module\Reports\Yearly_Targets.aspx.cs (Line 490).
+Access level of 'DropSearchBy_SelectedIndexChanged' changed to 'protected' in file Module\Reports\Yearly_Targets.aspx.cs (Line 621).
+Removed attribute AutoEventWireup from file Sysitem\AccessDeny.aspx.
+Removed attribute Codebehind from file Sysitem\AccessDeny.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Sysitem\AccessDeny.aspx.cs (Line 30).
+Removed attribute AutoEventWireup from file Sysitem\Error.aspx.
+Removed attribute Codebehind from file Sysitem\Error.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Sysitem\Error.aspx.cs (Line 29).
+Removed attribute AutoEventWireup from file Sysitem\ErrorPage.aspx.
+Removed attribute Codebehind from file Sysitem\ErrorPage.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Sysitem\ErrorPage.aspx.cs (Line 30).
+Removed attribute Codebehind from file Sysitem\Global.asax.
+Removed attribute AutoEventWireup from file Sysitem\Service.aspx.
+Removed attribute Codebehind from file Sysitem\Service.aspx.
+Access level of 'Page_Load' changed to 'protected' in file Sysitem\Service.aspx.cs (Line 30).
+Added folder App_Code\Sysitem\Classes.
+Moved file Sysitem\Classes\MasterClass.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\EmployeeClass.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\ConfirmBox.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\MessageBox.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\GenUtil.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Global.asax.cs to the App_Code\Sysitem\ directory.
+Moved file Sysitem\AssemblyInfo.cs to the App_Code\Sysitem\ directory.
+Moved file Sysitem\Classes\StringUtil.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\PartiesClass.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\InventoryClass1.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\PetrolPumpClass.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\InventoyCLass.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\CreateLogFiles.cs to the App_Code\Sysitem\Classes\ directory.
+Moved file Sysitem\Classes\DbOperations_LATEST.cs to the App_Code\Sysitem\Classes\ directory.
+Unable to convert user settings because user file C:\Documents and Settings\kunalk\VSWebCache\XP-STG2\Servosms\Servosms.csproj.user was not found.
+Removed file Bin\Servosms.dll.
+Removed file Bin\Servosms.pdb.
+Removed file Servosms.csproj.
+Removed file Servosms.csproj.webinfo.
+Renamed file backup\servosms\module\reports\taxreport.aspx to file taxreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\sadbhavnaschememonthwise.aspx to file sadbhavnaschememonthwise.aspx.exclude.
+Renamed file backup\servosms\module\reports\quaterly_targets.aspx to file quaterly_targets.aspx.exclude.
+Renamed file backup\servosms\module\admin\organisationdetails.aspx to file organisationdetails.aspx.exclude.
+Renamed file backup\servosms\module\reports\ssrwisetargets.aspx to file ssrwisetargets.aspx.exclude.
+Renamed file backup\servosms\module\help\contactdetails.aspx to file contactdetails.aspx.exclude.
+Renamed file backup\servosms\module\master\customertype.aspx to file customertype.aspx.exclude.
+Renamed file backup\servosms\module\reports\specificpacks.aspx to file specificpacks.aspx.exclude.
+Renamed file backup\servosms\module\accounts\taxentry_master.aspx to file taxentry_master.aspx.exclude.
+Renamed file backup\servosms\module\reports\districtwisereport.aspx to file districtwisereport.aspx.exclude.
+Renamed file backup\servosms\module\reports\hsd_customer_sale.aspx to file hsd_customer_sale.aspx.exclude.
+Renamed file backup\servosms\module\admin\modulemanagement\modulemanage.aspx to file modulemanage.aspx.exclude.
+Renamed file backup\servosms\module\inventory\ly_ps_sales.aspx to file ly_ps_sales.aspx.exclude.
+Renamed file backup\servosms\module\admin\modulemanagement\customerledgerupdation.aspx to file customerledgerupdation.aspx.exclude.
+Renamed file backup\servosms\headerfooter\header1.ascx to file header1.ascx.exclude.
+Renamed file backup\servosms\module\master\custdatamining_printpreview.aspx to file custdatamining_printpreview.aspx.exclude.
+Renamed file backup\servosms\module\reports\schemesecondrysales.aspx to file schemesecondrysales.aspx.exclude.
+Renamed file backup\servosms\module\employee\ot_compensation.aspx to file ot_compensation.aspx.exclude.
+Renamed file backup\servosms\module\inventory\batchno.aspx to file batchno.aspx.exclude.
+Renamed file backup\servosms\module\reports\salesbook_printpreview.aspx to file salesbook_printpreview.aspx.exclude.
+Renamed file backup\servosms\sysitem\service.aspx to file service.aspx.exclude.
+Renamed file backup\servosms\module\master\salespersonassignment.aspx to file salespersonassignment.aspx.exclude.
+Renamed file backup\servosms\module\reports\hash.aspx to file hash.aspx.exclude.
+Renamed file backup\servosms\module\accounts\payment.aspx to file payment.aspx.exclude.
+Renamed file backup\servosms\module\master\customermechanicentry.aspx to file customermechanicentry.aspx.exclude.
+Renamed file backup\servosms\module\inventory\salesinvoice.aspx to file salesinvoice.aspx.exclude.
+Renamed file backup\servosms\module\reports\vat_report.aspx to file vat_report.aspx.exclude.
+Renamed file backup\servosms\module\reports\specificpackssales.aspx to file specificpackssales.aspx.exclude.
+Renamed file backup\servosms\module\reports\pwsdcreport.aspx to file pwsdcreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\primsecdiscount.aspx to file primsecdiscount.aspx.exclude.
+Renamed file backup\servosms\module\master\customer_update.aspx to file customer_update.aspx.exclude.
+Renamed file backup\servosms\module\reports\marketpotentialreport.aspx to file marketpotentialreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\claimanalysis.aspx to file claimanalysis.aspx.exclude.
+Renamed file backup\servosms\module\reports\claimsheet.aspx to file claimsheet.aspx.exclude.
+Renamed file backup\servosms\loginhome\login.aspx to file login.aspx.exclude.
+Renamed file backup\servosms\module\inventory\purchaseinvoice.aspx to file purchaseinvoice.aspx.exclude.
+Renamed file backup\servosms\module\reports\stockreorderreport.aspx to file stockreorderreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\targetvsachivement.aspx to file targetvsachivement.aspx.exclude.
+Renamed file backup\servosms\module\reports\backorder_report.aspx to file backorder_report.aspx.exclude.
+Renamed file backup\servosms\module\inventory\purchasereturn.aspx to file purchasereturn.aspx.exclude.
+Renamed file backup\servosms\module\logistics\vechile_entryform.aspx to file vechile_entryform.aspx.exclude.
+Renamed file backup\servosms\module\logistics\vehicle.aspx to file vehicle.aspx.exclude.
+Renamed file backup\servosms\module\reports\documentcancelreport.aspx to file documentcancelreport.aspx.exclude.
+Renamed file backup\servosms\module\master\oilscheme.aspx to file oilscheme.aspx.exclude.
+Renamed file backup\servosms\module\master\supplier_update.aspx to file supplier_update.aspx.exclude.
+Renamed file backup\servosms\module\reports\mechanicreport.aspx to file mechanicreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\balancesheet.aspx to file balancesheet.aspx.exclude.
+Renamed file module\master\customermechentry.aspx to file customermechentry.aspx.exclude.
+Renamed file backup\servosms\module\master\customerupdation.aspx to file customerupdation.aspx.exclude.
+Renamed file backup\servosms\sysitem\accessdeny.aspx to file accessdeny.aspx.exclude.
+Renamed file backup\servosms\module\employee\employee_entry.aspx to file employee_entry.aspx.exclude.
+Renamed file backup\servosms\module\reports\customer_bill_ageing.aspx to file customer_bill_ageing.aspx.exclude.
+Renamed file backup\servosms\module\master\prod_promo_dis_entry.aspx to file prod_promo_dis_entry.aspx.exclude.
+Renamed file backup\servosms\module\reports\reward_report.aspx to file reward_report.aspx.exclude.
+Renamed file backup\servosms\module\reports\lubeindent.aspx to file lubeindent.aspx.exclude.
+Renamed file backup\servosms\headerfooter\header.ascx to file header.ascx.exclude.
+Renamed file backup\servosms\module\reports\stockmovement.aspx to file stockmovement.aspx.exclude.
+Renamed file backup\servosms\module\reports\schemelist.aspx to file schemelist.aspx.exclude.
+Renamed file backup\servosms\module\help\aboutus.aspx to file aboutus.aspx.exclude.
+Renamed file backup\servosms\module\reports\childwincas.aspx to file childwincas.aspx.exclude.
+Renamed file backup\servosms\module\master\customermechentry.aspx to file customermechentry.aspx.exclude.
+Renamed file backup\servosms\headerfooter\header2.ascx to file header2.ascx.exclude.
+Renamed file backup\servosms\module\reports\ledgerreport.aspx to file ledgerreport.aspx.exclude.
+Renamed file backup\servosms\module\employee\salary_statement.aspx to file salary_statement.aspx.exclude.
+Renamed file backup\servosms\module\reports\prod_promo_dis_claim_report.aspx to file prod_promo_dis_claim_report.aspx.exclude.
+Renamed file backup\servosms\module\master\marketcustentry.aspx to file marketcustentry.aspx.exclude.
+Renamed file backup\servosms\module\employee\leave_register.aspx to file leave_register.aspx.exclude.
+Renamed file backup\servosms\module\reports\ly_ps_salesreport.aspx to file ly_ps_salesreport.aspx.exclude.
+Renamed file backup\servosms\module\inventory\performainvoice.aspx to file performainvoice.aspx.exclude.
+Renamed file backup\servosms\module\inventory\ordercollection.aspx to file ordercollection.aspx.exclude.
+Renamed file backup\servosms\module\reports\ssrperforma.aspx to file ssrperforma.aspx.exclude.
+Renamed file backup\servosms\module\master\customermapping.aspx to file customermapping.aspx.exclude.
+Renamed file backup\servosms\module\reports\customerwisesalesreport.aspx to file customerwisesalesreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\yearly_targets.aspx to file yearly_targets.aspx.exclude.
+Renamed file backup\servosms\module\reports\monwiseprodsal.aspx to file monwiseprodsal.aspx.exclude.
+Renamed file backup\servosms\module\inventory\salesreturn.aspx to file salesreturn.aspx.exclude.
+Renamed file backup\servosms\module\reports\proposedlubeindent.aspx to file proposedlubeindent.aspx.exclude.
+Renamed file backup\servosms\module\reports\daybookreport.aspx to file daybookreport.aspx.exclude.
+Renamed file backup\servosms\module\employee\employee_list.aspx to file employee_list.aspx.exclude.
+Renamed file backup\servosms\loginhome\homepage.aspx to file homepage.aspx.exclude.
+Renamed file backup\servosms\module\reports\customerdatamining.aspx to file customerdatamining.aspx.exclude.
+Renamed file backup\servosms\module\reports\monthlyclaimlatter.aspx to file monthlyclaimlatter.aspx.exclude.
+Renamed file backup\servosms\module\reports\stockledgerreport.aspx to file stockledgerreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\profitanalysis1.aspx to file profitanalysis1.aspx.exclude.
+Renamed file backup\servosms\module\inventory\credit_bill.aspx to file credit_bill.aspx.exclude.
+Renamed file backup\servosms\module\reports\batchwisestock.aspx to file batchwisestock.aspx.exclude.
+Renamed file backup\servosms\module\reports\purchasebook.aspx to file purchasebook.aspx.exclude.
+Renamed file backup\servosms\module\reports\back_order_process.aspx to file back_order_process.aspx.exclude.
+Renamed file backup\servosms\module\reports\partywisesalesfigure.aspx to file partywisesalesfigure.aspx.exclude.
+Renamed file backup\servosms\module\reports\foc_management_report.aspx to file foc_management_report.aspx.exclude.
+Renamed file backup\servosms\module\reports\fleetoediscountreport.aspx to file fleetoediscountreport.aspx.exclude.
+Renamed file backup\servosms\module\accounts\voucher.aspx to file voucher.aspx.exclude.
+Renamed file backup\servosms\module\reports\productreport.aspx to file productreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\pricelist.aspx to file pricelist.aspx.exclude.
+Renamed file backup\servosms\module\reports\hsd_ms_report.aspx to file hsd_ms_report.aspx.exclude.
+Renamed file backup\servosms\module\admin\backuprestore.aspx to file backuprestore.aspx.exclude.
+Renamed file backup\servosms\module\inventory\payment_receipt.aspx to file payment_receipt.aspx.exclude.
+Renamed file backup\servosms\module\employee\mechanic.aspx to file mechanic.aspx.exclude.
+Renamed file backup\servosms\module\reports\return_report.aspx to file return_report.aspx.exclude.
+Renamed file backup\servosms\module\reports\districtwisechannelsales.aspx to file districtwisechannelsales.aspx.exclude.
+Renamed file backup\servosms\module\reports\stockreport.aspx to file stockreport.aspx.exclude.
+Renamed file backup\servosms\module\admin\roles.aspx to file roles.aspx.exclude.
+Renamed file backup\servosms\module\reports\leavereport.aspx to file leavereport.aspx.exclude.
+Renamed file backup\servosms\module\logistics\routeedit.aspx to file routeedit.aspx.exclude.
+Renamed file backup\servosms\module\reports\nillsellingro_report.aspx to file nillsellingro_report.aspx.exclude.
+Renamed file backup\servosms\module\admin\user_profile.aspx to file user_profile.aspx.exclude.
+Renamed file backup\servosms\headerfooter\header3.ascx to file header3.ascx.exclude.
+Renamed file backup\servosms\module\employee\leave_assignment.aspx to file leave_assignment.aspx.exclude.
+Renamed file backup\servosms\module\reports\stockmovement_batch.aspx to file stockmovement_batch.aspx.exclude.
+Renamed file backup\servosms\headerfooter\footer.ascx to file footer.ascx.exclude.
+Renamed file backup\servosms\module\logistics\vehicle_logbook.aspx to file vehicle_logbook.aspx.exclude.
+Renamed file backup\servosms\module\reports\ssrwisesales.aspx to file ssrwisesales.aspx.exclude.
+Renamed file backup\servosms\module\reports\salesreport1.aspx to file salesreport1.aspx.exclude.
+Renamed file backup\servosms\sysitem\error.aspx to file error.aspx.exclude.
+Renamed file backup\servosms\module\employee\attandance_register.aspx to file attandance_register.aspx.exclude.
+Renamed file backup\servosms\module\inventory\servostockistdiscountentry.aspx to file servostockistdiscountentry.aspx.exclude.
+Renamed file backup\servosms\module\reports\bankreconcillation.aspx to file bankreconcillation.aspx.exclude.
+Renamed file backup\servosms\sysitem\errorpage.aspx to file errorpage.aspx.exclude.
+Renamed file backup\servosms\module\master\customer_list.aspx to file customer_list.aspx.exclude.
+Renamed file backup\servosms\module\inventory\stockadjustment.aspx to file stockadjustment.aspx.exclude.
+Renamed file backup\servosms\module\master\customervehicleentry.aspx to file customervehicleentry.aspx.exclude.
+Renamed file backup\servosms\module\reports\tradingaccount.aspx to file tradingaccount.aspx.exclude.
+Renamed file backup\servosms\module\master\beatmaster_entry.aspx to file beatmaster_entry.aspx.exclude.
+Renamed file backup\servosms\module\reports\salebook.aspx to file salebook.aspx.exclude.
+Renamed file backup\servosms\module\reports\ssrincentivesheet.aspx to file ssrincentivesheet.aspx.exclude.
+Renamed file backup\servosms\module\master\supplier_list.aspx to file supplier_list.aspx.exclude.
+Renamed file backup\servosms\module\reports\specificpacks1.aspx to file specificpacks1.aspx.exclude.
+Renamed file backup\servosms\module\reports\productwisesales.aspx to file productwisesales.aspx.exclude.
+Renamed file backup\servosms\module\reports\servosadbhavnalist.aspx to file servosadbhavnalist.aspx.exclude.
+Renamed file backup\servosms\module\reports\primarysecsalesanalysis.aspx to file primarysecsalesanalysis.aspx.exclude.
+Renamed file backup\servosms\module\reports\vatrdreport.aspx to file vatrdreport.aspx.exclude.
+Renamed file backup\servosms\module\help\help\help.aspx to file help.aspx.exclude.
+Renamed file backup\servosms\module\reports\fourtzoom_report.aspx to file fourtzoom_report.aspx.exclude.
+Renamed file backup\servosms\module\admin\privileges.aspx to file privileges.aspx.exclude.
+Renamed file backup\servosms\module\reports\creditperiodanalysissheetreport.aspx to file creditperiodanalysissheetreport.aspx.exclude.
+Renamed file backup\servosms\sysitem\global.asax to file global.asax.exclude.
+Renamed file backup\servosms\module\reports\purchaselistiocl.aspx to file purchaselistiocl.aspx.exclude.
+Renamed file backup\servosms\module\employee\employee_update.aspx to file employee_update.aspx.exclude.
+Renamed file backup\servosms\module\reports\sadbhavnaschemeyearwise.aspx to file sadbhavnaschemeyearwise.aspx.exclude.
+Renamed file backup\servosms\module\reports\purchasebook_printpreview.aspx to file purchasebook_printpreview.aspx.exclude.
+Renamed file backup\servosms\module\reports\customerwiseoutstanding.aspx to file customerwiseoutstanding.aspx.exclude.
+Renamed file backup\servosms\module\inventory\product_entry.aspx to file product_entry.aspx.exclude.
+Renamed file backup\servosms\module\master\customer_entry.aspx to file customer_entry.aspx.exclude.
+Renamed file backup\servosms\module\inventory\price_updation.aspx to file price_updation.aspx.exclude.
+Renamed file backup\servosms\module\inventory\schemediscount.aspx to file schemediscount.aspx.exclude.
+Renamed file backup\servosms\module\inventory\fleet_oediscountentry.aspx to file fleet_oediscountentry.aspx.exclude.
+Renamed file backup\servosms\module\reports\attendencereport.aspx to file attendencereport.aspx.exclude.
+Renamed file backup\servosms\module\admin\modulemanagement\stockledgerupdation.aspx to file stockledgerupdation.aspx.exclude.
+Renamed file backup\servosms\module\reports\vehiclelogreport.aspx to file vehiclelogreport.aspx.exclude.
+Renamed file backup\servosms\module\reports\srsm_format_report.aspx to file srsm_format_report.aspx.exclude.
+Renamed file backup\servosms\module\inventory\modvatcenvatinvoice.aspx to file modvatcenvatinvoice.aspx.exclude.
+Renamed file backup\servosms\module\accounts\ledger.aspx to file ledger.aspx.exclude.
+Renamed file backup\servosms\module\reports\pricecalculation.aspx to file pricecalculation.aspx.exclude.
+Renamed file backup\servosms\module\admin\modulemanagement\setdiscount.aspx to file setdiscount.aspx.exclude.
+Renamed file backup\servosms\module\inventory\groupchild.aspx to file groupchild.aspx.exclude.
+Renamed file backup\servosms\module\inventory\schemediscountentry.aspx to file schemediscountentry.aspx.exclude.
+Renamed file backup\servosms\module\reports\expences_details.aspx to file expences_details.aspx.exclude.
+Renamed file backup\servosms\module\reports\batchwisestockledger.aspx to file batchwisestockledger.aspx.exclude.
+Renamed file backup\servosms\module\inventory\cashsalesinvoice.aspx to file cashsalesinvoice.aspx.exclude.
+Renamed file backup\servosms\module\master\supplier_entry.aspx to file supplier_entry.aspx.exclude.
+Project Servosms.csproj has been converted successfully at May 30 2017, 14:37:01.
