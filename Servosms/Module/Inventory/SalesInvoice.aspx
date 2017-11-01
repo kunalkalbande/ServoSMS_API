@@ -1439,7 +1439,7 @@
 		}
 		function checkDelRec()
 		{
-			if(document.Form1.btnEdit == null)
+			if(document.Form1.dropInvoiceNo != undefined)
 			{
 				if(document.Form1.dropInvoiceNo.value!="Select")
 				{
@@ -1456,7 +1456,7 @@
 			}
 			else
 			{
-				alert("Please Click The Edit button");
+				alert("Please Click The Edit button. Select dates to get Sales Invoice numbers to delete.");
 				return;
 			}
 			if(document.Form1.tempDelinfo.value=="Yes")

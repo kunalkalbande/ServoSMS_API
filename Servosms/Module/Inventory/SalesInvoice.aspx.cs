@@ -49,7 +49,7 @@ namespace Servosms.Module.Inventory
         protected System.Web.UI.WebControls.Label lblDate;
         DBUtil dbobj = new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"], true);
         string uid;
-        string baseUri = "http://localhost:55251";
+        string baseUri = "http://localhost:64862";
 
         public int flag = 0;
         public float Header1Height = 0;
@@ -121,6 +121,7 @@ namespace Servosms.Module.Inventory
 
         protected System.Web.UI.WebControls.CheckBox chkScheme;
         static string Invoice_Date = "";
+        bool isDeleteClicked = false;
 
         /// <summary>
         /// This method is used for setting the Session variable for userId and 
@@ -461,7 +462,12 @@ namespace Servosms.Module.Inventory
                 //getschemefoe();
             }
 
-            SaveDataInControlsOnPageLoad();
+            if(!isDeleteClicked)
+            {
+                SaveDataInControlsOnPageLoad();
+            }
+
+            isDeleteClicked = false;
             txtVehicleNo.Attributes.Add("onmousemove", "getScheme_New();");
         }
 
@@ -923,6 +929,7 @@ namespace Servosms.Module.Inventory
                 lblInvoiceNo.Visible = true;
                 dropInvoiceNo.Visible = false;
                 btnEdit.Visible = true;
+                isDeleteClicked = true;
             }
             catch (Exception ex)
             {
@@ -10030,7 +10037,7 @@ namespace Servosms.Module.Inventory
                     //DropUnderSalesMan.SelectedIndex=(DropUnderSalesMan.Items.IndexOf((DropUnderSalesMan.Items.FindByValue(SqlDtr.GetValue(4).ToString()))));
                     DropUnderSalesMan.SelectedIndex = (DropUnderSalesMan.Items.IndexOf((DropUnderSalesMan.Items.FindByValue(sales.Under_SalesMan))));
 
-                    if (getCustomerVehiclesNos(sales.Cust_ID.ToString()) == true)
+                    if (getCustomerVehicles(sales.Cust_ID.ToString()) == true)
                     {
                         DropVehicleNo.SelectedIndex = DropVehicleNo.Items.IndexOf(DropVehicleNo.Items.FindByValue(sales.Vehicle_No.ToString()));
                     }
