@@ -22,6 +22,11 @@ using System.Data.SqlClient;
 using Servosms.Sysitem.Classes;
 using DBOperations;
 using RMG;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Servo_API.Models;
 
 namespace Servosms.Module.Admin
 {
@@ -30,7 +35,8 @@ namespace Servosms.Module.Admin
 	/// </summary>
 	public partial class Roles : System.Web.UI.Page
 	{
-		DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
+        string baseUri = "http://localhost:64862";
+        DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string uid;
 
 		/// <summary>
@@ -98,22 +104,34 @@ namespace Servosms.Module.Admin
 		/// </summary>
 		public void GetNextRoleID()
 		{
-			EmployeeClass obj=new EmployeeClass();
-			SqlDataReader SqlDtr;
-			string sql;
+			//EmployeeClass obj=new EmployeeClass();
+			//SqlDataReader SqlDtr;
+			//string sql;
 			try
 			{
-				#region Fetch Next Role ID
-				sql="select max(Role_ID)+1 from Roles";
-				SqlDtr =obj.GetRecordSet(sql);
-				while(SqlDtr.Read())
-				{
-					lblRoleID.Text=SqlDtr.GetSqlValue(0).ToString ();
-					if (lblRoleID.Text=="Null")
+                //#region Fetch Next Role ID
+                //sql="select max(Role_ID)+1 from Roles";
+                //SqlDtr =obj.GetRecordSet(sql);
+                //while(SqlDtr.Read())
+                //{
+                //	lblRoleID.Text=SqlDtr.GetSqlValue(0).ToString ();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/Roles/GetNextRoleID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lblRoleID.Text = JsonConvert.DeserializeObject<string>(id);
+                    }
+                }
+                if (lblRoleID.Text=="Null")
 						lblRoleID.Text ="1001";
-				}		
-				SqlDtr.Close();
-				#endregion
+				//}		
+				//SqlDtr.Close();
+				//#endregion
 			}
 			catch(Exception ex)
 			{
@@ -134,17 +152,46 @@ namespace Servosms.Module.Admin
 				if(dropRoleID.Visible)
 				{
 					obj.Role_ID=dropRoleID.SelectedItem.Value;
-					obj.UpdateRoles();
-					CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:btnUpdateClick   Role  name "+obj.Role_Name +" Updated   "+uid);
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        var myContent = JsonConvert.SerializeObject(obj);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/Roles/UpdateRole", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                        }
+                    }
+                    //obj.UpdateRoles();
+                    CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:btnUpdateClick   Role  name "+obj.Role_Name +" Updated   "+uid);
 					MessageBox.Show("Role Updated");
 				}
 				else
 				{
 					#region Check Role Already Created or Not
 					int count=0;
-					DBOperations.DBUtil  dbobj=new DBOperations.DBUtil();
-					dbobj.ExecuteScalar("select count(*) from Roles where Role_Name='"+ txtRoleName.Text.Trim() +"'",ref count);
-					if(count>0)
+					//DBOperations.DBUtil  dbobj=new DBOperations.DBUtil();
+					//dbobj.ExecuteScalar("select count(*) from Roles where Role_Name='"+ txtRoleName.Text.Trim() +"'",ref count);
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/Roles/GetCheckRoleExists?txtRoleName=" + txtRoleName.Text.Trim()).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            count = JsonConvert.DeserializeObject<int>(id);
+                        }
+                    }
+
+                    if (count>0)
 					{
 						MessageBox.Show("Role already Exists");
 						return;
@@ -152,7 +199,25 @@ namespace Servosms.Module.Admin
 					#endregion
 
 					obj.Role_ID = lblRoleID.Text.ToString();
-					obj.InsertRoles();	
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        var myContent = JsonConvert.SerializeObject(obj);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/Roles/InsertRole", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                        }
+                    }
+
+                    //obj.InsertRoles();	
 					CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:btnUpdate_Click   Role Name "+obj.Role_Name +" Created   "+uid);
 					MessageBox.Show("Role Created");
 				}
@@ -185,14 +250,36 @@ namespace Servosms.Module.Admin
 				#region	Fetch All Role ID
 				dropRoleID.Items.Clear();
 				dropRoleID.Items.Add("Select");
-				DBOperations.DBUtil obj=new DBOperations.DBUtil();
-				SqlDataReader SqlDtr=null;
-				obj.SelectQuery("select Role_ID from Roles",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					dropRoleID.Items.Add(SqlDtr.GetValue(0).ToString());
-				}
-				SqlDtr.Close();
+                List<string> lstDropRoleID = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/Roles/FillDropRoleID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropRoleID = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropRoleID != null)
+                {
+                    foreach (var RoleID in lstDropRoleID)
+                        dropRoleID.Items.Add(RoleID);
+                }
+
+    //            DBOperations.DBUtil obj=new DBOperations.DBUtil();
+				//SqlDataReader SqlDtr=null;
+
+				//obj.SelectQuery("select Role_ID from Roles",ref SqlDtr);
+				//while(SqlDtr.Read())
+				//{
+				//	dropRoleID.Items.Add(SqlDtr.GetValue(0).ToString());
+				//}
+				//SqlDtr.Close();
 				#endregion
 			}
 			catch(Exception ex)
@@ -209,16 +296,32 @@ namespace Servosms.Module.Admin
 			try
 			{
 				Clear();
-				DBOperations.DBUtil obj=new DBOperations.DBUtil();
-				SqlDataReader SqlDtr=null;
+                RolesModel role = new RolesModel();
 
-				obj.SelectQuery("select * from roles where Role_Id='"+ dropRoleID.SelectedItem.Value +"'",ref SqlDtr);
-				while(SqlDtr.Read())
+                DBOperations.DBUtil obj=new DBOperations.DBUtil();
+				//SqlDataReader SqlDtr=null;
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/Roles/GetSelectedRoleIDData?RoleID=" + dropRoleID.SelectedItem.Value).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        role = JsonConvert.DeserializeObject<RolesModel>(id);
+                    }
+                }
+
+                //obj.SelectQuery("select * from roles where Role_Id='"+ dropRoleID.SelectedItem.Value +"'",ref SqlDtr);
+				if(role != null)
 				{
-					txtRoleName.Text=SqlDtr.GetValue(1).ToString();
-					txtDesc.Text=SqlDtr.GetValue(2).ToString();
+					txtRoleName.Text= role.Role_Name.ToString();
+					txtDesc.Text= role.Description.ToString();
 				}
-				SqlDtr.Close();
+				//SqlDtr.Close();
 				CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:dropRoleID_SelectedIndexChanged    "+"  userid "+uid);
 			
 			}
@@ -243,8 +346,21 @@ namespace Servosms.Module.Admin
 					return;
 				}
 				int output=0;
-				DBOperations.DBUtil obj=new DBOperations.DBUtil();
-				obj.ExecuteScalar("select count(*) from User_master where Role_ID='" + dropRoleID.SelectedItem.Value + "'",ref output);
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/Roles/GetCheckRoleExistsUser_master?txtRoleName=" + dropRoleID.SelectedItem.Value).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        output = JsonConvert.DeserializeObject<int>(id);
+                    }
+                }
+
+                //DBOperations.DBUtil obj=new DBOperations.DBUtil();
+				//obj.ExecuteScalar("select count(*) from User_master where Role_ID='" + dropRoleID.SelectedItem.Value + "'",ref output);
 				if(output>0) 
 				{
 					MessageBox.Show("Selected Role cannot be Deleted");
@@ -252,7 +368,24 @@ namespace Servosms.Module.Admin
 				}
 				else
 				{
-					obj.Insert_or_Update("delete from roles where Role_Id='"+ dropRoleID.SelectedItem.Value +"'",ref output);
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        var myContent = JsonConvert.SerializeObject(dropRoleID.SelectedItem.Value);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/Roles/DeleteRole?txtRoleName=" + dropRoleID.SelectedItem.Value, byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            output = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(responseString);
+                        }
+                    }
+
+                    //obj.Insert_or_Update("delete from roles where Role_Id='"+ dropRoleID.SelectedItem.Value +"'",ref output);
 					dropRoleID.Items.Remove(dropRoleID.SelectedItem.Value); 
 					MessageBox.Show("Role Deleted");
 					CreateLogFiles.ErrorLog("Form:Roles.aspx,Method: btnDelete_Click"+ uid);
