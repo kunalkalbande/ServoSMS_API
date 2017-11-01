@@ -104,20 +104,8 @@ namespace Servosms.Module.Inventory
         string strInvoiceToDate = string.Empty;
         static string CustID = "";
         public static string val = "";
-        //public static int jk=0;
-        protected System.Web.UI.HtmlControls.HtmlButton btndrop;
-        //protected System.Web.UI.WebControls.DropDownList DropType1;
-        //protected System.Web.UI.WebControls.DropDownList DropType2;
-        //protected System.Web.UI.WebControls.DropDownList DropType3;
-        //protected System.Web.UI.WebControls.DropDownList DropType4;
-        //protected System.Web.UI.WebControls.DropDownList DropType5;
-        //protected System.Web.UI.WebControls.DropDownList DropType6;
-        //protected System.Web.UI.WebControls.DropDownList DropType7;
-        //protected System.Web.UI.WebControls.DropDownList DropType8;
-        //protected System.Web.UI.WebControls.DropDownList DropType9;
-        //protected System.Web.UI.WebControls.DropDownList DropType10;
-        //protected System.Web.UI.WebControls.DropDownList DropType11;
-        //protected System.Web.UI.WebControls.DropDownList DropType12;
+        
+        protected System.Web.UI.HtmlControls.HtmlButton btndrop;        
 
         protected System.Web.UI.WebControls.CheckBox chkScheme;
         static string Invoice_Date = "";
@@ -137,16 +125,9 @@ namespace Servosms.Module.Inventory
                 {
                     fillInvoceNoDropdown();
                 }
-
-                //DropCustName.Attributes.Add("onkeypress", "DropCustName_onkeypress(this);");
+                
                 uid = (Session["User_Name"].ToString());
-                txtMessage.Text = (Session["Message"].ToString());
-                // txtVatRate.Value  = (Session["VAT_Rate"].ToString());
-
-                /****add-bhal*****///lblInvoiceDate.Text=(Session["CurrentDate"].ToString());
-                                   //getSlips(); 
-                                   //GetProducts();
-                                   //FetchData();
+                txtMessage.Text = (Session["Message"].ToString());                
 
             }
 
@@ -158,8 +139,7 @@ namespace Servosms.Module.Inventory
             }
             //if click the delete button then fire the function
             if (tempDelinfo.Value == "Yes")
-            {
-                //DeleteTheRec();
+            {                
                 DeleteSalesInvoice();
 
                 UpdateBatchNo();
@@ -170,22 +150,17 @@ namespace Servosms.Module.Inventory
                 try
                 {
                     lblInvoiceDate.Attributes.Add("readonly", "readonly");
-                    tempEdit.Value = "True";           //Add by vikas 14.07.09
-                                                       //jk=0;
-                                                       //Cache["CustName"]="";
+                    tempEdit.Value = "True";           
                     Invoice_Date = "";
                     checkPrevileges();
                     lblInvoiceDate.Text = DateTime.Now.Day + "/" + DateTime.Now.Month + "/" + DateTime.Now.Year;
                     txtChallanDate.Text = DateTime.Now.Day + "/" + DateTime.Now.Month + "/" + DateTime.Now.Year;
-                    //****com-bhal*****	lblInvoiceDate.Text=GenUtil.str2DDMMYYYY(DateTime.Today.ToShortDateString());  
+                    
                     lblEntryTime.Text = DateTime.Now.ToString();
                     lblEntryBy.Text = Session["User_Name"].ToString();
-                    //**	DropDownList[] ProductType={DropType1, DropType2, DropType3, DropType4, DropType5, DropType6, DropType7, DropType8 };
-                    //DropDownList[] ProductType={DropType1, DropType2, DropType3, DropType4, DropType5, DropType6, DropType7, DropType8 ,DropType9, DropType10, DropType11, DropType12};
+                    
 
-                    InventoryClass obj = new InventoryClass();
-                    SqlDataReader SqlDtr;
-                    string sql;
+                    InventoryClass obj = new InventoryClass();                    
 
                     #region Fetch the From and To Date From OrganisationDatail table.
                     List<string> resFromDateToDate = new List<string>();
@@ -201,6 +176,7 @@ namespace Servosms.Module.Inventory
                             resFromDateToDate = JsonConvert.DeserializeObject<List<string>>(result);
                         }
                     }
+
                     if (resFromDateToDate != null)
                     {
                         FromDate = resFromDateToDate[0];
@@ -211,28 +187,12 @@ namespace Servosms.Module.Inventory
                         MessageBox.Show("Please Fill The Organization Form First");
                         return;
                     }
-
-                    //               SqlDataReader rdr=null;
-                    //dbobj.SelectQuery("select * from organisation",ref rdr);
-                    //if(rdr.Read())
-                    //{
-                    //	FromDate=GetYear(GenUtil.trimDate(rdr["Acc_date_from"].ToString()));
-                    //	if(FromDate!="")
-                    //		FromDate=System.Convert.ToString(int.Parse(FromDate));
-                    //	ToDate=GetYear(GenUtil.trimDate(rdr["Acc_date_To"].ToString()));
-                    //}
-                    //else
-                    //{
-                    //	MessageBox.Show("Please Fill The Organization Form First");
-                    //	return;
-                    //}
+                    
                     #endregion
 
                     GetNextInvoiceNo();
 
-                    #region Fetch the Product Types and fill in the ComboBoxes
-                    //21.04.09 coment by vikas sql="select distinct Prod_name,pack_type from Products p, Price_Updation pu where p.Prod_ID=pu.Prod_ID";  //Comment by vikas sharma 21.04.09
-
+                    #region Fetch the Product Types and fill in the ComboBoxes                    
                     using (var client = new HttpClient())
                     {
                         client.BaseAddress = new Uri(baseUri);
@@ -252,33 +212,9 @@ namespace Servosms.Module.Inventory
                                 texthiddenprod.Value = res;
                             }
                         }
-                    }
-
-                    //               sql ="select distinct Prod_Code,Prod_name,Pack_Type from Products p,price_updation pu where p.prod_id=pu.prod_id";
-                    //SqlDtr = obj.GetRecordSet(sql);
-                    //if(SqlDtr.HasRows)
-                    //{
-                    //	texthiddenprod.Value="Type,";
-                    //	while(SqlDtr.Read())
-                    //	{
-                    //		texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+":"+SqlDtr.GetValue(1).ToString()+":"+SqlDtr.GetValue(2).ToString()+",";
-                    //		//21.04.09 coment by vikas  texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+":"+SqlDtr.GetValue(1).ToString()+",";
-                    //	}
-                    //}
-                    //SqlDtr.Close();
-                    //}
+                    }                    
                     #endregion
-
-                    #region Fetch All Customer ID and fill in the ComboBox
-                    //					sql="select Cust_Name from Customer order by Cust_Name";
-                    //					SqlDtr=obj.GetRecordSet(sql);
-                    //					while(SqlDtr.Read())
-                    //					{
-                    //						DropCustName.Items.Add (SqlDtr.GetValue(0).ToString ());
-                    //					}
-                    //					SqlDtr.Close ();
-                    #endregion
-
+                    
                     #region Fetch All SalesMan and Fill in the ComboBox
                     List<string> salesMan = new List<string>();
                     using (var client = new HttpClient())

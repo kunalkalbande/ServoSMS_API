@@ -7,8 +7,7 @@ using System.Web;
 /// Summary description for SalesDetailsModel
 /// </summary>
 public class SalesDetailsModel
-{
-    //SqlCommand SqlCmd;
+{    
     public string Invoice_No { get; set; }
     public string Product_Name { get; set; }
     public string Package_Type { get; set; }
