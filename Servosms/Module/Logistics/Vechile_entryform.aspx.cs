@@ -8,7 +8,7 @@
    bbnisys Technologies.
 
 */
-    # region Directives...
+#region Directives...
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -19,12 +19,17 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using System.Data .SqlClient ;
+using System.Data.SqlClient;
 using System.Text;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using DBOperations;
 using RMG;
-# endregion
+using System.Collections.Generic;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Net.Http;
+using Servo_API.Models;
+#endregion
 
 namespace Servosms.Module.Logistics
 {
@@ -42,41 +47,26 @@ namespace Servosms.Module.Logistics
 		protected System.Web.UI.WebControls.CompareValidator Comparevalidator2;
 		DBUtil dbobj=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string uid;
+        string baseUri = "http://localhost:64862";
 
-		/// <summary>
-		/// Put user code to initialize the page here
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// and generate the next ID also.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		# region PageLoad...
-		protected void Page_Load(object sender, System.EventArgs e)
+        /// <summary>
+        /// Put user code to initialize the page here
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// and generate the next ID also.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        #region PageLoad...
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			try
 			{
 				uid=(Session["User_Name"].ToString());
 
 				if(!Page.IsPostBack)
-				{
-					# region Dropdown Vehicle type
-					/*SqlConnection con;
-					SqlCommand cmdselect;
-					SqlDataReader dtrVechile;
-					con=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-					con.Open ();
-					cmdselect = new SqlCommand( "Select Vehicle_Type  From Vehicle", con );
-					dtrVechile = cmdselect.ExecuteReader();
-					DropVechileType2.Items.Add("Select");
-					while(dtrVechile.Read())
-					{
-						DropVechileType2.Items.Add(dtrVechile.GetString(0));
-					}
-					dtrVechile.Close();
-					con.Close ();*/
-					# endregion
+				{					
 					fillOilCombo();
 					getID();
 					btnSave.Enabled = true;
@@ -155,69 +145,194 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				SqlDataReader SqlDtr = null;
-				//				dbobj.SelectQuery("Select prod_name from products where category = 'Fuel'",ref SqlDtr);
-				//				DropFuelused.Items.Clear();
-				//				DropFuelused.Items.Add("Select");   
-				//				while(SqlDtr.Read())
-				//				{
-				//					DropFuelused.Items.Add(SqlDtr.GetValue(0).ToString());   
-				//				}
-				//				SqlDtr.Close();
+				SqlDataReader SqlDtr = null;				
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Engine Oil%'",ref SqlDtr);
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Engine Oil%'",ref SqlDtr);
 				DropEngineOil.Items.Clear();
-				DropEngineOil.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					DropEngineOil.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				DropEngineOil.Items.Add("Select");
+
+                List<string> lstDropEngineOil = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntry/FillDropEngineOil").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropEngineOil = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropEngineOil != null)
+                {
+                    foreach (var EngineOil in lstDropEngineOil)
+                        DropEngineOil.Items.Add(EngineOil);
+                }
+
+    //            while (SqlDtr.Read())
+				//{
+				//	DropEngineOil.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
                
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Brake Oil%'",ref SqlDtr);
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Brake Oil%'",ref SqlDtr);
 				Dropbreak.Items.Clear();
-				Dropbreak.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropbreak.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				Dropbreak.Items.Add("Select");
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Gear Oil%'",ref SqlDtr);
+                List<string> lstDropbreak = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntry/FillDropbreak").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropbreak = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropbreak != null)
+                {
+                    foreach (var Break in lstDropbreak)
+                        Dropbreak.Items.Add(Break);
+                }
+
+    //            while (SqlDtr.Read())
+				//{
+				//	Dropbreak.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
+
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Gear Oil%'",ref SqlDtr);
+
 				Dropgear.Items.Clear();
-				Dropgear.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropgear.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				Dropgear.Items.Add("Select");
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Collent%'",ref SqlDtr);
+                List<string> lstDropGear = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntry/FillDropGear").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropGear = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropGear != null)
+                {
+                    foreach (var Gear in lstDropGear)
+                        Dropgear.Items.Add(Gear);
+                }
+
+    //            while (SqlDtr.Read())
+				//{
+				//	Dropgear.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
+
+//				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Collent%'",ref SqlDtr);
 				Dropcoolent.Items.Clear();
-				Dropcoolent.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropcoolent.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
-			 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Grease%'",ref SqlDtr);
-				Dropgrease.Items.Clear();
-				Dropgrease.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropgrease.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				Dropcoolent.Items.Add("Select");
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Transmission Oil%'",ref SqlDtr);
+                List<string> lstDropCoolent = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntry/FillDropCoolent").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropCoolent = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropCoolent != null)
+                {
+                    foreach (var Coolent in lstDropCoolent)
+                        Dropcoolent.Items.Add(Coolent);
+                }
+
+    //            while (SqlDtr.Read())
+				//{
+				//	Dropcoolent.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
+			 
+//				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Grease%'",ref SqlDtr);
+				Dropgrease.Items.Clear();
+				Dropgrease.Items.Add("Select");
+
+                List<string> lstDropGrease = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntry/FillDropGrease").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropGrease = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropGrease != null)
+                {
+                    foreach (var Grease in lstDropGrease)
+                        Dropgrease.Items.Add(Grease);
+                }
+
+    //            while (SqlDtr.Read())
+				//{
+				//	Dropgrease.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
+
+//				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Transmission Oil%'",ref SqlDtr);
 				Droptransmission.Items.Clear();
-				Droptransmission.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Droptransmission.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				Droptransmission.Items.Add("Select");
+
+                List<string> lstDropTransmission = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntry/FillDropTransmission").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropTransmission = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropTransmission != null)
+                {
+                    foreach (var Transmission in lstDropTransmission)
+                        Droptransmission.Items.Add(Transmission);
+                }
+
+    //            while (SqlDtr.Read())
+				//{
+				//	Droptransmission.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -232,29 +347,45 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				SqlDataReader SqlDtr = null;
-				dbobj.SelectQuery("Select max(vehicledetail_id) from vehicleentry",ref SqlDtr);
-				if(SqlDtr.Read())
-				{
-					string str = SqlDtr.GetValue(0).ToString();
-					if(!str.Trim().Equals(""))  
-					{
-						int id  = System.Convert.ToInt32(str.Trim());
-						id = id + 1;
-						str= id.ToString();
-					}
-					else
-					{
-						str = "1001";
-					}
-					lblVehicleID.Text = str;
- 
-				}
-				else
-				{
-					lblVehicleID.Text = "1001";
-				}
-			}
+                string strVehicleID = string.Empty;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntry/GetNextVehicledetailID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        strVehicleID = JsonConvert.DeserializeObject<string>(id);
+                    }
+                }
+                lblVehicleID.Text = strVehicleID;
+
+    //            SqlDataReader SqlDtr = null;
+    //dbobj.SelectQuery("Select max(vehicledetail_id) from vehicleentry",ref SqlDtr);
+    //if(SqlDtr.Read())
+    //{
+    //	string str = SqlDtr.GetValue(0).ToString();
+    //	if(!str.Trim().Equals(""))  
+    //	{
+    //		int id  = System.Convert.ToInt32(str.Trim());
+    //		id = id + 1;
+    //		str= id.ToString();
+    //	}
+    //	else
+    //	{
+    //		str = "1001";
+    //	}
+    //	lblVehicleID.Text = str;
+
+                //}
+                //else
+                //{
+                //	lblVehicleID.Text = "1001";
+                //}
+            }
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:Vehicle_EntryForm.aspx,Method:getID() "+ " EXCEPTION  "+ex.Message+"   userid "+ uid );
@@ -370,183 +501,255 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				SqlConnection con;
-				string strInsert ;
-				SqlCommand cmdInsert;
-				DateTime dt1=DateTime.Now ;
-				con=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-				con.Open ();
-				strInsert = "Insert Vehicleentry(vehicledetail_id,Vehicle_Type,Vehicle_no,vehicle_name,RTO_Reg_Val_yrs,Model_name,RTO_Reg_No,Vehicle_Man_Date,Insurance_No,Meter_Reading,Insurance_validity,Vehicle_Route,Insurance_Comp_Name,Fuel_Used,Fuel_Used_Qty,start_Fuel_Qty,Engine_Oil,Engine_Oil_Qty,Engine_Oil_Dt,Engine_Oil_km,Gear_Oil,Gear_Oil_Qty,Gear_Oil_Dt,Gear_Oil_Km,Brake_Oil,Brake_Oil_Qty,Brake_Oil_Dt,Brake_Oil_km,Coolent,Coolent_Qty,Coolent_Dt,Coolent_Km,Grease,Grease_Qty,Grease_Dt,Grease_Km,Trans_Oil,Trans_Oil_Qty,Trans_Oil_Dt,Trans_Oil_Km,Vehicle_Avg)"
-					+"values(@vehicledetail_id,@Vehicle_Type,@Vehicle_no,@vehicle_name,@RTO_Reg_Val_yrs,@Model_name,@RTO_Reg_No,@Vehicle_Man_Date,@Insurance_No,@Meter_Reading,@Insurance_validity,@Vehicle_Route,@Insurance_Comp_Name,@Fuel_Used,@Fuel_Used_Qty,@start_Fuel_Qty,@Engine_Oil,@Engine_Oil_Qty,@Engine_Oil_Dt,@Engine_Oil_km,@Gear_Oil,@Gear_Oil_Qty,@Gear_Oil_Dt,@Gear_Oil_Km,@Brake_Oil,@Brake_Oil_Qty,@Brake_Oil_Dt,@Brake_Oil_km,@Coolent,@Coolent_Qty,@Coolent_Dt,@Coolent_Km,@Grease,@Grease_Qty,@Grease_Dt,@Grease_Km,@Trans_Oil,@Trans_Oil_Qty,@Trans_Oil_Dt,@Trans_Oil_Km,@Vehicle_Avg)";
+                VehicleEntryModel vehEntryModel = new VehicleEntryModel();
+                vehEntryModel.Vehicle_ID = lblVehicleID.Text;
+                vehEntryModel.VehicleType2 = DropVechileType2.SelectedItem.Text.ToString();
+                vehEntryModel.Vehicleno = txtVehicleno.Text.Trim();
 
-				cmdInsert=new SqlCommand (strInsert,con);
-				cmdInsert.Parameters .Add ("@vehicledetail_id",lblVehicleID.Text);
-				cmdInsert.Parameters .Add ("@Vehicle_Type",DropVechileType2.SelectedItem .Text .ToString () );
-				cmdInsert.Parameters .Add ("@Vehicle_no",txtVehicleno.Text.Trim());
-				cmdInsert.Parameters .Add ("@Vehicle_name",txtVehiclenm .Text.Trim());
-				cmdInsert.Parameters .Add ("@RTO_Reg_Val_yrs",GenUtil.str2MMDDYYYY(Request.Form["txtrtoregvalidity"].ToString().Trim()));
+                vehEntryModel.Vehiclenm = txtVehiclenm.Text.Trim();
 
-                cmdInsert.Parameters .Add ("@Model_name",txtmodelnm.Text.Trim());
-				cmdInsert.Parameters .Add ("@RTO_Reg_No",txtrtono.Text.Trim());
-				cmdInsert.Parameters .Add ("@Vehicle_Man_Date",GenUtil.str2MMDDYYYY(Request.Form["txtVehicleyear"].ToString().Trim()));
+                vehEntryModel.RTO_Reg_Val_yrs = GenUtil.str2MMDDYYYY(Request.Form["txtrtoregvalidity"].ToString().Trim());
+                vehEntryModel.Model_name = txtmodelnm.Text.Trim();
 
-                cmdInsert.Parameters .Add ("@Insurance_No",txtinsuranceno.Text.Trim());
-				cmdInsert.Parameters .Add ("@Meter_Reading",txtVehiclemreading.Text.Trim());
-				cmdInsert.Parameters .Add ("@Insurance_validity",GenUtil.str2MMDDYYYY(Request.Form["txtvalidityinsurance"].ToString().Trim()));
+                vehEntryModel.RTO_Reg_No = txtrtono.Text.Trim();
+                vehEntryModel.Vehicle_Man_Date = GenUtil.str2MMDDYYYY(Request.Form["txtVehicleyear"].ToString().Trim());
+                vehEntryModel.Insurance_No = txtinsuranceno.Text.Trim();
+                vehEntryModel.Meter_Reading = txtVehiclemreading.Text.Trim();
+                vehEntryModel.Insurance_validity = GenUtil.str2MMDDYYYY(Request.Form["txtvalidityinsurance"].ToString().Trim());
+                vehEntryModel.RouteName = DropDownList1.SelectedItem.Text.Trim();
+                vehEntryModel.Insurance_Comp_name = txtInsCompName.Text.Trim();
 
-                SqlDataReader SqlDtr  = null;
-				string route_id = "";
-				//Fetch the route id for selected route from route table.
-				dbobj.SelectQuery("Select route_id from Route where route_name='"+DropDownList1.SelectedItem.Text.Trim()+"'",ref SqlDtr);
-				if(SqlDtr.Read())
-				{
-					route_id = SqlDtr.GetValue(0).ToString();       
-				}
-				SqlDtr.Close();
-				cmdInsert.Parameters .Add ("@Vehicle_Route",route_id);
-				cmdInsert.Parameters .Add ("@Insurance_Comp_name",txtInsCompName.Text.Trim() );
-				string prod_id = "";
-				//Fetch the product id for selected product of type fuel from table products.
-				//				dbobj.SelectQuery("Select prod_id from products where prod_name='"+DropFuelused.SelectedItem.Text.Trim()+"' and Category ='Fuel'" ,ref SqlDtr);
-				//				if(SqlDtr.Read())
-				//				{
-				//					prod_id = SqlDtr.GetValue(0).ToString();       
-				//				}
-				//				SqlDtr.Close();
-				//cmdInsert.Parameters .Add ("@Fuel_Used",prod_id );
-				cmdInsert.Parameters .Add ("@Fuel_Used",DropFuelused.SelectedItem.Text.Trim());
-				cmdInsert.Parameters .Add ("@Fuel_Used_Qty",txtfuelinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Start_Fuel_Qty",txtfuelintank.Text.Trim() );
-				//Fetch the product id for selected product of type Engine Oil from table products.
-				string[] strArr = DropEngineOil.SelectedItem.Text.Split(new char[] {':'},DropEngineOil.SelectedItem.Text.Length);    
-				if(DropEngineOil.SelectedIndex != 0)
-				{
+                vehEntryModel.Fuel_Used = DropFuelused.SelectedItem.Text.Trim();
+                vehEntryModel.Fuel_Used_Qty = txtfuelinword.Text.Trim();
+                vehEntryModel.Start_Fuel_Qty = txtfuelintank.Text.Trim();
+
+                vehEntryModel.EngineOil = DropEngineOil.SelectedItem.Text.Trim();
+                vehEntryModel.Engine_Oil_Qty = txtEngineQty.Text.Trim();
+                vehEntryModel.Engine_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtEngineOilDate"].ToString().Trim());
+
+                vehEntryModel.Gear_Oil = Dropgear.SelectedItem.Text.Trim();
+                vehEntryModel.Gear_Oil_Qty = txtgearinword.Text.Trim();
+                vehEntryModel.Gear_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtgeardt"].ToString().Trim());
+
+                vehEntryModel.Brake_Oil = Dropbreak.SelectedItem.Text.Trim();
+                vehEntryModel.Brake_Oil_Qty = txtbearkinword.Text.Trim();
+                vehEntryModel.Brake_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtbreakdt"].ToString().Trim());
+                
+                vehEntryModel.Coolent = Dropcoolent.SelectedItem.Text.Trim();
+                vehEntryModel.Coolent_Oil_Qty = txtcoolentinword.Text.Trim();
+                vehEntryModel.Coolent_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtcoolentdt"].ToString().Trim());
+
+                vehEntryModel.Grease = Dropgrease.SelectedItem.Text.Trim();
+                vehEntryModel.Grease_Qty = txtgreaseinword.Text.Trim();
+                vehEntryModel.Grease_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtgreasedt"].ToString().Trim());                
+
+                vehEntryModel.Trans_Oil = Droptransmission.SelectedItem.Text.Trim();
+                vehEntryModel.Trans_Oil_Qty = txttransinword.Text.Trim();
+                vehEntryModel.Trans_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txttransmissiondt"].ToString().Trim());
+                vehEntryModel.Trans_Oil_km = txttransmissionkm.Text.Trim();
+                vehEntryModel.Vehicle_Avg = txtvechileavarge.Text.Trim();
+
+                vehEntryModel.Engine_Oil_km = txtEngineKM.Text.Trim();
+                vehEntryModel.Gear_Oil_km = txtgearkm.Text.Trim();
+                vehEntryModel.Brake_Oil_km = txtbreakkm.Text.Trim();
+                vehEntryModel.Coolent_km = txtcoolentkm.Text.Trim();
+                vehEntryModel.Grease_km = txtgreasekm.Text.Trim();
+
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(vehEntryModel);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VehicleEntry/InsertVehicleEntry", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                    }
+                }
+
+    //            SqlConnection con;
+				//string strInsert ;
+				//SqlCommand cmdInsert;
+				//DateTime dt1=DateTime.Now ;
+				//con=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+				//con.Open ();
+				//strInsert = "Insert Vehicleentry(vehicledetail_id,Vehicle_Type,Vehicle_no,vehicle_name,RTO_Reg_Val_yrs,Model_name,RTO_Reg_No,Vehicle_Man_Date,Insurance_No,Meter_Reading,Insurance_validity,Vehicle_Route,Insurance_Comp_Name,Fuel_Used,Fuel_Used_Qty,start_Fuel_Qty,Engine_Oil,Engine_Oil_Qty,Engine_Oil_Dt,Engine_Oil_km,Gear_Oil,Gear_Oil_Qty,Gear_Oil_Dt,Gear_Oil_Km,Brake_Oil,Brake_Oil_Qty,Brake_Oil_Dt,Brake_Oil_km,Coolent,Coolent_Qty,Coolent_Dt,Coolent_Km,Grease,Grease_Qty,Grease_Dt,Grease_Km,Trans_Oil,Trans_Oil_Qty,Trans_Oil_Dt,Trans_Oil_Km,Vehicle_Avg)"
+				//	+"values(@vehicledetail_id,@Vehicle_Type,@Vehicle_no,@vehicle_name,@RTO_Reg_Val_yrs,@Model_name,@RTO_Reg_No,@Vehicle_Man_Date,@Insurance_No,@Meter_Reading,@Insurance_validity,@Vehicle_Route,@Insurance_Comp_Name,@Fuel_Used,@Fuel_Used_Qty,@start_Fuel_Qty,@Engine_Oil,@Engine_Oil_Qty,@Engine_Oil_Dt,@Engine_Oil_km,@Gear_Oil,@Gear_Oil_Qty,@Gear_Oil_Dt,@Gear_Oil_Km,@Brake_Oil,@Brake_Oil_Qty,@Brake_Oil_Dt,@Brake_Oil_km,@Coolent,@Coolent_Qty,@Coolent_Dt,@Coolent_Km,@Grease,@Grease_Qty,@Grease_Dt,@Grease_Km,@Trans_Oil,@Trans_Oil_Qty,@Trans_Oil_Dt,@Trans_Oil_Km,@Vehicle_Avg)";
+
+				//cmdInsert=new SqlCommand (strInsert,con);
+				//cmdInsert.Parameters .Add ("@vehicledetail_id",lblVehicleID.Text);
+				//cmdInsert.Parameters .Add ("@Vehicle_Type",DropVechileType2.SelectedItem.Text.ToString () );
+				//cmdInsert.Parameters .Add ("@Vehicle_no",txtVehicleno.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Vehicle_name",txtVehiclenm .Text.Trim());
+				//cmdInsert.Parameters .Add ("@RTO_Reg_Val_yrs",GenUtil.str2MMDDYYYY(Request.Form["txtrtoregvalidity"].ToString().Trim()));
+
+    //            cmdInsert.Parameters .Add ("@Model_name",txtmodelnm.Text.Trim());
+				//cmdInsert.Parameters .Add ("@RTO_Reg_No",txtrtono.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Vehicle_Man_Date",GenUtil.str2MMDDYYYY(Request.Form["txtVehicleyear"].ToString().Trim()));
+
+    //            cmdInsert.Parameters .Add ("@Insurance_No",txtinsuranceno.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Meter_Reading",txtVehiclemreading.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Insurance_validity",GenUtil.str2MMDDYYYY(Request.Form["txtvalidityinsurance"].ToString().Trim()));
+
+    //            SqlDataReader SqlDtr  = null;
+				//string route_id = "";
+				////Fetch the route id for selected route from route table.
+				//dbobj.SelectQuery("Select route_id from Route where route_name='"+DropDownList1.SelectedItem.Text.Trim()+"'",ref SqlDtr);
+				//if(SqlDtr.Read())
+				//{
+				//	route_id = SqlDtr.GetValue(0).ToString();       
+				//}
+				//SqlDtr.Close();
+				//cmdInsert.Parameters .Add ("@Vehicle_Route",route_id);
+				//cmdInsert.Parameters .Add ("@Insurance_Comp_name",txtInsCompName.Text.Trim() );
+				//string prod_id = "";
+				////Fetch the product id for selected product of type fuel from table products.
+				////				dbobj.SelectQuery("Select prod_id from products where prod_name='"+DropFuelused.SelectedItem.Text.Trim()+"' and Category ='Fuel'" ,ref SqlDtr);
+				////				if(SqlDtr.Read())
+				////				{
+				////					prod_id = SqlDtr.GetValue(0).ToString();       
+				////				}
+				////				SqlDtr.Close();
+				////cmdInsert.Parameters .Add ("@Fuel_Used",prod_id );
+				//cmdInsert.Parameters .Add ("@Fuel_Used",DropFuelused.SelectedItem.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Fuel_Used_Qty",txtfuelinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Start_Fuel_Qty",txtfuelintank.Text.Trim() );
+				////Fetch the product id for selected product of type Engine Oil from table products.
+				//string[] strArr = DropEngineOil.SelectedItem.Text.Split(new char[] {':'},DropEngineOil.SelectedItem.Text.Length);    
+				//if(DropEngineOil.SelectedIndex != 0)
+				//{
 					
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Engine Oil%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Engine_Oil",prod_id);
-				cmdInsert.Parameters .Add ("@Engine_Oil_Qty",txtEngineQty.Text.Trim());
-				cmdInsert.Parameters .Add ("@Engine_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtEngineOilDate"].ToString().Trim()));
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Engine Oil%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Engine_Oil",prod_id);
+				//cmdInsert.Parameters .Add ("@Engine_Oil_Qty",txtEngineQty.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Engine_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtEngineOilDate"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Engine_Oil_km",txtEngineKM.Text.Trim());
-				//Fetch the product id for selected product of type Gear Oil from table products.
-				if(Dropgear.SelectedIndex != 0)
-				{
-					strArr = Dropgear.SelectedItem.Text.Split(new char[] {':'},Dropgear.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Gear Oil%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Gear_Oil",prod_id);
-				cmdInsert.Parameters .Add ("@Gear_Oil_Qty",txtgearinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Gear_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgeardt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Engine_Oil_km",txtEngineKM.Text.Trim());
+				////Fetch the product id for selected product of type Gear Oil from table products.
+				//if(Dropgear.SelectedIndex != 0)
+				//{
+				//	strArr = Dropgear.SelectedItem.Text.Split(new char[] {':'},Dropgear.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Gear Oil%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Gear_Oil",prod_id);
+				//cmdInsert.Parameters .Add ("@Gear_Oil_Qty",txtgearinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Gear_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgeardt"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Gear_Oil_km",txtgearkm.Text.Trim());
-				//Fetch the product id for selected product of type Brake Oil from table products. 
-				if(Dropbreak.SelectedIndex != 0)
-				{
-					strArr = Dropbreak.SelectedItem.Text.Split(new char[] {':'},Dropbreak.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Brake Oil%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Brake_Oil",prod_id);
-				cmdInsert.Parameters .Add ("@Brake_Oil_Qty",txtbearkinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Brake_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtbreakdt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Gear_Oil_km",txtgearkm.Text.Trim());
+				////Fetch the product id for selected product of type Brake Oil from table products. 
+				//if(Dropbreak.SelectedIndex != 0)
+				//{
+				//	strArr = Dropbreak.SelectedItem.Text.Split(new char[] {':'},Dropbreak.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Brake Oil%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Brake_Oil",prod_id);
+				//cmdInsert.Parameters .Add ("@Brake_Oil_Qty",txtbearkinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Brake_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtbreakdt"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Brake_Oil_km",txtbreakkm.Text.Trim());
-				//Fetch the product id for selected product of type Coolent from table products. 
-				if(Dropcoolent.SelectedIndex != 0)
-				{
-					strArr = Dropcoolent.SelectedItem.Text.Split(new char[] {':'},Dropcoolent.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Collent%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Coolent",prod_id);
-				cmdInsert.Parameters .Add ("@Coolent_Qty",txtcoolentinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Coolent_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtcoolentdt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Brake_Oil_km",txtbreakkm.Text.Trim());
+				////Fetch the product id for selected product of type Coolent from table products. 
+				//if(Dropcoolent.SelectedIndex != 0)
+				//{
+				//	strArr = Dropcoolent.SelectedItem.Text.Split(new char[] {':'},Dropcoolent.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Collent%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Coolent",prod_id);
+				//cmdInsert.Parameters .Add ("@Coolent_Qty",txtcoolentinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Coolent_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtcoolentdt"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Coolent_km",txtcoolentkm.Text.Trim());
-				//Fetch the product id for selected product of type Grease from table products.
-				if(Dropgrease.SelectedIndex != 0)
-				{
-					strArr = Dropgrease.SelectedItem.Text.Split(new char[] {':'},Dropgrease.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Grease%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Grease",prod_id);
-				cmdInsert.Parameters .Add ("@Grease_Qty",txtgreaseinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Grease_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgreasedt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Coolent_km",txtcoolentkm.Text.Trim());
+				////Fetch the product id for selected product of type Grease from table products.
+				//if(Dropgrease.SelectedIndex != 0)
+				//{
+				//	strArr = Dropgrease.SelectedItem.Text.Split(new char[] {':'},Dropgrease.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Grease%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Grease",prod_id);
+				//cmdInsert.Parameters .Add ("@Grease_Qty",txtgreaseinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Grease_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgreasedt"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Grease_km",txtgreasekm.Text.Trim());
-				//Fetch the product id for selected product of type Transmission Oil from table products.
-				if(Droptransmission.SelectedIndex != 0)
-				{
-					strArr = Droptransmission.SelectedItem.Text.Split(new char[] {':'},Droptransmission.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Transmission Oil%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Trans_Oil",prod_id);
-				cmdInsert.Parameters .Add ("@Trans_Oil_Qty",txttransinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Trans_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txttransmissiondt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Grease_km",txtgreasekm.Text.Trim());
+				////Fetch the product id for selected product of type Transmission Oil from table products.
+				//if(Droptransmission.SelectedIndex != 0)
+				//{
+				//	strArr = Droptransmission.SelectedItem.Text.Split(new char[] {':'},Droptransmission.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Transmission Oil%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Trans_Oil",prod_id);
+				//cmdInsert.Parameters .Add ("@Trans_Oil_Qty",txttransinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Trans_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txttransmissiondt"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Trans_Oil_km",txttransmissionkm.Text.Trim());
-				cmdInsert.Parameters .Add ("@Vehicle_Avg",txtvechileavarge.Text.Trim());			
-				cmdInsert.ExecuteNonQuery();
-				con.Close ();
+    //            cmdInsert.Parameters .Add ("@Trans_Oil_km",txttransmissionkm.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Vehicle_Avg",txtvechileavarge.Text.Trim());			
+				//cmdInsert.ExecuteNonQuery();
+				//con.Close ();
 				MessageBox.Show("Vehicle Saved");
 				CreateLogFiles.ErrorLog("Form:Vehicle_EntryForm.aspx,Method:btn_Save "+ " Vehicle entry for vehicle Name  "+txtVehiclenm.Text.Trim().ToUpper()+" Saved   userid "+ uid );
 				Clear();
@@ -605,7 +808,7 @@ namespace Servosms.Module.Logistics
 					DropVehicleID.Items.Add(SqlDtr.GetValue(0).ToString());    
 				}
 				SqlDtr.Close();
-				btnSave .Enabled  = false;
+				btnSave.Enabled  = false;
 				btnEdit.Enabled  = true;
 				btnDelete.Enabled  = true;
 				btnEdit1.Visible  = false;
@@ -793,175 +996,247 @@ namespace Servosms.Module.Logistics
 			}
             try
             {
-                SqlConnection con;
-                string strInsert;
-                SqlCommand cmdInsert;
-                DateTime dt1 = DateTime.Now;
-                con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-                con.Open();
-                strInsert = "update Vehicleentry set Vehicle_Type = @Vehicle_Type,Vehicle_no = @Vehicle_no,vehicle_name = @vehicle_name,RTO_Reg_Val_yrs = @RTO_Reg_Val_yrs,Model_name = @Model_name,RTO_Reg_No = @RTO_Reg_No,Vehicle_Man_Date =@Vehicle_Man_Date,Insurance_No = @Insurance_No,Meter_Reading=@Meter_Reading,Insurance_validity = @Insurance_validity,Vehicle_Route = @Vehicle_Route,Insurance_Comp_Name = @Insurance_Comp_Name,Fuel_Used=@Fuel_Used,Fuel_Used_Qty = @Fuel_Used_Qty,start_Fuel_Qty = @start_Fuel_Qty,"
-                    + "Engine_Oil = @Engine_Oil,Engine_Oil_Qty =@Engine_Oil_Qty,Engine_Oil_Dt = @Engine_Oil_Dt,Engine_Oil_km = @Engine_Oil_km,Gear_Oil = @Gear_Oil,Gear_Oil_Qty = @Gear_Oil_Qty,Gear_Oil_Dt = @Gear_Oil_Dt,Gear_Oil_Km = @Gear_Oil_Km,Brake_oil = @Brake_Oil,Brake_Oil_Qty = @Brake_Oil_Qty,BRake_Oil_dt = @Brake_Oil_Dt,Brake_OIl_Km = @Brake_Oil_Km,Coolent = @Coolent, Coolent_Qty = @Coolent_Qty, Coolent_Dt =@Coolent_Dt, Coolent_km = @Coolent_Km,Grease = @Grease,Grease_Qty =@Grease_Qty,Grease_Dt = @Grease_Dt,Grease_Km = @Grease_Km,"
-                    + "Trans_Oil = @Trans_Oil, Trans_Oil_Qty = @Trans_Oil_Qty, Trans_Oil_Dt = @Trans_Oil_Dt, Trans_Oil_Km = @Trans_Oil_km,Vehicle_Avg = @Vehicle_Avg where Vehicledetail_id = " + DropVehicleID.SelectedItem.Text.Trim();
-                cmdInsert = new SqlCommand(strInsert, con);
-                cmdInsert.Parameters.Add("@Vehicle_Type", DropVechileType2.SelectedItem.Text.ToString());
-                cmdInsert.Parameters.Add("@Vehicle_no", txtVehicleno.Text.Trim());
-                cmdInsert.Parameters.Add("@Vehicle_name", txtVehiclenm.Text.Trim());
-                cmdInsert.Parameters.Add("@RTO_Reg_Val_yrs", GenUtil.str2MMDDYYYY(Request.Form["txtrtoregvalidity"].ToString().Trim()));
-                cmdInsert.Parameters.Add("@Model_name", txtmodelnm.Text.Trim());
-                cmdInsert.Parameters.Add("@RTO_Reg_No", txtrtono.Text.Trim());
-                cmdInsert.Parameters.Add("@Vehicle_Man_Date", GenUtil.str2MMDDYYYY(Request.Form["txtVehicleyear"].ToString().Trim()));
-                cmdInsert.Parameters.Add("@Insurance_No", txtinsuranceno.Text.Trim());
-                cmdInsert.Parameters.Add("@Meter_Reading", txtVehiclemreading.Text.Trim());
-                cmdInsert.Parameters.Add("@Insurance_validity", GenUtil.str2MMDDYYYY(Request.Form["txtvalidityinsurance"].ToString().Trim()));
-                SqlDataReader SqlDtr = null;
-                string route_id = "";
-                dbobj.SelectQuery("Select route_id from Route where route_name='" + DropDownList1.SelectedItem.Text.Trim() + "'", ref SqlDtr);
-                if (SqlDtr.Read())
+                VehicleEntryModel vehEntryModel = new VehicleEntryModel();
+                vehEntryModel.Vehicle_ID = DropVehicleID.SelectedItem.Text.Trim();
+                vehEntryModel.VehicleType2 = DropVechileType2.SelectedItem.Text.ToString();
+                vehEntryModel.Vehicleno = txtVehicleno.Text.Trim();
+
+                vehEntryModel.Vehiclenm = txtVehiclenm.Text.Trim();
+
+                vehEntryModel.RTO_Reg_Val_yrs = GenUtil.str2MMDDYYYY(Request.Form["txtrtoregvalidity"].ToString().Trim());
+                vehEntryModel.Model_name = txtmodelnm.Text.Trim();
+
+                vehEntryModel.RTO_Reg_No = txtrtono.Text.Trim();
+                vehEntryModel.Vehicle_Man_Date = GenUtil.str2MMDDYYYY(Request.Form["txtVehicleyear"].ToString().Trim());
+                vehEntryModel.Insurance_No = txtinsuranceno.Text.Trim();
+                vehEntryModel.Meter_Reading = txtVehiclemreading.Text.Trim();
+                vehEntryModel.Insurance_validity = GenUtil.str2MMDDYYYY(Request.Form["txtvalidityinsurance"].ToString().Trim());
+                vehEntryModel.RouteName = DropDownList1.SelectedItem.Text.Trim();
+                vehEntryModel.Insurance_Comp_name = txtInsCompName.Text.Trim();
+
+                vehEntryModel.Fuel_Used = DropFuelused.SelectedItem.Text.Trim();
+                vehEntryModel.Fuel_Used_Qty = txtfuelinword.Text.Trim();
+                vehEntryModel.Start_Fuel_Qty = txtfuelintank.Text.Trim();
+
+                vehEntryModel.EngineOil = DropEngineOil.SelectedItem.Text.Trim();
+                vehEntryModel.Engine_Oil_Qty = txtEngineQty.Text.Trim();
+                vehEntryModel.Engine_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtEngineOilDate"].ToString().Trim());
+
+                vehEntryModel.Gear_Oil = Dropgear.SelectedItem.Text.Trim();
+                vehEntryModel.Gear_Oil_Qty = txtgearinword.Text.Trim();
+                vehEntryModel.Gear_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtgeardt"].ToString().Trim());
+
+                vehEntryModel.Brake_Oil = Dropbreak.SelectedItem.Text.Trim();
+                vehEntryModel.Brake_Oil_Qty = txtbearkinword.Text.Trim();
+                vehEntryModel.Brake_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtbreakdt"].ToString().Trim());
+
+                vehEntryModel.Coolent = Dropcoolent.SelectedItem.Text.Trim();
+                vehEntryModel.Coolent_Oil_Qty = txtcoolentinword.Text.Trim();
+                vehEntryModel.Coolent_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtcoolentdt"].ToString().Trim());
+
+                vehEntryModel.Grease = Dropgrease.SelectedItem.Text.Trim();
+                vehEntryModel.Grease_Qty = txtgreaseinword.Text.Trim();
+                vehEntryModel.Grease_Dt = GenUtil.str2MMDDYYYY(Request.Form["txtgreasedt"].ToString().Trim());
+
+                vehEntryModel.Trans_Oil = Droptransmission.SelectedItem.Text.Trim();
+                vehEntryModel.Trans_Oil_Qty = txttransinword.Text.Trim();
+                vehEntryModel.Trans_Oil_Dt = GenUtil.str2MMDDYYYY(Request.Form["txttransmissiondt"].ToString().Trim());
+                vehEntryModel.Trans_Oil_km = txttransmissionkm.Text.Trim();
+                vehEntryModel.Vehicle_Avg = txtvechileavarge.Text.Trim();
+
+                vehEntryModel.Engine_Oil_km = txtEngineKM.Text.Trim();
+                vehEntryModel.Gear_Oil_km = txtgearkm.Text.Trim();
+                vehEntryModel.Brake_Oil_km = txtbreakkm.Text.Trim();
+                vehEntryModel.Coolent_km = txtcoolentkm.Text.Trim();
+                vehEntryModel.Grease_km = txtgreasekm.Text.Trim();
+                vehEntryModel.Vehicle_ID = DropVehicleID.SelectedItem.Text.Trim();
+
+                using (var client = new HttpClient())
                 {
-                    route_id = SqlDtr.GetValue(0).ToString();
-                }
-                SqlDtr.Close();
-                cmdInsert.Parameters.Add("@Vehicle_Route", route_id);
-                cmdInsert.Parameters.Add("@Insurance_Comp_name", txtInsCompName.Text.Trim());
-                string prod_id = "";
-                //					dbobj.SelectQuery("Select prod_id from products where prod_name='"+DropFuelused.SelectedItem.Text.Trim()+"' and Category ='Fuel'" ,ref SqlDtr);
-                //					if(SqlDtr.Read())
-                //					{
-                //						prod_id = SqlDtr.GetValue(0).ToString();       
-                //					}
-                //					SqlDtr.Close();
-                //cmdInsert.Parameters .Add ("@Fuel_Used",prod_id);
-                cmdInsert.Parameters.Add("@Fuel_Used", DropFuelused.SelectedItem.Text.Trim());
-                cmdInsert.Parameters.Add("@Fuel_Used_Qty", txtfuelinword.Text.Trim());
-                cmdInsert.Parameters.Add("@Start_Fuel_Qty", txtfuelintank.Text.Trim());
-                string[] strArr = DropEngineOil.SelectedItem.Text.Split(new char[] { ':' }, DropEngineOil.SelectedItem.Text.Length);
-                if (DropEngineOil.SelectedIndex != 0)
-                {
-                    prod_id = "";
-                    dbobj.SelectQuery("Select prod_id from products where prod_name='" + strArr[0].Trim() + "' and pack_type ='" + strArr[1].Trim() + "' and Category like 'Engine Oil%'", ref SqlDtr);
-                    if (SqlDtr.Read())
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(vehEntryModel);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VehicleEntry/UpdateVehicleEntry", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
                     {
-                        prod_id = SqlDtr.GetValue(0).ToString();
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
                     }
-                    SqlDtr.Close();
                 }
-                else
-                {
-                    prod_id = "0";
-                }
-                cmdInsert.Parameters.Add("@Engine_Oil", prod_id);
-                cmdInsert.Parameters.Add("@Engine_Oil_Qty", txtEngineQty.Text.Trim());
-                cmdInsert.Parameters.Add("@Engine_Oil_Dt", GenUtil.str2MMDDYYYY(Request.Form["txtEngineOilDate"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Engine_Oil_km",txtEngineKM.Text.Trim());
+    //            SqlConnection con;
+    //            string strInsert;
+    //            SqlCommand cmdInsert;
+    //            DateTime dt1 = DateTime.Now;
+    //            con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+    //            con.Open();
+    //            strInsert = "update Vehicleentry set Vehicle_Type = @Vehicle_Type,Vehicle_no = @Vehicle_no,vehicle_name = @vehicle_name,RTO_Reg_Val_yrs = @RTO_Reg_Val_yrs,Model_name = @Model_name,RTO_Reg_No = @RTO_Reg_No,Vehicle_Man_Date =@Vehicle_Man_Date,Insurance_No = @Insurance_No,Meter_Reading=@Meter_Reading,Insurance_validity = @Insurance_validity,Vehicle_Route = @Vehicle_Route,Insurance_Comp_Name = @Insurance_Comp_Name,Fuel_Used=@Fuel_Used,Fuel_Used_Qty = @Fuel_Used_Qty,start_Fuel_Qty = @start_Fuel_Qty,"
+    //                + "Engine_Oil = @Engine_Oil,Engine_Oil_Qty =@Engine_Oil_Qty,Engine_Oil_Dt = @Engine_Oil_Dt,Engine_Oil_km = @Engine_Oil_km,Gear_Oil = @Gear_Oil,Gear_Oil_Qty = @Gear_Oil_Qty,Gear_Oil_Dt = @Gear_Oil_Dt,Gear_Oil_Km = @Gear_Oil_Km,Brake_oil = @Brake_Oil,Brake_Oil_Qty = @Brake_Oil_Qty,BRake_Oil_dt = @Brake_Oil_Dt,Brake_OIl_Km = @Brake_Oil_Km,Coolent = @Coolent, Coolent_Qty = @Coolent_Qty, Coolent_Dt =@Coolent_Dt, Coolent_km = @Coolent_Km,Grease = @Grease,Grease_Qty =@Grease_Qty,Grease_Dt = @Grease_Dt,Grease_Km = @Grease_Km,"
+    //                + "Trans_Oil = @Trans_Oil, Trans_Oil_Qty = @Trans_Oil_Qty, Trans_Oil_Dt = @Trans_Oil_Dt, Trans_Oil_Km = @Trans_Oil_km,Vehicle_Avg = @Vehicle_Avg where Vehicledetail_id = " + DropVehicleID.SelectedItem.Text.Trim();
+    //            cmdInsert = new SqlCommand(strInsert, con);
+    //            cmdInsert.Parameters.Add("@Vehicle_Type", DropVechileType2.SelectedItem.Text.ToString());
+    //            cmdInsert.Parameters.Add("@Vehicle_no", txtVehicleno.Text.Trim());
+    //            cmdInsert.Parameters.Add("@Vehicle_name", txtVehiclenm.Text.Trim());
+    //            cmdInsert.Parameters.Add("@RTO_Reg_Val_yrs", GenUtil.str2MMDDYYYY(Request.Form["txtrtoregvalidity"].ToString().Trim()));
+    //            cmdInsert.Parameters.Add("@Model_name", txtmodelnm.Text.Trim());
+    //            cmdInsert.Parameters.Add("@RTO_Reg_No", txtrtono.Text.Trim());
+    //            cmdInsert.Parameters.Add("@Vehicle_Man_Date", GenUtil.str2MMDDYYYY(Request.Form["txtVehicleyear"].ToString().Trim()));
+    //            cmdInsert.Parameters.Add("@Insurance_No", txtinsuranceno.Text.Trim());
+    //            cmdInsert.Parameters.Add("@Meter_Reading", txtVehiclemreading.Text.Trim());
+    //            cmdInsert.Parameters.Add("@Insurance_validity", GenUtil.str2MMDDYYYY(Request.Form["txtvalidityinsurance"].ToString().Trim()));
+    //            SqlDataReader SqlDtr = null;
+    //            string route_id = "";
+    //            dbobj.SelectQuery("Select route_id from Route where route_name='" + DropDownList1.SelectedItem.Text.Trim() + "'", ref SqlDtr);
+    //            if (SqlDtr.Read())
+    //            {
+    //                route_id = SqlDtr.GetValue(0).ToString();
+    //            }
+    //            SqlDtr.Close();
+    //            cmdInsert.Parameters.Add("@Vehicle_Route", route_id);
+    //            cmdInsert.Parameters.Add("@Insurance_Comp_name", txtInsCompName.Text.Trim());
+    //            string prod_id = "";
+    //            //					dbobj.SelectQuery("Select prod_id from products where prod_name='"+DropFuelused.SelectedItem.Text.Trim()+"' and Category ='Fuel'" ,ref SqlDtr);
+    //            //					if(SqlDtr.Read())
+    //            //					{
+    //            //						prod_id = SqlDtr.GetValue(0).ToString();       
+    //            //					}
+    //            //					SqlDtr.Close();
+    //            //cmdInsert.Parameters .Add ("@Fuel_Used",prod_id);
+    //            cmdInsert.Parameters.Add("@Fuel_Used", DropFuelused.SelectedItem.Text.Trim());
+    //            cmdInsert.Parameters.Add("@Fuel_Used_Qty", txtfuelinword.Text.Trim());
+    //            cmdInsert.Parameters.Add("@Start_Fuel_Qty", txtfuelintank.Text.Trim());
+    //            string[] strArr = DropEngineOil.SelectedItem.Text.Split(new char[] { ':' }, DropEngineOil.SelectedItem.Text.Length);
+    //            if (DropEngineOil.SelectedIndex != 0)
+    //            {
+    //                prod_id = "";
+    //                dbobj.SelectQuery("Select prod_id from products where prod_name='" + strArr[0].Trim() + "' and pack_type ='" + strArr[1].Trim() + "' and Category like 'Engine Oil%'", ref SqlDtr);
+    //                if (SqlDtr.Read())
+    //                {
+    //                    prod_id = SqlDtr.GetValue(0).ToString();
+    //                }
+    //                SqlDtr.Close();
+    //            }
+    //            else
+    //            {
+    //                prod_id = "0";
+    //            }
+    //            cmdInsert.Parameters.Add("@Engine_Oil", prod_id);
+    //            cmdInsert.Parameters.Add("@Engine_Oil_Qty", txtEngineQty.Text.Trim());
+    //            cmdInsert.Parameters.Add("@Engine_Oil_Dt", GenUtil.str2MMDDYYYY(Request.Form["txtEngineOilDate"].ToString().Trim()));
 
-				if(Dropgear.SelectedIndex != 0)
-				{
-					strArr = Dropgear.SelectedItem.Text.Split(new char[] {':'},Dropgear.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Gear Oil%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Gear_Oil",prod_id);
-				cmdInsert.Parameters .Add ("@Gear_Oil_Qty",txtgearinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Gear_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgeardt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Engine_Oil_km",txtEngineKM.Text.Trim());
 
-                cmdInsert.Parameters .Add ("@Gear_Oil_km",txtgearkm.Text.Trim());
+				//if(Dropgear.SelectedIndex != 0)
+				//{
+				//	strArr = Dropgear.SelectedItem.Text.Split(new char[] {':'},Dropgear.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Gear Oil%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Gear_Oil",prod_id);
+				//cmdInsert.Parameters .Add ("@Gear_Oil_Qty",txtgearinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Gear_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgeardt"].ToString().Trim()));
 
-				if(Dropbreak.SelectedIndex != 0)
-				{
-					strArr = Dropbreak.SelectedItem.Text.Split(new char[] {':'},Dropbreak.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Brake Oil%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Brake_Oil",prod_id);
-				cmdInsert.Parameters .Add ("@Brake_Oil_Qty",txtbearkinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Brake_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtbreakdt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Gear_Oil_km",txtgearkm.Text.Trim());
 
-                cmdInsert.Parameters .Add ("@Brake_Oil_km",txtbreakkm.Text.Trim());
+				//if(Dropbreak.SelectedIndex != 0)
+				//{
+				//	strArr = Dropbreak.SelectedItem.Text.Split(new char[] {':'},Dropbreak.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Brake Oil%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Brake_Oil",prod_id);
+				//cmdInsert.Parameters .Add ("@Brake_Oil_Qty",txtbearkinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Brake_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtbreakdt"].ToString().Trim()));
 
-				if(Dropcoolent.SelectedIndex != 0 )
-				{
-					strArr = Dropcoolent.SelectedItem.Text.Split(new char[] {':'},Dropcoolent.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Collent%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Coolent",prod_id);
-				cmdInsert.Parameters .Add ("@Coolent_Qty",txtcoolentinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Coolent_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtcoolentdt"].ToString().Trim()));
+    //            cmdInsert.Parameters .Add ("@Brake_Oil_km",txtbreakkm.Text.Trim());
 
-                cmdInsert.Parameters .Add ("@Coolent_km",txtcoolentkm.Text.Trim());
+				//if(Dropcoolent.SelectedIndex != 0 )
+				//{
+				//	strArr = Dropcoolent.SelectedItem.Text.Split(new char[] {':'},Dropcoolent.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Collent%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Coolent",prod_id);
+				//cmdInsert.Parameters .Add ("@Coolent_Qty",txtcoolentinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Coolent_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtcoolentdt"].ToString().Trim()));
+
+    //            cmdInsert.Parameters .Add ("@Coolent_km",txtcoolentkm.Text.Trim());
 				
-				if(Dropgrease.SelectedIndex != 0)
-				{
-					strArr = Dropgrease.SelectedItem.Text.Split(new char[] {':'},Dropgrease.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Grease%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Grease",prod_id);
-				cmdInsert.Parameters .Add ("@Grease_Qty",txtgreaseinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Grease_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgreasedt"].ToString().Trim()));
+				//if(Dropgrease.SelectedIndex != 0)
+				//{
+				//	strArr = Dropgrease.SelectedItem.Text.Split(new char[] {':'},Dropgrease.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Grease%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Grease",prod_id);
+				//cmdInsert.Parameters .Add ("@Grease_Qty",txtgreaseinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Grease_Dt",GenUtil.str2MMDDYYYY(Request.Form["txtgreasedt"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Grease_km",txtgreasekm.Text.Trim());
+    //            cmdInsert.Parameters .Add ("@Grease_km",txtgreasekm.Text.Trim());
 
-				if(Droptransmission.SelectedIndex != 0)
-				{
-					strArr = Droptransmission.SelectedItem.Text.Split(new char[] {':'},Droptransmission.SelectedItem.Text.Length);    
-					prod_id = "";
-					dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Transmission Oil%'" ,ref SqlDtr);
-					if(SqlDtr.Read())
-					{
-						prod_id = SqlDtr.GetValue(0).ToString();       
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					prod_id = "0";
-				}
-				cmdInsert.Parameters .Add ("@Trans_Oil",prod_id);
-				cmdInsert.Parameters .Add ("@Trans_Oil_Qty",txttransinword.Text.Trim());
-				cmdInsert.Parameters .Add ("@Trans_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txttransmissiondt"].ToString().Trim()));
+				//if(Droptransmission.SelectedIndex != 0)
+				//{
+				//	strArr = Droptransmission.SelectedItem.Text.Split(new char[] {':'},Droptransmission.SelectedItem.Text.Length);    
+				//	prod_id = "";
+				//	dbobj.SelectQuery("Select prod_id from products where prod_name='"+strArr[0].Trim()+"' and pack_type ='"+strArr[1].Trim()+"' and Category like 'Transmission Oil%'" ,ref SqlDtr);
+				//	if(SqlDtr.Read())
+				//	{
+				//		prod_id = SqlDtr.GetValue(0).ToString();       
+				//	}
+				//	SqlDtr.Close();
+				//}
+				//else
+				//{
+				//	prod_id = "0";
+				//}
+				//cmdInsert.Parameters .Add ("@Trans_Oil",prod_id);
+				//cmdInsert.Parameters .Add ("@Trans_Oil_Qty",txttransinword.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Trans_Oil_Dt",GenUtil.str2MMDDYYYY(Request.Form["txttransmissiondt"].ToString().Trim()));
 
-                cmdInsert.Parameters .Add ("@Trans_Oil_km",txttransmissionkm.Text.Trim());
-				cmdInsert.Parameters .Add ("@Vehicle_Avg",txtvechileavarge.Text.Trim());			
-				cmdInsert.ExecuteNonQuery();
-				con.Close ();
+    //            cmdInsert.Parameters .Add ("@Trans_Oil_km",txttransmissionkm.Text.Trim());
+				//cmdInsert.Parameters .Add ("@Vehicle_Avg",txtvechileavarge.Text.Trim());			
+				//cmdInsert.ExecuteNonQuery();
+				//con.Close ();
 				MessageBox.Show("Vehicle Updated");
 				CreateLogFiles.ErrorLog("Form:Vehicle_EntryForm.aspx,Method:btn_Edit "+ " Vehicle entry for vehicle Name  "+txtVehiclenm.Text.Trim().ToUpper()+" Updated   userid "+ uid );
 				Clear();
@@ -995,8 +1270,26 @@ namespace Servosms.Module.Logistics
 					return;
 				}
 
-				int c = 0;
-				dbobj.Insert_or_Update("Delete from vehicleentry where vehicledetail_id = "+DropVehicleID.SelectedItem.Text.Trim(),ref c);    
+                int c = 0;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(DropVehicleID.SelectedItem.Text.Trim());
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VehicleEntry/UpdateVehicleEntry?vehicleID=" + DropVehicleID.SelectedItem.Text.Trim(), byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        c = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(responseString);
+                    }
+                }
+
+                
+				//dbobj.Insert_or_Update("Delete from vehicleentry where vehicledetail_id = "+DropVehicleID.SelectedItem.Text.Trim(),ref c);    
 				if(c > 0)
 				{
 					MessageBox.Show("Vehicle Deleted");
