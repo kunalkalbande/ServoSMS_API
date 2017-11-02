@@ -44,7 +44,7 @@ namespace Servosms.Module.Accounts
         static ArrayList LedgerID = new ArrayList();
         static bool PrintFlag = false;
         static string Invoice_Date = "", Acc_Date = "";
-        string BaseUri = "http://localhost:60637";
+        string BaseUri = "http://localhost:64862";
 
         /// <summary>
         /// Put user code to initialize the page here
@@ -79,13 +79,28 @@ namespace Servosms.Module.Accounts
                 LedgerID = new ArrayList();
                 Invoice_Date = "";
                 Acc_Date = "";
+                string str = "";
                 InventoryClass obj = new InventoryClass();
-                SqlDataReader rdr = obj.GetRecordSet("select Acc_Date_from from Organisation");
-                if (rdr.Read())
+
+                using (var client = new HttpClient())
                 {
-                    Acc_Date = GenUtil.trimDate(rdr["Acc_Date_from"].ToString());
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/payment/page_load").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        str = JsonConvert.DeserializeObject<string>(id);
+                    }
                 }
-                rdr.Close();
+                Acc_Date = str;
+                //SqlDataReader rdr = obj.GetRecordSet("select Acc_Date_from from Organisation");
+                //if (rdr.Read())
+                //{
+                //    Acc_Date = GenUtil.trimDate(rdr["Acc_Date_from"].ToString());
+                //}
+                //rdr.Close();
             }
             txtDate.Text = Request.Form["txtDate"] == null ? GenUtil.str2DDMMYYYY(System.DateTime.Now.ToShortDateString()) : Request.Form["txtDate"].ToString().Trim();
             txtchkDate.Text = Request.Form["txtchkDate"] == null ? GenUtil.str2DDMMYYYY(System.DateTime.Now.ToShortDateString()) : Request.Form["txtchkDate"].ToString().Trim();
@@ -138,31 +153,65 @@ namespace Servosms.Module.Accounts
         {
             try
             {
-                SqlDataReader SqlDtr = null;
+                //SqlDataReader SqlDtr = null;
                 dbobj.Dispose();
-                dbobj.SelectQuery("Select Ledger_Name,Ledger_ID from Ledger_Master lm,Ledger_master_sub_grp lmsg  where  lm.sub_grp_id = lmsg.sub_grp_id and lmsg.sub_grp_name not like 'Bank%' and lmsg.sub_grp_name <> 'Cash in hand' and lmsg.sub_grp_name <> 'Discount' Order by Ledger_Name", ref SqlDtr);
-                if (SqlDtr.HasRows)
+                string str="";
+                using (var client = new HttpClient())
                 {
-                    texthiddenprod.Value = "Select,";
-                    while (SqlDtr.Read())
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/payment/fillCombo").Result;
+                    if (Res.IsSuccessStatusCode)
                     {
-                        texthiddenprod.Value += SqlDtr["Ledger_Name"].ToString() + ";" + SqlDtr["Ledger_ID"].ToString() + ",";
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        str = JsonConvert.DeserializeObject<string>(id);
                     }
                 }
-                SqlDtr.Close();
+                texthiddenprod.Value = str;
+                //dbobj.SelectQuery("Select Ledger_Name,Ledger_ID from Ledger_Master lm,Ledger_master_sub_grp lmsg  where  lm.sub_grp_id = lmsg.sub_grp_id and lmsg.sub_grp_name not like 'Bank%' and lmsg.sub_grp_name <> 'Cash in hand' and lmsg.sub_grp_name <> 'Discount' Order by Ledger_Name", ref SqlDtr);
+                //if (SqlDtr.HasRows)
+                //{
+                //    texthiddenprod.Value = "Select,";
+                //    while (SqlDtr.Read())
+                //    {
+                //        texthiddenprod.Value += SqlDtr["Ledger_Name"].ToString() + ";" + SqlDtr["Ledger_ID"].ToString() + ",";
+                //    }
+                //}
+                //SqlDtr.Close();
+
                 dbobj.Dispose();
-                dbobj.SelectQuery("Select Ledger_Name,sub_grp_name from Ledger_Master lm,Ledger_master_sub_grp lmsg  where  lm.sub_grp_id = lmsg.sub_grp_id  and (sub_grp_name='Cash in hand' or sub_grp_name like'Bank%')  Order by Ledger_Name", ref SqlDtr);
-                while (SqlDtr.Read())
+                PaymentModels payment = new PaymentModels();
+                using (var client = new HttpClient())
                 {
-                    string str = SqlDtr["sub_grp_name"].ToString();
-                    if (str.Equals("Cash in hand") || str.IndexOf("Bank") > -1)
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/payment/fillCombo2").Result;
+                    if (Res.IsSuccessStatusCode)
                     {
-                        DropBy.Items.Add(SqlDtr["Ledger_Name"].ToString());
-                        if (str.Equals("Cash in hand"))
-                            strCash = SqlDtr["Ledger_Name"].ToString();
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        payment = JsonConvert.DeserializeObject<PaymentModels>(id);
                     }
                 }
-                SqlDtr.Close();
+                foreach (var item in payment.DropBy1)
+                {
+                    DropBy.Items.Add(item);
+                }                
+                strCash = payment.strCash;
+                //dbobj.SelectQuery("Select Ledger_Name,sub_grp_name from Ledger_Master lm,Ledger_master_sub_grp lmsg  where  lm.sub_grp_id = lmsg.sub_grp_id  and (sub_grp_name='Cash in hand' or sub_grp_name like'Bank%')  Order by Ledger_Name", ref SqlDtr);
+                //    while (SqlDtr.Read())
+                //    {
+                //        str = SqlDtr["sub_grp_name"].ToString();
+                //        if (str.Equals("Cash in hand") || str.IndexOf("Bank") > -1)
+                //        {
+                //            DropBy.Items.Add(SqlDtr["Ledger_Name"].ToString());
+                //            if (str.Equals("Cash in hand"))
+                //                strCash = SqlDtr["Ledger_Name"].ToString();
+                //        }
+                //    }
+                //SqlDtr.Close();
+
             }
             catch (Exception ex)
             {
@@ -241,7 +290,7 @@ namespace Servosms.Module.Accounts
             Amount = txtAmount.Text.Trim();
             narration = txtNarrartion.Value.Trim();
 
-            SqlDataReader SqlDtr = null;
+            //SqlDataReader SqlDtr = null;
             string strNew = DropLedgerName.Value;
             string[] arrstrNew = strNew.Split(new char[] { ';' }, strNew.Length);
             if (strNew == "Select")
@@ -270,7 +319,7 @@ namespace Servosms.Module.Accounts
                     byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                    var response = client.PostAsync("api/payment/btnSave_Click", byteContent).Result;
+                    var response = client.PostAsync("api/payment/SavePayment", byteContent).Result;
                     if (response.IsSuccessStatusCode)
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
@@ -362,15 +411,32 @@ namespace Servosms.Module.Accounts
                 if (name.IndexOf(";") > 0)
                 {
                     string[] arrLName = name.Split(new char[] { ';' }, name.Length);
-                    SqlDataReader rdr = null;
-                    string str = "select address,city from customer,ledger_master where ledger_name=cust_name and ledger_id='" + arrLName[1] + "'";
-                    dbobj.SelectQuery(str, ref rdr);
-                    if (rdr.Read())
+                   // SqlDataReader rdr = null;
+                    string str;
+                    str = arrLName[1];
+                    PaymentModels payment = new PaymentModels();
+                    using (var client = new HttpClient())
                     {
-                        addr = rdr.GetValue(0).ToString();
-                        city = rdr.GetValue(1).ToString();
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/payment/makingReport?str="+str ).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            payment = JsonConvert.DeserializeObject<PaymentModels>(id);
+                        }
                     }
-                    rdr.Close();
+                    addr = payment.addr;
+                    city = payment.city;
+                    //string str = "select address,city from customer,ledger_master where ledger_name=cust_name and ledger_id='" + arrLName[1] + "'";
+                    //dbobj.SelectQuery(str, ref rdr);
+                    //if (rdr.Read())
+                    //{
+                    //    addr = rdr.GetValue(0).ToString();
+                    //    city = rdr.GetValue(1).ToString();
+                    //}
+                    //rdr.Close();
                 }
                 else
                 {
@@ -534,7 +600,7 @@ namespace Servosms.Module.Accounts
                     client.BaseAddress = new Uri(BaseUri);
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var Res = client.GetAsync("api/payment/btnEdit1_Click").Result;
+                    var Res = client.GetAsync("api/payment/FillLedgerName").Result;
                     if (Res.IsSuccessStatusCode)
                     {
                         var id = Res.Content.ReadAsStringAsync().Result;
@@ -589,7 +655,7 @@ namespace Servosms.Module.Accounts
                     client.BaseAddress = new Uri(BaseUri);
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var Res = client.GetAsync("api/payment/DropLedgerName1_SelectedIndexChanged?VoucherId=" + VoucherId).Result;
+                    var Res = client.GetAsync("api/payment/LedgerName_SelectedIndexChanged?VoucherId=" + VoucherId).Result;
                     if (Res.IsSuccessStatusCode)
                     {
                         var id = Res.Content.ReadAsStringAsync().Result;
@@ -736,7 +802,7 @@ namespace Servosms.Module.Accounts
                 client.BaseAddress = new Uri(BaseUri);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var Res = client.GetAsync("api/payment/btnEdit_Click?Ledger_Name1=" + Ledger_Name1).Result;
+                var Res = client.GetAsync("api/payment/SelectLedgerId?Ledger_Name1=" + Ledger_Name1).Result;
                 if (Res.IsSuccessStatusCode)
                 {
                     var id = Res.Content.ReadAsStringAsync().Result;
@@ -764,7 +830,7 @@ namespace Servosms.Module.Accounts
                 client.BaseAddress = new Uri(BaseUri);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var Res = client.GetAsync("api/payment/btnEdit_Click2?Ledger_ID1=" + Ledger_ID1 + "&OldLedger_ID=" + OldLedger_ID).Result;
+                var Res = client.GetAsync("api/payment/SelectCustId?Ledger_ID1=" + Ledger_ID1 + "&OldLedger_ID=" + OldLedger_ID).Result;
                 if (Res.IsSuccessStatusCode)
                 {
                     var id = Res.Content.ReadAsStringAsync().Result;
@@ -809,7 +875,7 @@ namespace Servosms.Module.Accounts
                     byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                    var response = client.PostAsync("api/payment/btnEdit_Click3", byteContent).Result;
+                    var response = client.PostAsync("api/payment/UpdatePayment", byteContent).Result;
                     if (response.IsSuccessStatusCode)
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
@@ -861,7 +927,7 @@ namespace Servosms.Module.Accounts
                     byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                    var response = client.PostAsync("api/payment/btnEdit_Click4", byteContent).Result;
+                    var response = client.PostAsync("api/payment/DeleteAndUpdatePayment", byteContent).Result;
                     if (response.IsSuccessStatusCode)
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
@@ -927,7 +993,7 @@ namespace Servosms.Module.Accounts
                     client.BaseAddress = new Uri(BaseUri);
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var Res = client.GetAsync("api/payment/btnDelete_Click?CustName=" + CustName + "&VoucherId=" + VoucherId).Result;
+                    var Res = client.GetAsync("api/payment/DeletePayment?CustName=" + CustName + "&VoucherId=" + VoucherId).Result;
                     if (Res.IsSuccessStatusCode)
                     {
                         var id = Res.Content.ReadAsStringAsync().Result;
@@ -1015,65 +1081,80 @@ namespace Servosms.Module.Accounts
         /// </summary>
         public void SeqCashAccount()
         {
-            SqlDataReader rdr = null;
-            SqlCommand cmd;
+            //SqlDataReader rdr = null;
+            //SqlCommand cmd;
             SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-            dbobj.SelectQuery("select * from AccountsLedgerTable where Ledger_ID=(select Ledger_ID from Ledger_Master where sub_grp_id=118) and Entry_Date>='" + Invoice_Date + "' order by entry_date", ref rdr);
-            double Bal = 0;
-            string BalType = "";
-            int i = 0;
-            while (rdr.Read())
+
+            PaymentModels payment = new PaymentModels();
+            using (var client = new HttpClient())
             {
-                if (i == 0)
+                client.BaseAddress = new Uri(BaseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var Res = client.GetAsync("api/payment/SeqCashAccount?Invoice_Date="+ Invoice_Date).Result;
+                if (Res.IsSuccessStatusCode)
                 {
-                    BalType = rdr["Bal_Type"].ToString();
-                    i++;
-                }
-                else
-                {
-                    if (double.Parse(rdr["Credit_Amount"].ToString()) != 0)
-                    {
-                        if (BalType == "Cr")
-                        {
-                            Bal += double.Parse(rdr["Credit_Amount"].ToString());
-                            BalType = "Cr";
-                        }
-                        else
-                        {
-                            Bal -= double.Parse(rdr["Credit_Amount"].ToString());
-                            if (Bal < 0)
-                            {
-                                Bal = double.Parse(Bal.ToString().Substring(1));
-                                BalType = "Cr";
-                            }
-                            else
-                                BalType = "Dr";
-                        }
-                    }
-                    else if (double.Parse(rdr["Debit_Amount"].ToString()) != 0)
-                    {
-                        if (BalType == "Dr")
-                            Bal += double.Parse(rdr["Debit_Amount"].ToString());
-                        else
-                        {
-                            Bal -= double.Parse(rdr["Debit_Amount"].ToString());
-                            if (Bal < 0)
-                            {
-                                Bal = double.Parse(Bal.ToString().Substring(1));
-                                BalType = "Dr";
-                            }
-                            else
-                                BalType = "Cr";
-                        }
-                    }
-                    Con.Open();
-                    cmd = new SqlCommand("update AccountsLedgerTable set Balance='" + Bal.ToString() + "',Bal_Type='" + BalType + "' where Ledger_ID='" + rdr["Ledger_ID"].ToString() + "' and Particulars='" + rdr["Particulars"].ToString() + "' ", Con);
-                    cmd.ExecuteNonQuery();
-                    cmd.Dispose();
-                    Con.Close();
+                    var id = Res.Content.ReadAsStringAsync().Result;
+                    payment = JsonConvert.DeserializeObject<PaymentModels>(id);
                 }
             }
-            rdr.Close();
+
+            //dbobj.SelectQuery("select * from AccountsLedgerTable where Ledger_ID=(select Ledger_ID from Ledger_Master where sub_grp_id=118) and Entry_Date>='" + Invoice_Date + "' order by entry_date", ref rdr);
+            //double Bal = 0;
+            //string BalType = "";
+            //int i = 0;
+            //while (rdr.Read())
+            //{
+            //    if (i == 0)
+            //    {
+            //        BalType = rdr["Bal_Type"].ToString();
+            //        i++;
+            //    }
+            //    else
+            //    {
+            //        if (double.Parse(rdr["Credit_Amount"].ToString()) != 0)
+            //        {
+            //            if (BalType == "Cr")
+            //            {
+            //                Bal += double.Parse(rdr["Credit_Amount"].ToString());
+            //                BalType = "Cr";
+            //            }
+            //            else
+            //            {
+            //                Bal -= double.Parse(rdr["Credit_Amount"].ToString());
+            //                if (Bal < 0)
+            //                {
+            //                    Bal = double.Parse(Bal.ToString().Substring(1));
+            //                    BalType = "Cr";
+            //                }
+            //                else
+            //                    BalType = "Dr";
+            //            }
+            //        }
+            //        else if (double.Parse(rdr["Debit_Amount"].ToString()) != 0)
+            //        {
+            //            if (BalType == "Dr")
+            //                Bal += double.Parse(rdr["Debit_Amount"].ToString());
+            //            else
+            //            {
+            //                Bal -= double.Parse(rdr["Debit_Amount"].ToString());
+            //                if (Bal < 0)
+            //                {
+            //                    Bal = double.Parse(Bal.ToString().Substring(1));
+            //                    BalType = "Dr";
+            //                }
+            //                else
+            //                    BalType = "Cr";
+            //            }
+            //        }
+            //        Con.Open();
+            //        cmd = new SqlCommand("update AccountsLedgerTable set Balance='" + Bal.ToString() + "',Bal_Type='" + BalType + "' where Ledger_ID='" + rdr["Ledger_ID"].ToString() + "' and Particulars='" + rdr["Particulars"].ToString() + "' ", Con);
+            //        cmd.ExecuteNonQuery();
+            //        cmd.Dispose();
+            //        Con.Close();
+            //    }
+            //}
+            //rdr.Close();
         }
 
         /// <summary>
@@ -1081,10 +1162,10 @@ namespace Servosms.Module.Accounts
         /// </summary>
         public void CustomerUpdate()
         {
-            SqlDataReader rdr = null;
+            //SqlDataReader rdr = null;
             InventoryClass obj = new InventoryClass();
             SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-            object obj1 = null;
+            //object obj1 = null;
             if (Invoice_Date.IndexOf(" ") > 0)
             {
                 string[] CheckDate = Invoice_Date.Split(new char[] { ' ' }, Invoice_Date.Length);
@@ -1101,13 +1182,28 @@ namespace Servosms.Module.Accounts
                 Invoice_Date = GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString());
             for (int k = 0; k < LedgerID.Count; k++)
             {
-                dbobj.ExecProc(DBOperations.OprType.Insert, "UpdateAccountsLedgerForCustomer", ref obj1, "@Ledger_ID", LedgerID[k].ToString(), "@Invoice_Date", Invoice_Date);
-                dbobj.SelectQuery("select cust_id from customer,ledger_master where ledger_name=cust_name and ledger_id='" + LedgerID[k].ToString() + "'", ref rdr);
-                if (rdr.Read())
+                string str = LedgerID[k].ToString();
+
+                using (var client = new HttpClient())
                 {
-                    dbobj.ExecProc(DBOperations.OprType.Insert, "UpdateCustomerLedgerForCustomer", ref obj1, "@Cust_ID", rdr["Cust_ID"].ToString(), "@Invoice_Date", Convert.ToDateTime(Invoice_Date));
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/payment/CustomerUpdate?str="+str +"&Invoice_Date="+Invoice_Date).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        //LedgerName = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
                 }
-                rdr.Close();
+
+                //dbobj.ExecProc(DBOperations.OprType.Insert, "UpdateAccountsLedgerForCustomer", ref obj1, "@Ledger_ID", LedgerID[k].ToString(), "@Invoice_Date", Invoice_Date);
+                //dbobj.SelectQuery("select cust_id from customer,ledger_master where ledger_name=cust_name and ledger_id='" + LedgerID[k].ToString() + "'", ref rdr);
+                //if (rdr.Read())
+                //{
+                //    dbobj.ExecProc(DBOperations.OprType.Insert, "UpdateCustomerLedgerForCustomer", ref obj1, "@Cust_ID", rdr["Cust_ID"].ToString(), "@Invoice_Date", Convert.ToDateTime(Invoice_Date));
+                //}
+                //rdr.Close();
             }
         }
 
@@ -1116,13 +1212,13 @@ namespace Servosms.Module.Accounts
         /// </summary>
         public void CustomerInsertUpdate(string Ledger_ID)
         {
-            SqlDataReader rdr = null;
-            SqlCommand cmd;
+            //SqlDataReader rdr = null;
+            //SqlCommand cmd;
             InventoryClass obj = new InventoryClass();
             SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-            double Bal = 0;
-            string BalType = "", str = "";
-            int i = 0;
+            //double Bal = 0;
+            //string BalType = "", str = "";
+            //int i = 0;
             if (Invoice_Date.IndexOf(" ") > 0)
             {
                 string[] CheckDate = Invoice_Date.Split(new char[] { ' ' }, Invoice_Date.Length);
@@ -1133,143 +1229,160 @@ namespace Servosms.Module.Accounts
             }
             else
                 Invoice_Date = GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString());
-            rdr = obj.GetRecordSet("select top 1 Entry_Date from AccountsLedgerTable where Ledger_ID='" + Ledger_ID.ToString() + "' and Entry_Date<=Convert(datetime,'" + Invoice_Date + "',103) order by entry_date desc");
-            if (rdr.Read())
-            {
-                var entry_date = GenUtil.str2MMDDYYYY(rdr.GetValue(0).ToString());
-                str = "select * from AccountsLedgerTable where Ledger_ID='" + Ledger_ID + "' and Entry_Date>='" + entry_date + "' order by entry_date";
-            }
-            else
-                str = "select * from AccountsLedgerTable where Ledger_ID='" + Ledger_ID + "' order by entry_date";
-            rdr.Close();
-            rdr = obj.GetRecordSet(str);
-            Bal = 0;
-            BalType = "";
-            i = 0;
-            while (rdr.Read())
-            {
-                if (i == 0)
-                {
-                    BalType = rdr["Bal_Type"].ToString();
-                    Bal = double.Parse(rdr["Balance"].ToString());
-                    i++;
-                }
-                else
-                {
-                    if (double.Parse(rdr["Credit_Amount"].ToString()) != 0)
-                    {
-                        if (BalType == "Cr")
-                        {
-                            string ss = rdr["Credit_Amount"].ToString();
-                            Bal += double.Parse(rdr["Credit_Amount"].ToString());
-                            BalType = "Cr";
-                        }
-                        else
-                        {
-                            string ss = rdr["Credit_Amount"].ToString();
-                            Bal -= double.Parse(rdr["Credit_Amount"].ToString());
-                            if (Bal < 0)
-                            {
-                                Bal = double.Parse(Bal.ToString().Substring(1));
-                                BalType = "Cr";
-                            }
-                            else
-                                BalType = "Dr";
-                        }
-                    }
-                    else if (double.Parse(rdr["Debit_Amount"].ToString()) != 0)
-                    {
-                        if (BalType == "Dr")
-                        {
-                            string ss = rdr["Debit_Amount"].ToString();
-                            Bal += double.Parse(rdr["Debit_Amount"].ToString());
-                        }
-                        else
-                        {
-                            string ss = rdr["Debit_Amount"].ToString();
-                            Bal -= double.Parse(rdr["Debit_Amount"].ToString());
-                            if (Bal < 0)
-                            {
-                                Bal = double.Parse(Bal.ToString().Substring(1));
-                                BalType = "Dr";
-                            }
-                            else
-                                BalType = "Cr";
-                        }
-                    }
-                    Con.Open();
-                    string str11 = "update AccountsLedgerTable set Balance='" + Bal.ToString() + "',Bal_Type='" + BalType + "' where Ledger_ID='" + rdr["Ledger_ID"].ToString() + "' and Particulars='" + rdr["Particulars"].ToString() + "'";
-                    cmd = new SqlCommand("update AccountsLedgerTable set Balance='" + Bal.ToString() + "',Bal_Type='" + BalType + "' where Ledger_ID='" + rdr["Ledger_ID"].ToString() + "' and Particulars='" + rdr["Particulars"].ToString() + "'", Con);
-                    cmd.ExecuteNonQuery();
-                    cmd.Dispose();
-                    Con.Close();
-                }
-            }
-            rdr.Close();
 
-            rdr = obj.GetRecordSet("select top 1 EntryDate from CustomerLedgerTable where CustID=(select Cust_ID from Customer,Ledger_Master where Ledger_Name=Cust_Name and Ledger_ID='" + Ledger_ID.ToString() + "') and EntryDate<=Convert(datetime,'" + Invoice_Date + "',103) order by entrydate desc");
-            if (rdr.Read())
-                str = "select * from CustomerLedgerTable where CustID=(select Cust_ID from Customer,Ledger_Master where Ledger_Name=Cust_Name and Ledger_ID='" + Ledger_ID + "') and  EntryDate>=Convert(datetime,'" + rdr.GetValue(0).ToString() + "',103) order by entrydate";
-            else
-                str = "select * from CustomerLedgerTable where CustID=(select Cust_ID from Customer c,Ledger_Master l where Ledger_Name=Cust_Name and Ledger_ID='" + Ledger_ID + "') order by entrydate";
-            rdr.Close();
-            rdr = obj.GetRecordSet(str);
-            Bal = 0;
-            i = 0;
-            BalType = "";
-            while (rdr.Read())
+            string Ledger_ID1 = "";
+            Ledger_ID1 = Ledger_ID.ToString();
+            using (var client = new HttpClient())
             {
-                if (i == 0)
+                client.BaseAddress = new Uri(BaseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var Res = client.GetAsync("api/payment/CustomerInsertUpdate?Ledger_ID1=" + Ledger_ID1 + "&Invoice_Date=" + Invoice_Date).Result;
+                if (Res.IsSuccessStatusCode)
                 {
-                    BalType = rdr["BalanceType"].ToString();
-                    Bal = double.Parse(rdr["Balance"].ToString());
-                    i++;
-                }
-                else
-                {
-                    if (double.Parse(rdr["CreditAmount"].ToString()) != 0)
-                    {
-                        if (BalType == "Cr.")
-                        {
-                            Bal += double.Parse(rdr["CreditAmount"].ToString());
-                            BalType = "Cr.";
-                        }
-                        else
-                        {
-                            Bal -= double.Parse(rdr["CreditAmount"].ToString());
-                            if (Bal < 0)
-                            {
-                                Bal = double.Parse(Bal.ToString().Substring(1));
-                                BalType = "Cr.";
-                            }
-                            else
-                                BalType = "Dr.";
-                        }
-                    }
-                    else if (double.Parse(rdr["DebitAmount"].ToString()) != 0)
-                    {
-                        if (BalType == "Dr.")
-                            Bal += double.Parse(rdr["DebitAmount"].ToString());
-                        else
-                        {
-                            Bal -= double.Parse(rdr["DebitAmount"].ToString());
-                            if (Bal < 0)
-                            {
-                                Bal = double.Parse(Bal.ToString().Substring(1));
-                                BalType = "Dr.";
-                            }
-                            else
-                                BalType = "Cr.";
-                        }
-                    }
-                    Con.Open();
-                    cmd = new SqlCommand("update CustomerLedgerTable set Balance='" + Bal.ToString() + "',BalanceType='" + BalType + "' where CustID='" + rdr["CustID"].ToString() + "' and Particular='" + rdr["Particular"].ToString() + "'", Con);
-                    cmd.ExecuteNonQuery();
-                    cmd.Dispose();
-                    Con.Close();
+                    var id = Res.Content.ReadAsStringAsync().Result;
+                    //LedgerName = JsonConvert.DeserializeObject<List<string>>(id);
                 }
             }
-            rdr.Close();
+
+            //rdr = obj.GetRecordSet("select top 1 Entry_Date from AccountsLedgerTable where Ledger_ID='" + Ledger_ID.ToString() + "' and Entry_Date<=Convert(datetime,'" + Invoice_Date + "',103) order by entry_date desc");
+            //if (rdr.Read())
+            //{
+            //    var entry_date = GenUtil.str2MMDDYYYY(rdr.GetValue(0).ToString());
+            //    str = "select * from AccountsLedgerTable where Ledger_ID='" + Ledger_ID + "' and Entry_Date>='" + entry_date + "' order by entry_date";
+            //}
+            //else
+            //    str = "select * from AccountsLedgerTable where Ledger_ID='" + Ledger_ID + "' order by entry_date";
+            //rdr.Close();
+
+            //rdr = obj.GetRecordSet(str);
+            //Bal = 0;
+            //BalType = "";
+            //i = 0;
+            //while (rdr.Read())
+            //{
+            //    if (i == 0)
+            //    {
+            //        BalType = rdr["Bal_Type"].ToString();
+            //        Bal = double.Parse(rdr["Balance"].ToString());
+            //        i++;
+            //    }
+            //    else
+            //    {
+            //        if (double.Parse(rdr["Credit_Amount"].ToString()) != 0)
+            //        {
+            //            if (BalType == "Cr")
+            //            {
+            //                string ss = rdr["Credit_Amount"].ToString();
+            //                Bal += double.Parse(rdr["Credit_Amount"].ToString());
+            //                BalType = "Cr";
+            //            }
+            //            else
+            //            {
+            //                string ss = rdr["Credit_Amount"].ToString();
+            //                Bal -= double.Parse(rdr["Credit_Amount"].ToString());
+            //                if (Bal < 0)
+            //                {
+            //                    Bal = double.Parse(Bal.ToString().Substring(1));
+            //                    BalType = "Cr";
+            //                }
+            //                else
+            //                    BalType = "Dr";
+            //            }
+            //        }
+            //        else if (double.Parse(rdr["Debit_Amount"].ToString()) != 0)
+            //        {
+            //            if (BalType == "Dr")
+            //            {
+            //                string ss = rdr["Debit_Amount"].ToString();
+            //                Bal += double.Parse(rdr["Debit_Amount"].ToString());
+            //            }
+            //            else
+            //            {
+            //                string ss = rdr["Debit_Amount"].ToString();
+            //                Bal -= double.Parse(rdr["Debit_Amount"].ToString());
+            //                if (Bal < 0)
+            //                {
+            //                    Bal = double.Parse(Bal.ToString().Substring(1));
+            //                    BalType = "Dr";
+            //                }
+            //                else
+            //                    BalType = "Cr";
+            //            }
+            //        }
+            //        Con.Open();
+            //        string str11 = "update AccountsLedgerTable set Balance='" + Bal.ToString() + "',Bal_Type='" + BalType + "' where Ledger_ID='" + rdr["Ledger_ID"].ToString() + "' and Particulars='" + rdr["Particulars"].ToString() + "'";
+            //        cmd = new SqlCommand("update AccountsLedgerTable set Balance='" + Bal.ToString() + "',Bal_Type='" + BalType + "' where Ledger_ID='" + rdr["Ledger_ID"].ToString() + "' and Particulars='" + rdr["Particulars"].ToString() + "'", Con);
+            //        cmd.ExecuteNonQuery();
+            //        cmd.Dispose();
+            //        Con.Close();
+            //    }
+            //}
+            //rdr.Close();
+
+            //rdr = obj.GetRecordSet("select top 1 EntryDate from CustomerLedgerTable where CustID=(select Cust_ID from Customer,Ledger_Master where Ledger_Name=Cust_Name and Ledger_ID='" + Ledger_ID.ToString() + "') and EntryDate<=Convert(datetime,'" + Invoice_Date + "',103) order by entrydate desc");
+            //if (rdr.Read())
+            //    str = "select * from CustomerLedgerTable where CustID=(select Cust_ID from Customer,Ledger_Master where Ledger_Name=Cust_Name and Ledger_ID='" + Ledger_ID + "') and  EntryDate>=Convert(datetime,'" + rdr.GetValue(0).ToString() + "',103) order by entrydate";
+            //else
+            //    str = "select * from CustomerLedgerTable where CustID=(select Cust_ID from Customer c,Ledger_Master l where Ledger_Name=Cust_Name and Ledger_ID='" + Ledger_ID + "') order by entrydate";
+            //rdr.Close();
+            //rdr = obj.GetRecordSet(str);
+            //Bal = 0;
+            //i = 0;
+            //BalType = "";
+            //while (rdr.Read())
+            //{
+            //    if (i == 0)
+            //    {
+            //        BalType = rdr["BalanceType"].ToString();
+            //        Bal = double.Parse(rdr["Balance"].ToString());
+            //        i++;
+            //    }
+            //    else
+            //    {
+            //        if (double.Parse(rdr["CreditAmount"].ToString()) != 0)
+            //        {
+            //            if (BalType == "Cr.")
+            //            {
+            //                Bal += double.Parse(rdr["CreditAmount"].ToString());
+            //                BalType = "Cr.";
+            //            }
+            //            else
+            //            {
+            //                Bal -= double.Parse(rdr["CreditAmount"].ToString());
+            //                if (Bal < 0)
+            //                {
+            //                    Bal = double.Parse(Bal.ToString().Substring(1));
+            //                    BalType = "Cr.";
+            //                }
+            //                else
+            //                    BalType = "Dr.";
+            //            }
+            //        }
+            //        else if (double.Parse(rdr["DebitAmount"].ToString()) != 0)
+            //        {
+            //            if (BalType == "Dr.")
+            //                Bal += double.Parse(rdr["DebitAmount"].ToString());
+            //            else
+            //            {
+            //                Bal -= double.Parse(rdr["DebitAmount"].ToString());
+            //                if (Bal < 0)
+            //                {
+            //                    Bal = double.Parse(Bal.ToString().Substring(1));
+            //                    BalType = "Dr.";
+            //                }
+            //                else
+            //                    BalType = "Cr.";
+            //            }
+            //        }
+            //        Con.Open();
+            //        cmd = new SqlCommand("update CustomerLedgerTable set Balance='" + Bal.ToString() + "',BalanceType='" + BalType + "' where CustID='" + rdr["CustID"].ToString() + "' and Particular='" + rdr["Particular"].ToString() + "'", Con);
+            //        cmd.ExecuteNonQuery();
+            //        cmd.Dispose();
+            //        Con.Close();
+            //    }
+            //}
+            //rdr.Close();
         }
     }
 }

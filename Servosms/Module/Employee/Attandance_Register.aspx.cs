@@ -21,6 +21,9 @@ using System.Web.UI.HtmlControls;
 using Servosms.Sysitem.Classes;
 using System.Data.SqlClient;
 using RMG;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Servosms.Module.Employee
 {
@@ -30,7 +33,7 @@ namespace Servosms.Module.Employee
     public partial class Attandance_Register : System.Web.UI.Page
     {
         public static int Row_No;
-
+        string BaseUri = "http://localhost:64862";
         /// <summary>
         /// This method is used for setting the Session variable for userId 
         /// and also check accessing priviledges for particular user.
@@ -132,14 +135,31 @@ namespace Servosms.Module.Employee
 
                         obj1.Emp_ID = Request.Params.Get("lblEmpID" + i);
                         obj1.Status = "1";
-                        sql = "select Status from Attandance_Register where Att_Date='" + GenUtil.str2MMDDYYYY(txtdate.Text.ToString()) + "' and  Emp_ID=" + Request.Params.Get("lblEmpID" + i) + "";
-                        SqlDtr = obj.GetRecordSet(sql);
-                        while (SqlDtr.Read())
+                        string str1="";
+                        string Att_Date= obj1.Att_Date;
+                        string lblEmpID= Request.Params.Get("lblEmpID" + i); 
+                        
+                        using (var client = new HttpClient())
                         {
-                            str = SqlDtr.GetValue(0).ToString();
+                            client.BaseAddress = new Uri(BaseUri);
+                            client.DefaultRequestHeaders.Clear();
+                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                            var Res = client.GetAsync("api/AttandanceRegister/SaveAttandance?Att_Date=" + Att_Date + "&lblEmpID=" + lblEmpID).Result;
+                            if (Res.IsSuccessStatusCode)
+                            {
+                                var id = Res.Content.ReadAsStringAsync().Result;
+                                str1 = JsonConvert.DeserializeObject<string>(id);
+                            }
                         }
-                        SqlDtr.Close();
 
+                        //sql = "select Status from Attandance_Register where Att_Date='" + GenUtil.str2MMDDYYYY(txtdate.Text.ToString()) + "' and  Emp_ID=" + Request.Params.Get("lblEmpID" + i) + "";
+                        //SqlDtr = obj.GetRecordSet(sql);
+                        //while (SqlDtr.Read())
+                        //{
+                        //    str = SqlDtr.GetValue(0).ToString();
+                        //}
+                        //SqlDtr.Close();
+                        str = str1;
                         if (str.Equals(""))
                         {
                             obj1.InsertEmployeeAttandance();
@@ -154,7 +174,7 @@ namespace Servosms.Module.Employee
                             obj.Status = "1";
                             obj.UpdateEmployeeAttandance();
                             //sql="insert into Attandance_Register (Att_Date,Emp_Id,Status)  values('"+Att_Date+"','"+Emp_ID+"','"+Status+"')";
-                            obj.ExecRecord(sql);
+                            //obj.ExecRecord(sql);
                             CreateLogFiles.ErrorLog("Form:Attendance_Register.aspx.cs,Method:attan(). Attendance of employee ID " + Request.Params.Get("tempEmpID" + i) + " Updated. userid :" + Session["User_Name"].ToString());
                         }
                     }
@@ -162,8 +182,20 @@ namespace Servosms.Module.Employee
                     {
                         string Emp_ID = Request.Params.Get("lblEmpID" + i);
                         string Attan_Date = GenUtil.str2MMDDYYYY(txtdate.Text.ToString());
-                        sql = "delete from Attandance_Register where emp_id=" + Emp_ID + " and att_date='" + Attan_Date + "'";
-                        obj.ExecRecord(sql);
+                        
+                        using (var client = new HttpClient())
+                        {
+                            client.BaseAddress = new Uri(BaseUri);
+                            client.DefaultRequestHeaders.Clear();
+                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                            var Res = client.GetAsync("api/AttandanceRegister/DeleteAttandance?Emp_ID=" + Emp_ID + "&Attan_Date=" + Attan_Date).Result;
+                            if (Res.IsSuccessStatusCode)
+                            {
+                                var id = Res.Content.ReadAsStringAsync().Result;                        
+                            }
+                        }
+                        //sql = "delete from Attandance_Register where emp_id=" + Emp_ID + " and att_date='" + Attan_Date + "'";
+                        //obj.ExecRecord(sql);
                     }
                 }
 
