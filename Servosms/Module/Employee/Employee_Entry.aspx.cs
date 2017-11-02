@@ -12,15 +12,19 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
-using System.Data .SqlClient ;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using RMG;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Servosms.Module.Employee
 {
@@ -41,16 +45,16 @@ namespace Servosms.Module.Employee
 		protected System.Web.UI.WebControls.TextBox TextBox1;
 		DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string uid;
-
-		/// <summary>
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// and generate the next ID also.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string BaseUri = "http://localhost:64862";
+        /// <summary>
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// and generate the next ID also.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{  
 			try
 			{
@@ -101,38 +105,90 @@ namespace Servosms.Module.Employee
 					string sql;
 
 					GetNextEmpID();
-					#region Fetch Extra Cities from Database and add to the ComboBox
-					sql="select distinct City from Beat_Master order by City asc";
-					SqlDtr=obj.GetRecordSet(sql);
-					while(SqlDtr.Read())
-					{
-						DropCity.Items.Add(SqlDtr.GetValue(0).ToString()); 
-				
-					}
-					SqlDtr.Close();
-					#endregion
+                    #region Fetch Extra Cities from Database and add to the ComboBox
+                    List<string> DropCity1 = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/payment/FetchCity").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            DropCity1 = JsonConvert.DeserializeObject<List<string>>(id);
+                        }
+                    }
+                    foreach (var item in DropCity1)
+                    {
+                        DropCity.Items.Add(item);
+                    }
+                    //sql ="select distinct City from Beat_Master order by City asc";
+                    //SqlDtr=obj.GetRecordSet(sql);
+                    //while(SqlDtr.Read())
+                    //{
+                    //	 DropCity.Items.Add(SqlDtr.GetValue(0).ToString()); 
 
-					#region Fetch Extra Cities from Database and add to the ComboBox
-					sql="select distinct state from Beat_Master order by state asc";
-					SqlDtr=obj.GetRecordSet(sql);
-					while(SqlDtr.Read())
-					{
-				
-						DropState.Items.Add(SqlDtr.GetValue(0).ToString()); 
-				
-					}
-					SqlDtr.Close();
-					#endregion
+                    //}
+                    //SqlDtr.Close();
+                    #endregion
 
-					#region Fetch Extra Cities from Database and add to the ComboBox
-					sql="select distinct country from Beat_Master order by country asc";
-					SqlDtr=obj.GetRecordSet(sql);
-					while(SqlDtr.Read())
-					{
-				
-						DropCountry.Items.Add(SqlDtr.GetValue(0).ToString()); 
-					}
-					SqlDtr.Close();
+                    #region Fetch Extra Cities from Database and add to the ComboBox
+
+                    List<string> DropState1 = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/payment/FetchState").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            DropState1 = JsonConvert.DeserializeObject<List<string>>(id);
+                        }
+                    }
+                    foreach (var item in DropState1)
+                    {
+                        DropState.Items.Add(item);
+                    }
+
+                    //sql ="select distinct state from Beat_Master order by state asc";
+                    //SqlDtr=obj.GetRecordSet(sql);
+                    //while(SqlDtr.Read())
+                    //{
+
+                    //	DropState.Items.Add(SqlDtr.GetValue(0).ToString()); 
+
+                    //}
+                    //SqlDtr.Close();
+                    #endregion
+
+                    #region Fetch Extra Cities from Database and add to the ComboBox
+                    List<string> DropCountry1 = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/payment/FetchCountry").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            DropCountry1 = JsonConvert.DeserializeObject<List<string>>(id);
+                        }
+                    }
+                    foreach (var item in DropCountry1)
+                    {
+                        DropCountry.Items.Add(item);
+                    }
+                    //sql ="select distinct country from Beat_Master order by country asc";
+					//SqlDtr=obj.GetRecordSet(sql);
+					//while(SqlDtr.Read())
+					//{				
+					//	DropCountry.Items.Add(SqlDtr.GetValue(0).ToString()); 
+					//}
+					//SqlDtr.Close();
 					#endregion
 			
 					getbeat();
@@ -162,18 +218,32 @@ namespace Servosms.Module.Employee
 			try
 			{
 				InventoryClass obj=new InventoryClass();
-				SqlDataReader sqldtr;
-				string sql;
+				//SqlDataReader sqldtr;
+				//string sql;
 				string str="";
-				sql="select city,state,country from beat_master";
-				sqldtr=obj.GetRecordSet(sql);
-				while(sqldtr.Read())
-				{
-					str=str+sqldtr.GetValue(0).ToString()+":";
-					str=str+sqldtr.GetValue(1).ToString()+":";
-					str=str+sqldtr.GetValue(2).ToString()+"#";
-				}
-				txtbeatname.Text=str;
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/payment/FetchData").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        str = JsonConvert.DeserializeObject<string>(id);
+                    }
+                }
+                txtbeatname.Text = str;
+    //            sql ="select city,state,country from beat_master";
+				//sqldtr=obj.GetRecordSet(sql);
+				//while(sqldtr.Read())
+				//{
+				//	str=str+sqldtr.GetValue(0).ToString()+":";
+				//	str=str+sqldtr.GetValue(1).ToString()+":";
+				//	str=str+sqldtr.GetValue(2).ToString()+"#";
+				//}
+				//txtbeatname.Text=str;
 			}
 			catch(Exception ex)
 			{
@@ -190,13 +260,32 @@ namespace Servosms.Module.Employee
 			txtLICvalidity.Text = System.DateTime.Now.Day+"/"+System.DateTime.Now.Month+"/"+System.DateTime.Now.Year ;   
 			DropVehicleNo.Items.Clear();
 			DropVehicleNo.Items.Add("Select");
-			SqlDataReader SqlDtr = null;
-			dbobj.SelectQuery("Select vehicle_no from vehicleentry",ref SqlDtr);
-			while(SqlDtr.Read())
-			{
-				DropVehicleNo.Items.Add(SqlDtr.GetValue(0).ToString());   
-			}
-			SqlDtr.Close();
+			//SqlDataReader SqlDtr = null;
+
+            List<string> Vehicle = new List<string>();
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(BaseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var Res = client.GetAsync("api/payment/FetchVehicle").Result;
+                if (Res.IsSuccessStatusCode)
+                {
+                    var id = Res.Content.ReadAsStringAsync().Result;
+                    Vehicle = JsonConvert.DeserializeObject<List<string>>(id);
+                }
+            }
+            foreach (var item in Vehicle)
+            {
+                DropVehicleNo.Items.Add(item);
+            }
+
+   //         dbobj.SelectQuery("Select vehicle_no from vehicleentry",ref SqlDtr);
+			//while(SqlDtr.Read())
+			//{
+			//	DropVehicleNo.Items.Add(SqlDtr.GetValue(0).ToString());   
+			//}
+			//SqlDtr.Close();
 		}
 
 		#region Web Form Designer generated code
