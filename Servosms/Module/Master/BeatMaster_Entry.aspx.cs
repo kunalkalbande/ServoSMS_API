@@ -19,9 +19,13 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using RMG;
 using DBOperations;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Servosms.Module.Master
 {
@@ -32,15 +36,15 @@ namespace Servosms.Module.Master
 	{
 		DBUtil dbobj=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string uid;
-
-		/// <summary>
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string BaseUri = "http://localhost:64862";
+        /// <summary>
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{ 
 			try
 			{
@@ -142,22 +146,26 @@ namespace Servosms.Module.Master
 		{
 			try
 			{
-				PartiesClass obj=new PartiesClass ();
-				SqlDataReader SqlDtr;
-				SqlDtr = obj.GetRecordSet ("select max(Beat_No)+1 from Beat_Master");
-				while(SqlDtr.Read ())
-				{
-					lblBeatNo.Text =SqlDtr.GetValue(0).ToString ();
-					if(lblBeatNo.Text =="")
-					{
-						lblBeatNo.Text ="1001";
-					}
-				}
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/BeatMasterEntryController/GetID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        lblBeatNo.Text = JsonConvert.DeserializeObject<string>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
 			}
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method:FillID().  EXCEPTION "+ ex.Message+"  "+uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		
 		}
 
@@ -180,22 +188,36 @@ namespace Servosms.Module.Master
 			Clear();
 			try
 			{
-				PartiesClass  obj=new PartiesClass  ();
-				SqlDataReader SqlDtr;
-				SqlDtr = obj.GetRecordSet("select Beat_No,city from Beat_Master order by city");
+                List<string> BeatIds = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/BeatMasterEntryController/GetAllBeatIDs").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        BeatIds = JsonConvert.DeserializeObject<List<string>>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
 				DropBeatNo.Items.Clear();
 				DropBeatNo.Items.Add("Select");
-				while(SqlDtr.Read ())
-				{
-					DropBeatNo.Items.Add(SqlDtr.GetValue(0).ToString ()+':'+SqlDtr.GetValue(1).ToString ());
-				}	
-				SqlDtr.Close(); 
+                if (BeatIds != null && BeatIds.Count > 0)
+                {
+                    foreach (var beat in BeatIds)
+                        DropBeatNo.Items.Add(beat);
+                }
 				checkPrevileges();
 			}
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method:btnEdit_Click().  EXCEPTION "+ ex.Message+"  "+uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 		/// <summary>
 		/// This is to Save the beat information.
@@ -204,28 +226,51 @@ namespace Servosms.Module.Master
 		/// <param name="e"></param>
 		protected void btnSave_Click(object sender, System.EventArgs e)
 		{
-			PartiesClass  obj = new PartiesClass ();
 			try 
 			{
-				SqlDataReader SqlDtr; 
-				string sql;
 				int flag=0;
-				sql="select City  from Beat_Master where City='"+ txtCity.Text  +"'";
-				//sql="select City  from Beat_Master where City='"+ arr[0] +"'";
-		
-				SqlDtr=obj.GetRecordSet(sql);
-				if(SqlDtr.Read())
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/BeatMasterEntryController/FetchCity?City="+ txtCity.Text).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        flag = JsonConvert.DeserializeObject<int>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+				if (DropBeatNo.Visible==false)
 				{
-					flag=1;		
-				}
-				else if(DropBeatNo.Visible==false)
-				{
-					obj.City =StringUtil.FirstCharUpper(txtCity.Text.ToString());  
-					obj.State= StringUtil.FirstCharUpper(txtState.Text.ToString());
-					obj.Country=StringUtil.FirstCharUpper(txtCountry.Text.ToString()); 
-					obj.Beat_No = lblBeatNo.Text;
-					obj.InsertBeatMaster();	
-					CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method: btnSave_Click"+"  Beatno  "+obj.Beat_No +" city  "+obj.City    +"   state  "+ obj.State   +" Country"+obj.Country+ " IS SAVED  "+" userid  "+ uid);
+                    BeatMasterModel beatmaster = new BeatMasterModel();
+
+                    beatmaster.City =StringUtil.FirstCharUpper(txtCity.Text.ToString());
+                    beatmaster.State= StringUtil.FirstCharUpper(txtState.Text.ToString());
+                    beatmaster.Country=StringUtil.FirstCharUpper(txtCountry.Text.ToString());
+                    beatmaster.BeatNo = lblBeatNo.Text;
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        var myContent = JsonConvert.SerializeObject(beatmaster);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/BeatMasterEntryController/InsertBeatMaster", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            var rr = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                        }
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }
+                    CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method: btnSave_Click"+"  Beatno  "+ beatmaster.BeatNo + " city  "+beatmaster.City    +"   state  "+ beatmaster.State   +" Country"+beatmaster.Country+ " IS SAVED  "+" userid  "+ uid);
 					FillID();
 					lblBeatNo.Visible=true;
 					DropBeatNo.Visible=false;
@@ -239,14 +284,14 @@ namespace Servosms.Module.Master
 				if(flag==1)
 				{
 					RMG.MessageBox.Show("City already Exits");				
-					SqlDtr.Close();
 				}
 				checkPrevileges();
 			}
 			catch(Exception ex)
 			{
-				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method: btnSave_Click"+"  Beatno  "+obj.Beat_No +" city  "+obj.City    +"   state  "+ obj.State   +" Country"+obj.Country+ ex.Message+" userid  "+ uid);
-			}
+                CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method: btnSave_Click" + ex.Message + " userid  " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 		
 		/// <summary>
@@ -256,7 +301,6 @@ namespace Servosms.Module.Master
 		/// <param name="e"></param>
 		protected void btnDelete_Click(object sender, System.EventArgs e)
 		{
-			PartiesClass  obj=new PartiesClass  (); 
 			try
 			{
 				if (DropBeatNo.Visible==true && DropBeatNo.SelectedIndex==0 )
@@ -267,11 +311,24 @@ namespace Servosms.Module.Master
 				{		
 					string bno = DropBeatNo.SelectedItem.Value ;  
 					string[] Beat = bno.Split(new char[] {':'},bno.Length);
-					//obj.Beat_No = DropBeatNo.SelectedItem.Value ;  
-					obj.Beat_No = Beat[0];  
-					obj.DeleteBeatMaster();
+                    string message = "";
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/BeatMasterEntryController/DeleteBeat?BeatNo="+ Beat[0]).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            message = JsonConvert.DeserializeObject<string>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                   
 					MessageBox.Show("Beat deleted");
-					CreateLogFiles.ErrorLog("Form:BeatMasterEntry.aspx,Method: btnDelete_Click"+"  Beat no  "+obj.Beat_No+"  is DELETED  " +"  user id  "+uid);
+					CreateLogFiles.ErrorLog("Form:BeatMasterEntry.aspx,Method: btnDelete_Click"+"  Beat no  "+ Beat[0] + "  is DELETED  " +"  user id  "+uid);
 			
 					Clear(); 
 					btnEdit.Visible=true;
@@ -285,7 +342,8 @@ namespace Servosms.Module.Master
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:BeatMasterEntry.aspx,Method: btnDelete_Click. EXCEPTION  "+ex.Message+"  user id  "+uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -299,27 +357,36 @@ namespace Servosms.Module.Master
 			{
 				if(DropBeatNo.SelectedIndex==0)
 					return;
-				PartiesClass obj=new PartiesClass();
-				SqlDataReader SqlDtr;
-				string sql;
-				string cty=DropBeatNo.SelectedItem.Value;
-				string[] arr=cty.Split(new char[]{':'},cty.Length); 
-				//sql="Select * from Beat_Master where Beat_No='"+ DropBeatNo.SelectedItem.Value  +"'";
-				sql="Select * from Beat_Master where Beat_No='"+ arr[0]  +"'";
-				SqlDtr=obj.GetRecordSet(sql);
-				while(SqlDtr.Read())
+                string cty = DropBeatNo.SelectedItem.Value;
+                string[] arr = cty.Split(new char[] { ':' }, cty.Length);
+                BeatMasterModel beat = new BeatMasterModel();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/BeatMasterEntryController/GetSelectedBeat?BeatNo="+ arr[0]).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        beat = JsonConvert.DeserializeObject<BeatMasterModel>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+				if(beat !=null)
 				{
-					txtCity.Text=SqlDtr.GetValue(1).ToString();
-					txtState.Text=SqlDtr.GetValue(2).ToString();
-					txtCountry.Text=SqlDtr.GetValue(3).ToString();
+                    txtCity.Text = beat.City;
+                    txtState.Text = beat.State;
+                    txtCountry.Text = beat.Country;
 				}
-				SqlDtr.Close();
 				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method:DropBeatNo_SelectedIndexChanged"+uid);
 			}
 			catch(Exception ex)
 			{
-				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method:DropBeatNo_SelectedIndexChange"+"  EXCEPTION "+ ex.Message+uid);
-			}
+                CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx,Method:DropBeatNo_SelectedIndexChange" + "  EXCEPTION " + ex.Message + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -339,31 +406,50 @@ namespace Servosms.Module.Master
 		/// <param name="e"></param>
 		protected void Edit1_Click(object sender, System.EventArgs e)
 		{
-			PartiesClass  obj1 = new PartiesClass ();
-			try
-			{	
-				PartiesClass  obj = new PartiesClass ();
-				obj1.City = txtCity.Text;  
-				obj1.State = txtState.Text;
-				obj1.Country=txtCountry.Text; 
-				string cty=DropBeatNo.SelectedItem.Value;
-				string[] arr=cty.Split(new char[]{':'},cty.Length); 
-				//obj1.Beat_No =DropBeatNo.SelectedItem.Value ; 
-				obj1.Beat_No =arr[0] ; 
-				obj1.UpdateBeatMaster();
-				MessageBox.Show("Beat Updated");
+            BeatMasterModel beat = new BeatMasterModel();
+            try
+			{
+                string cty = DropBeatNo.SelectedItem.Value;
+                string[] arr = cty.Split(new char[] { ':' }, cty.Length);
+
+                beat.City = txtCity.Text;
+                beat.State = txtState.Text;
+                beat.Country=txtCountry.Text;
+                beat.BeatNo =arr[0] ;
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    var myContent = JsonConvert.SerializeObject(beat);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/BeatMasterEntryController/UpdateBeat", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        var rr = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+
+                MessageBox.Show("Beat Updated");
 				Clear();
 				DropBeatNo.Visible=false;
 				lblBeatNo.Visible=true;
 				Edit1.Visible=false;
 				btnEdit.Visible=true; 
 				checkPrevileges();
-				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx ,method Edit1_Click,"+"  Beat no   "+obj1.Beat_No +"City Updated to   "+obj1.City+"  user:"+uid);
+				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx ,method Edit1_Click,"+"  Beat no   "+ arr[0] + "City Updated to   "+ beat.City + "  user:"+uid);
 			}
 			catch(Exception ex)
 			{
-				CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx ,method Edit1_Click,"+"  Beat no   "+obj1.Beat_No +"City Updated to   "+obj1.City+ "  EXCEPTION  "+ex.Message+"  user:"+uid);
-			}
+                CreateLogFiles.ErrorLog("Form:BeatMasterEntery.aspx ,method Edit1_Click," + ex.Message + "  user:" + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 	}
 }
