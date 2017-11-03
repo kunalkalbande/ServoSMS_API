@@ -37,8 +37,6 @@ namespace Servosms.Module.Inventory
 	/// </summary>
 	public partial class Payment_Receipt : System.Web.UI.Page
 	{
-		DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
-		DBOperations.DBUtil dbobj1=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		double total=0;
 		string uid;
 		string[] billDetails;
@@ -881,16 +879,27 @@ namespace Servosms.Module.Inventory
 				{}
 				else
 				{
-					SqlDataReader rdr=null;
-					//string str = "select address,city from customer,ledger_master where ledger_name=cust_name and ledger_name='"+DropCustName.Value+"'"; //Comment by vikas sharma 2.05.09
-					string str = "select address,city from customer,ledger_master where ledger_name=cust_name and ledger_name='"+name+"'";
-					dbobj.SelectQuery(str,ref rdr);
-					if(rdr.Read())
-					{
-						addr = rdr.GetValue(0).ToString();
-						city = rdr.GetValue(1).ToString();
-					}
-					rdr.Close();
+                    CustomerModel customer = new CustomerModel();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/VoucherController/Report?VoucherName="+ name).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            customer = JsonConvert.DeserializeObject<CustomerModel>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+
+                    }
+                    if (customer != null)
+                    {
+                        addr = customer.Address;
+                        city = customer.City;
+                    }
 				}
 					
 				if(DropReceiptNo.Visible==true)
@@ -1985,9 +1994,9 @@ namespace Servosms.Module.Inventory
 				Textbox3.Enabled = true; 
 				txtCr.Enabled = true;
 				txtFinalDues.Enabled = true;
-				object op =null;
-				//dbobj.ExecProc(OprType.Insert,"Test",ref op,"@Cust_ID",Cust_ID);
-				dbobj.ExecProc(OprType.Insert,"Test",ref op,"@Cust_ID",OldCustomerID);
+				//object op =null;
+				////dbobj.ExecProc(OprType.Insert,"Test",ref op,"@Cust_ID",Cust_ID);
+				//dbobj.ExecProc(OprType.Insert,"Test",ref op,"@Cust_ID",OldCustomerID);
 
 				#region Bind DataGrid
 				if(DropReceiptNo.Visible==true)

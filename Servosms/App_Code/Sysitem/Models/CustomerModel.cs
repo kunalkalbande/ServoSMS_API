@@ -12,6 +12,7 @@ public class CustomerModel
     public string City { get; set; }
     public string CustomerID { get; set; }
     public int Flag { get; set; }
+    public string Address { get; set; }
     public CustomerModel()
     {
         //

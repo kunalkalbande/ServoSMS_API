@@ -38,7 +38,6 @@ namespace Servosms.Module.Accounts
 	/// </summary>
 	public partial class voucher : System.Web.UI.Page
 	{
-		DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string id= "";
 		string uid = "";
 		static bool PrintFlag = false;
@@ -56,48 +55,58 @@ namespace Servosms.Module.Accounts
         /// and generate the next ID also.
         /// </summary>
         protected void Page_Load(object sender, System.EventArgs e)
-		{
-			// Put user code to initialize the page here
-			try
-			{
-				uid=(Session["User_Name"].ToString());
-			}
-			catch(Exception ex)
-			{
-				string str = ex.ToString();
-				CreateLogFiles.ErrorLog("Form:voucher,Method:PageLoad   "+" EXCEPTION "+ ex.Message+" userid "+ uid);
-				Response.Redirect("../../Sysitem/ErrorPage.aspx",false);
-				return;
-			}
-			if(!IsPostBack)
-			{
-				Acc_Date="";
-				checkPrevileges();
-				LedgerID=new ArrayList();
-				Invoice_Date = "";
-				getID();
-				txtNarration.Text = "";
-				setValue();
-				DropDownID.Visible = false;  
-				btnEdit.Enabled = false;
-				btnDelete.Enabled = false; 
-				txtDate.Text = DateTime.Now.Day.ToString()+"/"+ DateTime.Now.Month.ToString()+"/"+DateTime.Now.Year.ToString();
-
-                using (var client = new HttpClient())
+        {
+            // Put user code to initialize the page here
+            try
+            {
+                uid = (Session["User_Name"].ToString());
+            }
+            catch (Exception ex)
+            {
+                string str = ex.ToString();
+                CreateLogFiles.ErrorLog("Form:voucher,Method:PageLoad   " + " EXCEPTION " + ex.Message + " userid " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+                return;
+            }
+            try
+            {
+                if (!IsPostBack)
                 {
-                    client.BaseAddress = new Uri(BaseUri);
-                    client.DefaultRequestHeaders.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var Res = client.GetAsync("api/ReceiptController/GetOrgDate").Result;
-                    if (Res.IsSuccessStatusCode)
+                    Acc_Date = "";
+                    checkPrevileges();
+                    LedgerID = new ArrayList();
+                    Invoice_Date = "";
+                    getID();
+                    txtNarration.Text = "";
+                    setValue();
+                    DropDownID.Visible = false;
+                    btnEdit.Enabled = false;
+                    btnDelete.Enabled = false;
+                    txtDate.Text = DateTime.Now.Day.ToString() + "/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString();
+
+                    using (var client = new HttpClient())
                     {
-                        var disc = Res.Content.ReadAsStringAsync().Result;
-                        var DateFrom = JsonConvert.DeserializeObject<string>(disc);
-                        Acc_Date = GenUtil.trimDate(DateFrom);
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/ReceiptController/GetOrgDate").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            var DateFrom = JsonConvert.DeserializeObject<string>(disc);
+                            Acc_Date = GenUtil.trimDate(DateFrom);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
                 }
-			}
-            txtDate.Text = Request.Form["txtDate"] == null ? GenUtil.str2DDMMYYYY(System.DateTime.Now.ToShortDateString()) : Request.Form["txtDate"].ToString().Trim();
+                txtDate.Text = Request.Form["txtDate"] == null ? GenUtil.str2DDMMYYYY(System.DateTime.Now.ToShortDateString()) : Request.Form["txtDate"].ToString().Trim();
+            }
+            catch (Exception ex)
+            {
+                CreateLogFiles.ErrorLog("Form:voucher,Method:PageLoad   " + " EXCEPTION " + ex.Message + " userid " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
         }
 
 		/// <summary>
@@ -182,6 +191,8 @@ namespace Servosms.Module.Accounts
                         var disc = Res.Content.ReadAsStringAsync().Result;
                         voucher = JsonConvert.DeserializeObject<VoucherModel>(disc);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 				if(voucher!=null)
 				{
@@ -283,6 +294,8 @@ namespace Servosms.Module.Accounts
                         var disc = Res.Content.ReadAsStringAsync().Result;
                         voucher = JsonConvert.DeserializeObject<VoucherModel>(disc);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (voucher != null)
@@ -291,7 +304,7 @@ namespace Servosms.Module.Accounts
                     strDebitNote = voucher.Debit;
                     strCreditNote = voucher.Credit;
                     strJournal = voucher.Journal;
-                    CustName.Add(voucher.CustomerName);
+                    CustName = voucher.CustomerName;
                 }
 
 				for(int i=0;i<CustName.Count;i++)
@@ -324,7 +337,8 @@ namespace Servosms.Module.Accounts
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:voucher.aspx,Method:getID() EXCEPTION: "+ ex.Message+" userid :"+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -385,6 +399,8 @@ namespace Servosms.Module.Accounts
                         var voucher = JsonConvert.DeserializeObject<string>(disc);
                         texthiddenprod.Value = voucher;
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 
                 for (int j=0;j<dropAccName.Length;j++)
@@ -396,7 +412,8 @@ namespace Servosms.Module.Accounts
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:voucher.aspx,Method:fillCombo() EXCEPTION: "+ ex.Message+" userid :"+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		#region Web Form Designer generated code
@@ -452,158 +469,168 @@ namespace Servosms.Module.Accounts
 			}
 		}
 
-		/// <summary>
-		/// This method is used to save the record.
-		/// </summary>
-		public void Save()
-		{
-			if(txtVouchID.Visible==true)
-				id = txtID.Value;
-			else
-				id=DropDownID.SelectedItem.Text;
-			if(txtAccName1.Value == "Select" && txtAccName2.Value == "Select"  && txtAccName3.Value == "Select"  && txtAccName4.Value == "Select"  && txtAccName5.Value == "Select"  && txtAccName6.Value == "Select"  && txtAccName7.Value == "Select"  && txtAccName8.Value == "Select" )
-			{
-				txtVouchID.Value = id;
-				MessageBox.Show("Please select Account Name");
-				fillCombo();
-				return;
-			}
-			HtmlInputText[] dropAccName ={dropAccName1, dropAccName2, dropAccName3, dropAccName4, dropAccName5, dropAccName6, dropAccName7, dropAccName8};
-			HtmlInputHidden[] txtAccName ={txtAccName1, txtAccName2, txtAccName3, txtAccName4, txtAccName5,txtAccName6, txtAccName7, txtAccName8}; 
-			TextBox[] Amount = {txtAmount1,txtAmount2,txtAmount3,txtAmount4,txtAmount5,txtAmount6,txtAmount7,txtAmount8};
-			DropDownList[] dropType = {dropType_1 ,dropType_2,dropType_3,dropType_4,dropType_5,dropType_6,dropType_7,dropType_8};
-			string narration = txtNarration.Text.Trim();
-			string Vouch_Type = DropVoucherName.SelectedItem.Text;
-			for(int i=0; i<(txtAccName.Length/2);i++)
-			{
-				if(txtAccName[i].Value!="Select")
-				{
-					if(txtAccName[i].Value==txtAccName[i+4].Value)
-					{
-						MessageBox.Show("Can Not be Select Same Ledger Name");
-						fillCombo();
-						return;
-					}
-					if(Amount[i].Text.Trim()== "" && Amount[i+4].Text.Trim()== "")
-					{
-						MessageBox.Show("Please Enter the Amount");
-						fillCombo();
-						return;
-					}
-				}
-			}
-			DateTime date = System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtDate.Text.ToString())+" "+DateTime.Now.TimeOfDay.ToString());
-			int intID = System.Convert.ToInt32(id.ToString()); 
-			int flag = 0;
-			
-			for(int i=0; i<(dropAccName.Length/2);i++)
-			{
-				int c = 0;
-				if(	txtAccName[i].Value != "Select" && txtAccName[i+4].Value == "Select")
-				{
-					MessageBox.Show("Please Select The Second Account Name");
-					flag = 1;
-					break;
-				}
-				else if(txtAccName[i].Value == "Select" && txtAccName[i+4].Value != "Select")
-				{
-					MessageBox.Show("Please Select The First Account Name");
-					flag = 1;
-					break;
-				}
-				
-				if(txtAccName[i].Value != "Select" && txtAccName[i+4].Value != "Select" && Amount[i].Text.Trim()!= "" && Amount[i+4].Text.Trim()!= "")
-				{
-					string crID = "";
-					string drID = "";
-					string Amount_cr = "";
-					string Amount_Dr = "";
-					string L_Type =""; 
-
-					string Ledg_ID =txtAccName[i].Value.ToString() ;
-					string[] arr = Ledg_ID.Split(new char[] {':'},Ledg_ID.Length);
-					string Ledg_ID1 =txtAccName[i+4].Value.ToString() ;
-					string[] arr1 = Ledg_ID1.Split(new char[] {':'},Ledg_ID1.Length);
-					if(dropType[i].SelectedItem.Text.Trim() == "Dr")
-					{
-						drID = arr[1];
-						crID = arr1[1];
-						Amount_Dr = Amount[i].Text.Trim();
-						Amount_cr = Amount[i+4].Text.Trim();
-						L_Type = "Dr";
-					}
-					else
-					{
-						drID = arr1[1];
-						crID = arr[1];
-						Amount_Dr = Amount[i+4].Text.Trim();
-						Amount_cr = Amount[i].Text.Trim();
-						L_Type = "Cr";
-					}
-                    VoucherModel voucher = new VoucherModel();
-                    voucher.VoucherID = intID;
-                    voucher.VoucherType = Vouch_Type.Trim();
-                    voucher.VoucherDate = date.ToShortDateString();
-                    voucher.LedgerIDCr = crID.Trim();
-                    voucher.Amount1 = Amount_cr.Trim();
-                    voucher.LedgerIDDr = drID.Trim();
-                    voucher.Amount2 = Amount_Dr.Trim();
-                    voucher.Narration = narration;
-                    voucher.LType = L_Type;
-                    voucher.InvoiceDate = date.ToShortDateString();
-
-                    using (var client = new HttpClient())
+        /// <summary>
+        /// This method is used to save the record.
+        /// </summary>
+        public void Save()
+        {
+            try
+            {
+                if (txtVouchID.Visible == true)
+                    id = txtID.Value;
+                else
+                    id = DropDownID.SelectedItem.Text;
+                if (txtAccName1.Value == "Select" && txtAccName2.Value == "Select" && txtAccName3.Value == "Select" && txtAccName4.Value == "Select" && txtAccName5.Value == "Select" && txtAccName6.Value == "Select" && txtAccName7.Value == "Select" && txtAccName8.Value == "Select")
+                {
+                    txtVouchID.Value = id;
+                    MessageBox.Show("Please select Account Name");
+                    fillCombo();
+                    return;
+                }
+                HtmlInputText[] dropAccName = { dropAccName1, dropAccName2, dropAccName3, dropAccName4, dropAccName5, dropAccName6, dropAccName7, dropAccName8 };
+                HtmlInputHidden[] txtAccName = { txtAccName1, txtAccName2, txtAccName3, txtAccName4, txtAccName5, txtAccName6, txtAccName7, txtAccName8 };
+                TextBox[] Amount = { txtAmount1, txtAmount2, txtAmount3, txtAmount4, txtAmount5, txtAmount6, txtAmount7, txtAmount8 };
+                DropDownList[] dropType = { dropType_1, dropType_2, dropType_3, dropType_4, dropType_5, dropType_6, dropType_7, dropType_8 };
+                string narration = txtNarration.Text.Trim();
+                string Vouch_Type = DropVoucherName.SelectedItem.Text;
+                for (int i = 0; i < (txtAccName.Length / 2); i++)
+                {
+                    if (txtAccName[i].Value != "Select")
                     {
-                        client.BaseAddress = new Uri(BaseUri);
-                        var myContent = JsonConvert.SerializeObject(voucher);
-                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
-                        var byteContent = new ByteArrayContent(buffer);
-                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                        client.DefaultRequestHeaders.Accept.Clear();
-                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                        var response = client.PostAsync("api/VoucherController/InsertVoucher", byteContent).Result;
-                        if (response.IsSuccessStatusCode)
+                        if (txtAccName[i].Value == txtAccName[i + 4].Value)
                         {
-                            string responseString = response.Content.ReadAsStringAsync().Result;
-                            var rr = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                            MessageBox.Show("Can Not be Select Same Ledger Name");
+                            fillCombo();
+                            return;
+                        }
+                        if (Amount[i].Text.Trim() == "" && Amount[i + 4].Text.Trim() == "")
+                        {
+                            MessageBox.Show("Please Enter the Amount");
+                            fillCombo();
+                            return;
                         }
                     }
+                }
+                DateTime date = System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtDate.Text.ToString()) + " " + DateTime.Now.TimeOfDay.ToString());
+                int intID = System.Convert.ToInt32(id.ToString());
+                int flag = 0;
 
-					if(txtVouchID.Visible==true)
-					{
-						CustomerInsertUpdate(drID);
-						CustomerInsertUpdate(crID);
-					}
-					intID++;
-				}
-			}
-			if(DropDownID.Visible==true)
-			{
-				CustomerUpdate();
-			}
-			
-			if(flag == 1)
-			{
-				txtVouchID.Value = id;
-				fillCombo();
-				return;
-			}
-			else
-			{
-				if(txtVouchID.Visible==true)
-					MessageBox.Show("Voucher Saved");
-				else
-					MessageBox.Show("Voucher Updated");
-				CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:btnAdd_Click, New Voucher of ID = "+(--intID)+" Saved  userid :"+ uid);
-				makingReport();
-				clear1();
-				clear();
-				getID();
-			}
-			checkPrevileges();
-			PrintFlag=true;
-			btnPrint.CausesValidation=false;
-		}
+                for (int i = 0; i < (dropAccName.Length / 2); i++)
+                {
+                    int c = 0;
+                    if (txtAccName[i].Value != "Select" && txtAccName[i + 4].Value == "Select")
+                    {
+                        MessageBox.Show("Please Select The Second Account Name");
+                        flag = 1;
+                        break;
+                    }
+                    else if (txtAccName[i].Value == "Select" && txtAccName[i + 4].Value != "Select")
+                    {
+                        MessageBox.Show("Please Select The First Account Name");
+                        flag = 1;
+                        break;
+                    }
+
+                    if (txtAccName[i].Value != "Select" && txtAccName[i + 4].Value != "Select" && Amount[i].Text.Trim() != "" && Amount[i + 4].Text.Trim() != "")
+                    {
+                        string crID = "";
+                        string drID = "";
+                        string Amount_cr = "";
+                        string Amount_Dr = "";
+                        string L_Type = "";
+
+                        string Ledg_ID = txtAccName[i].Value.ToString();
+                        string[] arr = Ledg_ID.Split(new char[] { ':' }, Ledg_ID.Length);
+                        string Ledg_ID1 = txtAccName[i + 4].Value.ToString();
+                        string[] arr1 = Ledg_ID1.Split(new char[] { ':' }, Ledg_ID1.Length);
+                        if (dropType[i].SelectedItem.Text.Trim() == "Dr")
+                        {
+                            drID = arr[1];
+                            crID = arr1[1];
+                            Amount_Dr = Amount[i].Text.Trim();
+                            Amount_cr = Amount[i + 4].Text.Trim();
+                            L_Type = "Dr";
+                        }
+                        else
+                        {
+                            drID = arr1[1];
+                            crID = arr[1];
+                            Amount_Dr = Amount[i + 4].Text.Trim();
+                            Amount_cr = Amount[i].Text.Trim();
+                            L_Type = "Cr";
+                        }
+                        VoucherModel voucher = new VoucherModel();
+                        voucher.VoucherID = intID;
+                        voucher.VoucherType = Vouch_Type.Trim();
+                        voucher.VoucherDate = date.ToShortDateString();
+                        voucher.LedgerIDCr = crID.Trim();
+                        voucher.Amount1 = Amount_cr.Trim();
+                        voucher.LedgerIDDr = drID.Trim();
+                        voucher.Amount2 = Amount_Dr.Trim();
+                        voucher.Narration = narration;
+                        voucher.LType = L_Type;
+                        voucher.InvoiceDate = date.ToShortDateString();
+
+                        using (var client = new HttpClient())
+                        {
+                            client.BaseAddress = new Uri(BaseUri);
+                            var myContent = JsonConvert.SerializeObject(voucher);
+                            var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                            var byteContent = new ByteArrayContent(buffer);
+                            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                            client.DefaultRequestHeaders.Accept.Clear();
+                            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                            var response = client.PostAsync("api/VoucherController/InsertVoucher", byteContent).Result;
+                            if (response.IsSuccessStatusCode)
+                            {
+                                string responseString = response.Content.ReadAsStringAsync().Result;
+                                var rr = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                            }
+                            else
+                                response.EnsureSuccessStatusCode();
+                        }
+
+                        if (txtVouchID.Visible == true)
+                        {
+                            CustomerInsertUpdate(drID);
+                            CustomerInsertUpdate(crID);
+                        }
+                        intID++;
+                    }
+                }
+                if (DropDownID.Visible == true)
+                {
+                    CustomerUpdate();
+                }
+
+                if (flag == 1)
+                {
+                    txtVouchID.Value = id;
+                    fillCombo();
+                    return;
+                }
+                else
+                {
+                    if (txtVouchID.Visible == true)
+                        MessageBox.Show("Voucher Saved");
+                    else
+                        MessageBox.Show("Voucher Updated");
+                    CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:btnAdd_Click, New Voucher of ID = " + (--intID) + " Saved  userid :" + uid);
+                    makingReport();
+                    clear1();
+                    clear();
+                    getID();
+                }
+                checkPrevileges();
+                PrintFlag = true;
+                btnPrint.CausesValidation = false;
+            }
+            catch (Exception ex)
+            {
+                CreateLogFiles.ErrorLog("Form:voucher,Method:Save()   " + " EXCEPTION " + ex.Message + " userid " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
+        }
 		
 		/// <summary>
 		/// Method to write into the report file to print.
@@ -614,7 +641,7 @@ namespace Servosms.Module.Accounts
 			{
 				string home_drive = Environment.SystemDirectory;
 				home_drive = home_drive.Substring(0,2); 
-				string path = home_drive+@"\Inetpub\wwwroot\Servosms\Sysitem\ServosmsPrintServices\ReportView\Voucher.txt";
+				string path = @"F:\Servo\ServoSMS_API\Servosms\Sysitem\ServosmsPrintServices\ReportView\Voucher.txt";
 				StreamWriter sw = new StreamWriter(path);
 				string info =" {0,-14:S} {1,-50:S} {2,20:S} {3,-46:S}";//Party Name & Address
 				string info2=" {0,16:S} {1,-114:S}";
@@ -642,8 +669,6 @@ namespace Servosms.Module.Accounts
 					VoucherName="DEBIT NOTE";
 				else if(DropVoucherName.SelectedIndex==4)
 					VoucherName="  JOURNAL";
-				InventoryClass obj = new InventoryClass();
-				SqlDataReader rdr = null;
 				if(arrName[1].Value!="Select")
 				{
 					sw.WriteLine("                                                             "+VoucherName);
@@ -654,14 +679,27 @@ namespace Servosms.Module.Accounts
 					string addr="",city="";
 					string name=arrName[0].Value;
 					string[] arrAname = name.Split(new char[] {':'},name.Length);
-					string str = "select address,city from customer,ledger_master where ledger_name=cust_name and ledger_id='"+arrAname[1]+"'";
-					rdr = obj.GetRecordSet(str);
-					if(rdr.Read())
+                    CustomerModel customer = new CustomerModel();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/VoucherController/Report?VoucherName="+ arrAname[1]).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            customer = JsonConvert.DeserializeObject<CustomerModel>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+
+                    }
+					if(customer !=null)
 					{
-						addr = rdr.GetValue(0).ToString();
-						city = rdr.GetValue(1).ToString();
+						addr = customer.Address;
+						city = customer.City;
 					}
-					rdr.Close();
 					if(txtVouchID.Visible==true)
 						sw.WriteLine(info,"",arrName[0].Value,"",txtID.Value);
 					else
@@ -692,7 +730,8 @@ namespace Servosms.Module.Accounts
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:Payment,Method:makingReport() Exception: "+ex.Message+"  User: "+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -890,7 +929,8 @@ namespace Servosms.Module.Accounts
                             foreach (var voucher in Voucherids)
                                 DropDownID.Items.Add(voucher);
                     }
-
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 
 				checkPrevileges();
@@ -901,7 +941,8 @@ namespace Servosms.Module.Accounts
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:btnEdit1_Click EXCEPTION: "+ ex.Message+" userid :"+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -935,6 +976,8 @@ namespace Servosms.Module.Accounts
                         var disc = Res.Content.ReadAsStringAsync().Result;
                         vocher = JsonConvert.DeserializeObject<VoucherModel>(disc);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (vocher != null)
@@ -992,7 +1035,8 @@ namespace Servosms.Module.Accounts
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:DropDownID_SelectedIndexChanged EXCEPTION: "+ ex.Message+" userid :"+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -1025,20 +1069,40 @@ namespace Servosms.Module.Accounts
 					MessageBox.Show("Please Select Date Must be Greater than Opening Date");
 				else
 				{
-					int c = 0;
-					dbobj.Insert_or_Update("delete from voucher_Transaction where voucher_id ="+DropDownID.SelectedItem.Text.Trim(),ref c);
-					if(DropVoucherName.SelectedItem.Text.Equals("Contra"))
-						dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Contra ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-					else if(DropVoucherName.SelectedItem.Text.Equals("Journal"))
-						dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Journal ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-					else if(DropVoucherName.SelectedItem.Text.Equals("Credit Note"))
-						dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Credit Note ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-					else if(DropVoucherName.SelectedItem.Text.Equals("Debit Note"))
-						dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Debit Note ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-					dbobj.Insert_or_Update("delete from CustomerLedgerTable where Particular ='Voucher("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
+                    //int c = 0;
+                    //dbobj.Insert_or_Update("delete from voucher_Transaction where voucher_id ="+DropDownID.SelectedItem.Text.Trim(),ref c);
+                    //if(DropVoucherName.SelectedItem.Text.Equals("Contra"))
+                    //	dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Contra ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
+                    //else if(DropVoucherName.SelectedItem.Text.Equals("Journal"))
+                    //	dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Journal ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
+                    //else if(DropVoucherName.SelectedItem.Text.Equals("Credit Note"))
+                    //	dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Credit Note ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
+                    //else if(DropVoucherName.SelectedItem.Text.Equals("Debit Note"))
+                    //	dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Debit Note ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
+                    //dbobj.Insert_or_Update("delete from CustomerLedgerTable where Particular ='Voucher("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
+
                     VoucherModel vcher = new VoucherModel();
                     vcher.VoucherType = DropVoucherName.SelectedItem.Text;
                     vcher.VoucherID = Convert.ToInt32(DropDownID.SelectedItem.Text.Trim());
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        var myContent = JsonConvert.SerializeObject(vcher);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/VoucherController/UpdateVoucherEntry", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            var rr = JsonConvert.DeserializeObject<string>(responseString);
+                        }
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }
 
 
                     Save();
@@ -1048,74 +1112,105 @@ namespace Servosms.Module.Accounts
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:btnEdit_Click EXCEPTION: "+ ex.Message+" userid :"+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
 		/// This method is used to update the record from select the dropdown list.
 		/// </summary>
 		public void Update()
-		{
-			if(DropDownID.SelectedIndex == 0)
-			{
-				MessageBox.Show("Please select Account Name");
-				return;
-			}
-			if(txtAccName1.Value == "Select" || txtAccName5.Value == "Select" )
-			{
-				MessageBox.Show("Please select Account Name");
-				fillCombo();
-				
-				return;
-			}
-			string voucher_type = DropVoucherName.SelectedItem.Text;
-			string voucher_ID = DropDownID.SelectedItem.Text;
-			DateTime date = System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString());
-			string narration = txtNarration.Text.Trim();  
-			string crID = "";
-			string drID = "";
-			string Amount_cr = "";
-			string Amount_Dr = "";
-			string L_Type =""; 
-			string Ledg_ID =txtAccName1.Value.ToString() ;
-			string[] arr = Ledg_ID.Split(new char[] {':'},Ledg_ID.Length);
-			string Ledg_ID1 =txtAccName5.Value.ToString() ;
-			string[] arr1 = Ledg_ID1.Split(new char[] {':'},Ledg_ID1.Length);
-			if(dropType_1.SelectedItem.Text.Trim() == "Dr")
-			{
-				drID = arr[1];
-				crID = arr1[1];
-				Amount_Dr = txtAmount1.Text.Trim();
-				Amount_cr = txtAmount5.Text.Trim();
-				L_Type = "Dr";
-			}
-			else
-			{
-				drID = arr1[1];
-				crID = arr[1];
-				Amount_Dr = txtAmount5.Text.Trim();
-				Amount_cr = txtAmount1.Text.Trim();
-				L_Type = "Cr";
-			}
-			int c = 0;
-				
-			dbobj.Insert_or_Update("Update voucher_transaction set voucher_date =Convert(datetime,'" + date+"',103),Ledg_ID_Cr ="+crID.Trim()+",Amount1="+Amount_cr+",Ledg_ID_Dr="+drID.Trim()+",Amount2="+Amount_Dr+",Narration='"+narration+"',L_Type='"+L_Type+"' where Voucher_ID ="+voucher_ID,ref c);   
-			object obj = null;
-			dbobj.ExecProc(OprType.Update,"ProUpdateAccountsLedger",ref obj,"@Voucher_ID",voucher_ID,"@Ledger_ID",drID.Trim(),"@Amount",Amount_Dr,"@Type","Dr","@Invoice_Date",date);
-			dbobj.ExecProc(OprType.Update,"ProUpdateAccountsLedger",ref obj,"@Voucher_ID",voucher_ID,"@Ledger_ID",crID.Trim(),"@Amount",Amount_cr,"@Type","Cr","@Invoice_Date",date);
-			if(c > 0)
-			{
-				MessageBox.Show("Voucher Updated"); 
-				CreateLogFiles.ErrorLog("Form:voucher,Method:btnEdit_Click, Voucher of ID = "+voucher_ID+" updated  userid :"+ uid);
-				makingReport();
-				clear1();
-				clear();
-				getID();
-			}
-			checkPrevileges();
-			PrintFlag=true;
-			btnPrint.CausesValidation=false;
-		}
+        {
+            try {
+                if (DropDownID.SelectedIndex == 0)
+                {
+                    MessageBox.Show("Please select Account Name");
+                    return;
+                }
+                if (txtAccName1.Value == "Select" || txtAccName5.Value == "Select")
+                {
+                    MessageBox.Show("Please select Account Name");
+                    fillCombo();
+
+                    return;
+                }
+                string voucher_type = DropVoucherName.SelectedItem.Text;
+                string voucher_ID = DropDownID.SelectedItem.Text;
+                DateTime date = System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtDate.Text) + " " + DateTime.Now.TimeOfDay.ToString());
+                string narration = txtNarration.Text.Trim();
+                string crID = "";
+                string drID = "";
+                string Amount_cr = "";
+                string Amount_Dr = "";
+                string L_Type = "";
+                string Ledg_ID = txtAccName1.Value.ToString();
+                string[] arr = Ledg_ID.Split(new char[] { ':' }, Ledg_ID.Length);
+                string Ledg_ID1 = txtAccName5.Value.ToString();
+                string[] arr1 = Ledg_ID1.Split(new char[] { ':' }, Ledg_ID1.Length);
+                if (dropType_1.SelectedItem.Text.Trim() == "Dr")
+                {
+                    drID = arr[1];
+                    crID = arr1[1];
+                    Amount_Dr = txtAmount1.Text.Trim();
+                    Amount_cr = txtAmount5.Text.Trim();
+                    L_Type = "Dr";
+                }
+                else
+                {
+                    drID = arr1[1];
+                    crID = arr[1];
+                    Amount_Dr = txtAmount5.Text.Trim();
+                    Amount_cr = txtAmount1.Text.Trim();
+                    L_Type = "Cr";
+                }
+
+                VoucherModel vcher = new VoucherModel();
+                vcher.VoucherDate = date.ToShortDateString();
+                vcher.LedgerIDCr = crID.Trim();
+                vcher.LedgerIDDr = drID.Trim();
+                vcher.Amount1 = Amount_cr;
+                vcher.Amount2 = Amount_Dr;
+                vcher.Narration = narration;
+                vcher.LType = L_Type;
+                vcher.VoucherID = Convert.ToInt32(voucher_ID);
+                int c = 0;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    var myContent = JsonConvert.SerializeObject(vcher);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VoucherController/UpdateVoucher", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        c = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(responseString);
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+                if (c > 0)
+                {
+                    MessageBox.Show("Voucher Updated");
+                    CreateLogFiles.ErrorLog("Form:voucher,Method:btnEdit_Click, Voucher of ID = " + voucher_ID + " updated  userid :" + uid);
+                    makingReport();
+                    clear1();
+                    clear();
+                    getID();
+                }
+                checkPrevileges();
+                PrintFlag = true;
+                btnPrint.CausesValidation = false;
+            }
+            catch(Exception ex)
+            {
+                CreateLogFiles.ErrorLog("Form:voucher,Method:btnEdit_Click, EXCEPTION  " + ex.Message + "  userid :" + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
+        }
 
 		/// <summary>
 		/// This method is used to delete the particular record when select the dropdownlist.
@@ -1129,18 +1224,30 @@ namespace Servosms.Module.Accounts
 					MessageBox.Show("Please select Account Name");
 					return;
 				}
-				int c = 0;
-				dbobj.Insert_or_Update("delete from voucher_Transaction where voucher_id ="+DropDownID.SelectedItem.Text.Trim(),ref c);
-				if(DropVoucherName.SelectedItem.Text.Equals("Contra"))
-					dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Contra ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-				else if(DropVoucherName.SelectedItem.Text.Equals("Journal"))
-					dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Journal ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-				else if(DropVoucherName.SelectedItem.Text.Equals("Credit Note"))
-					dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Credit Note ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-				else if(DropVoucherName.SelectedItem.Text.Equals("Debit Note"))
-					dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Debit Note ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-				dbobj.Insert_or_Update("delete from CustomerLedgerTable where Particular ='Voucher("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-				CustomerUpdate();
+                VoucherModel vcher = new VoucherModel();
+                vcher.VoucherType = DropVoucherName.SelectedItem.Text;
+                vcher.VoucherID = Convert.ToInt32(DropDownID.SelectedItem.Text.Trim());
+
+                int c = 0;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    var myContent = JsonConvert.SerializeObject(vcher);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VoucherController/DeleteVoucher", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        c = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(responseString);
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+                CustomerUpdate();
 				MessageBox.Show("Voucher Deleted");
 				CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:btnDelete_Click Voucher of ID = "+DropDownID.SelectedItem.Text.Trim()+" deleted  userid :"+ uid);
 				clear1();
@@ -1151,7 +1258,8 @@ namespace Servosms.Module.Accounts
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:btnDelete_Click EXCEPTION: "+ ex.Message+" userid :"+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -1213,6 +1321,8 @@ namespace Servosms.Module.Accounts
                                 foreach (var voucher in Voucherids)
                                     DropDownID.Items.Add(voucher);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
 
                     }
                     getAcountName();
@@ -1230,6 +1340,7 @@ namespace Servosms.Module.Accounts
             catch (Exception ex)
             {
                 CreateLogFiles.ErrorLog("Form:voucher.aspx.cs,Method:DropVoucherName_SelectedIndexChanged EXCEPTION: " + ex.Message + " userid :" + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
             }
         }
 
@@ -1278,69 +1389,87 @@ namespace Servosms.Module.Accounts
         /// </summary>
         public void CustomerUpdate()
 		{
-			if(Invoice_Date.IndexOf(" ")>0)
-			{               
-                string[] CheckDate = Invoice_Date.Split(new char[] {' '},Invoice_Date.Length);
-				if(DateTime.Compare(System.Convert.ToDateTime(CheckDate[0].ToString()), System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString())))>0)
-					Invoice_Date= GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString());
-				else
-					Invoice_Date=CheckDate[0].ToString();
-			}
-			else
-				Invoice_Date= GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString());
-						
-			for(int k=0;k<LedgerID.Count;k++)
-			{
-                VoucherModel vouchr = new VoucherModel();
-                vouchr.LedgerID = LedgerID[k].ToString();
-                vouchr.InvoiceDate = Invoice_Date;
+            try {
+                if (Invoice_Date.IndexOf(" ") > 0)
+                {
+                    string[] CheckDate = Invoice_Date.Split(new char[] { ' ' }, Invoice_Date.Length);
+                    if (DateTime.Compare(System.Convert.ToDateTime(CheckDate[0].ToString()), System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString()))) > 0)
+                        Invoice_Date = GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString());
+                    else
+                        Invoice_Date = CheckDate[0].ToString();
+                }
+                else
+                    Invoice_Date = GenUtil.str2DDMMYYYY(Request.Form["txtDate"].ToString());
 
+                for (int k = 0; k < LedgerID.Count; k++)
+                {
+                    VoucherModel vouchr = new VoucherModel();
+                    vouchr.LedgerID = LedgerID[k].ToString();
+                    vouchr.InvoiceDate = Invoice_Date;
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        var myContent = JsonConvert.SerializeObject(vouchr);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/VoucherController/CustomerUpdate", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            var meessage = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                        }
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                CreateLogFiles.ErrorLog("Form:voucher,Method:CustomerUpdate()   " + " EXCEPTION " + ex.Message + " userid " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
+		}
+
+        /// <summary>
+        /// This method is used for update the customer balance after insert record.
+        /// </summary>
+        /// <param name="Ledger_ID"></param>
+        public void CustomerInsertUpdate(string Ledger_ID)
+        {
+            try
+            {
+                VoucherModel voucher = new VoucherModel();
+                voucher.LedgerID = Ledger_ID;
+                voucher.InvoiceDate = txtDate.Text;
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(BaseUri);
-                    var myContent = JsonConvert.SerializeObject(vouchr);
+                    var myContent = JsonConvert.SerializeObject(voucher);
                     var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
                     var byteContent = new ByteArrayContent(buffer);
                     byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                    var response = client.PostAsync("api/VoucherController/CustomerUpdate", byteContent).Result;
+                    var response = client.PostAsync("api/VoucherController/CustomerInsertUpdate", byteContent).Result;
                     if (response.IsSuccessStatusCode)
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                         var meessage = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
-            }
-		}
 
-		/// <summary>
-		/// This method is used for update the customer balance after insert record.
-		/// </summary>
-		/// <param name="Ledger_ID"></param>
-		public void CustomerInsertUpdate(string Ledger_ID)
-		{
-            VoucherModel voucher = new VoucherModel();
-            voucher.LedgerID = Ledger_ID;
-            voucher.InvoiceDate = txtDate.Text;
-            using (var client = new HttpClient())
+            }
+            catch (Exception ex)
             {
-                client.BaseAddress = new Uri(BaseUri);
-                var myContent = JsonConvert.SerializeObject(voucher);
-                var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                var response = client.PostAsync("api/VoucherController/CustomerInsertUpdate", byteContent).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseString = response.Content.ReadAsStringAsync().Result;
-                    var meessage = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
-                }
+                CreateLogFiles.ErrorLog("Form:voucher,Method:CustomerInsertUpdate   " + " EXCEPTION " + ex.Message + " userid " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
             }
-
-
         }
 	}
 }
