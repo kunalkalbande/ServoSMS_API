@@ -80,6 +80,8 @@ namespace Servosms.Module.Logistics
                             var id = Res.Content.ReadAsStringAsync().Result;
                             lstVehicleroute = JsonConvert.DeserializeObject<List<string>>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     if (lstVehicleroute != null)
@@ -193,6 +195,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstDropEngineOil = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstDropEngineOil != null)
@@ -224,6 +228,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstDropbreak = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstDropbreak != null)
@@ -256,6 +262,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstDropGear = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstDropGear != null)
@@ -287,6 +295,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstDropCoolent = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstDropCoolent != null)
@@ -318,6 +328,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstDropGrease = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstDropGrease != null)
@@ -349,6 +361,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstDropTransmission = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstDropTransmission != null)
@@ -441,37 +455,18 @@ namespace Servosms.Module.Logistics
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var Res = client.GetAsync("api/VehicleDailyLogbook/GetNextVehicledetailID").Result;
+                    var Res = client.GetAsync("api/VehicleDailyLogbook/GetNextVehicleLogbookID").Result;
                     if (Res.IsSuccessStatusCode)
                     {
                         var id = Res.Content.ReadAsStringAsync().Result;
                         strVehicleLBID = JsonConvert.DeserializeObject<string>(id);
+                        lblVDLBID.Text = strVehicleLBID;
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
-                lblVDLBID.Text = strVehicleLBID;
-
-    //            SqlDataReader SqlDtr = null;
-    //int id = 0;
-    //string strID = "";
-    //dbobj.SelectQuery("Select max(VDLB_id) from VDLB",ref SqlDtr); 
-    //if(SqlDtr.Read())
-    //{
-    //	strID = SqlDtr.GetValue(0).ToString();
-    //	if(!strID.Trim().Equals(""))
-    //	{
-    //		id = System.Convert.ToInt32(strID);
-    //		id = id + 1;
-    //		lblVDLBID.Text = id.ToString(); 
-    //	}
-    //	else
-    //	{
-    //		lblVDLBID.Text = "1001";
-    //	}
-    //}
-    //else
-    //{
-    //	lblVDLBID.Text = "1001";
-    //}
+                
+                
             }
 			catch(Exception ex)
 			{
@@ -499,6 +494,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstVehicleNo = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstVehicleNo != null)
@@ -541,6 +538,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         strHidden = JsonConvert.DeserializeObject<string>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 txtHidden.Value = strHidden;
@@ -727,6 +726,8 @@ namespace Servosms.Module.Logistics
                         string responseString = response.Content.ReadAsStringAsync().Result;
                         //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //object op = null;
@@ -817,6 +818,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstVehicleLogbookId = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstVehicleLogbookId != null)
@@ -872,6 +875,8 @@ namespace Servosms.Module.Logistics
                         var id = Res.Content.ReadAsStringAsync().Result;
                         vehDLB = JsonConvert.DeserializeObject<VehicleDailyLogbookModel>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 
@@ -1122,6 +1127,8 @@ namespace Servosms.Module.Logistics
                         string responseString = response.Content.ReadAsStringAsync().Result;
                         //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //object op = null;
@@ -1389,6 +1396,8 @@ namespace Servosms.Module.Logistics
                         string responseString = response.Content.ReadAsStringAsync().Result;
                         c = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(responseString);
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
 
