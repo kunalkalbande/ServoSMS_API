@@ -115,6 +115,8 @@ namespace Servosms.Module.Inventory
                             var disc = Res.Content.ReadAsStringAsync().Result;
                             CustName = JsonConvert.DeserializeObject<ArrayList>(disc);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 					for(int i=0;i<CustName.Count;i++)
 					{
@@ -179,6 +181,7 @@ namespace Servosms.Module.Inventory
                             var disc = Res.Content.ReadAsStringAsync().Result;
                             DateFrom = JsonConvert.DeserializeObject<string>(disc);
                         }
+                       
                     }
 					if(DateFrom!=null)
 					{
@@ -188,7 +191,8 @@ namespace Servosms.Module.Inventory
 				catch(Exception ex)
 				{
 					CreateLogFiles.ErrorLog("Form:FuelPerchase.aspx,Method:Payment_Receipt. EXCEPTION  "+ex.Message +" userid "+uid);
-				}
+                    Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+                }
 			}
 		}
 		
@@ -993,8 +997,7 @@ namespace Servosms.Module.Inventory
             try
             {
                 //string[] arrSubReceipt={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-                InventoryClass obj = new InventoryClass();
-                SqlDataReader SqlDtr = null;
+                PaymentReceiptModel paymentreceipt = new PaymentReceiptModel();
                 ArrayList UpdateLedgerID = new ArrayList();
                 ArrayList UpdateCustomerID = new ArrayList();
                 double rec_amount;
@@ -1034,7 +1037,6 @@ namespace Servosms.Module.Inventory
                     MessageBox.Show("Cash and Bank Accounts are not created");
                     return;
                 }
-                string sql = "";
                 string[] strName = new string[2];
                 if (_CustName.IndexOf(":") > 0)
                 {
@@ -1078,7 +1080,7 @@ namespace Servosms.Module.Inventory
                     }
 
                 }
-                obj.Receipt = "Save";
+                paymentreceipt.Receipt = "Save";
                 if (PanBankInfo.Visible == true)
                 {
 
@@ -1092,7 +1094,7 @@ namespace Servosms.Module.Inventory
                         {
                             var disc = Res.Content.ReadAsStringAsync().Result;
                             var bankName = JsonConvert.DeserializeObject<string>(disc);
-                            obj.BankName = bankName;
+                            paymentreceipt.BankName = bankName;
                             Acc_Type = bankName;
                             UpdateLedgerID.Add(bankName);
                         }
@@ -1100,30 +1102,43 @@ namespace Servosms.Module.Inventory
                 }
                 else
                 {
-                    obj.BankName = "";
+                    paymentreceipt.BankName = "";
                 }
-                dbobj.SelectQuery("select Ledger_ID from Ledger_Master lm, Ledger_Master_sub_grp lmsg where lm.sub_grp_id = lmsg.sub_grp_id and  lmsg.sub_grp_name = 'Cash in hand'", ref SqlDtr);
-                if (SqlDtr.Read())
+
+                List<string> ledgerIDs = new List<string>();
+                using (var client = new HttpClient())
                 {
-                    UpdateLedgerID.Add(SqlDtr.GetValue(0).ToString());
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/ReceiptController/GetLedgerIDs").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        ledgerIDs = JsonConvert.DeserializeObject<List<string>>(disc);
+                    }
                 }
-                SqlDtr.Close();
+                if (ledgerIDs != null && ledgerIDs.Count > 0)
+                {
+                    foreach (var ledger in ledgerIDs)
+                        UpdateLedgerID.Add(ledger);
+                }
 
                 //obj.BankName=txtBankName.Text.Trim().ToString();
-                obj.ChequeNo = txtChequeno.Text.Trim().ToString();
-                obj.Mode = DropMode.SelectedItem.Text;
-                obj.ChequeDate = GenUtil.str2DDMMYYYY(txtDate.Text.Trim().ToString());
-                obj.cust_id = Cust_ID;
-                obj.Narration = txtNar.Text;
-                obj.discount = txtDisc1.Text;
-                obj.Discount = txtDisc2.Text;
-                obj.CustBankName = txtCustBankName.Text;
-                obj.Invoice_Date = System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString());
+                paymentreceipt.ChequeNumber = txtChequeno.Text.Trim().ToString();
+                paymentreceipt.Mode = DropMode.SelectedItem.Text;
+                paymentreceipt.ChequeDate = GenUtil.str2DDMMYYYY(txtDate.Text.Trim().ToString());
+                paymentreceipt.Cust_ID = Cust_ID;
+                paymentreceipt.Narration = txtNar.Text;
+                paymentreceipt.Discount1 = txtDisc1.Text;
+                paymentreceipt.Discount2 = txtDisc2.Text;
+                paymentreceipt.CustBankName = txtCustBankName.Text;
+                paymentreceipt.Invoice_Date = GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString();
                 string DiscID1 = "0", DiscID2 = "0";
 
 
                 if (DropDiscount1.SelectedIndex == 0)
-                    obj.discountid1 = "";
+                    paymentreceipt.DiscountID1 = "";
                 else
                 {
 
@@ -1137,7 +1152,7 @@ namespace Servosms.Module.Inventory
                         {
                             var disc = Res.Content.ReadAsStringAsync().Result;
                             var discount = JsonConvert.DeserializeObject<string>(disc);
-                            obj.discountid1 = discount;
+                            paymentreceipt.DiscountID1 = discount;
                             DiscID1 = discount;
                             if (txtDisc1.Text != "")
                                 UpdateLedgerID.Add(discount);
@@ -1146,7 +1161,7 @@ namespace Servosms.Module.Inventory
                 }
 
                 if (DropDiscount2.SelectedIndex == 0)
-                    obj.discountid2 = "";
+                    paymentreceipt.DiscountID2 = "";
                 else
                 {
                     using (var client = new HttpClient())
@@ -1159,7 +1174,7 @@ namespace Servosms.Module.Inventory
                         {
                             var disc = Res.Content.ReadAsStringAsync().Result;
                             var discount = JsonConvert.DeserializeObject<string>(disc);
-                            obj.discountid2 = discount;
+                            paymentreceipt.DiscountID2 = discount;
                             DiscID2 = discount;
                             if (txtDisc2.Text != "")
                                 UpdateLedgerID.Add(discount);
@@ -1169,9 +1184,9 @@ namespace Servosms.Module.Inventory
 
 
                 if (txtDisc1.Text == "")
-                    obj.discountid1 = "";
+                    paymentreceipt.DiscountID1 = "";
                 if (txtDisc2.Text == "")
-                    obj.discountid2 = "";
+                    paymentreceipt.DiscountID2 = "";
                 //********** Add This code by Mahesh On 05.07.008 **********************************
 
                 /*Coment by vikas 12.4.2013 string DisType1 = "", DisType2 = "";
@@ -1255,55 +1270,43 @@ namespace Servosms.Module.Inventory
                 }
 
                 GetNextReceiptNo();
-              
+
                 if (_CustName.IndexOf(":") > 0)
                 {
                     rec_amount = 0;
                     rec_amount = System.Convert.ToDouble(txtRecAmount.Text);
-                   
+
                     MakingReport();
-                    
+
                     //call procedure to insert the record into payment_Receipt and voucher_transaction tables.
                     PaymentReceiptModel payment = new PaymentReceiptModel();
                     payment.PanReceiptNo = PanReceiptNo.Visible;
 
-                    if (PanReceiptNo.Visible == true)
-                    {
-                        payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
-                        payment.Discount1 = DisType1;
-                        payment.Discount2 = DisType2;
-                        payment.CustomerID = OldCustID.ToString();
+                    //payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
+                    payment.Discount1 = DisType1;
+                    payment.Discount2 = DisType2;
+                    payment.CustomerID = OldCustID.ToString();
 
-                        if (DropMode.SelectedItem.Text == "Cash")
-                        {
-                            payment.Cust_ID = Cust_ID;
-                            payment.Amount = TotalAmt;
-                            payment.AccountType = Acc_Type;
-                            payment.Mode = DropMode.SelectedItem.Text;
-                            payment.RecDate = GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString();
-                            payment.ChequeDate = GenUtil.str2DDMMYYYY(txtDate.Text);
-                            payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
+                    payment.Cust_ID = Cust_ID;
+                    payment.Amount = TotalAmt;
+                    payment.AccountType = Acc_Type;
+                    payment.Mode = DropMode.SelectedItem.Text;
+                    payment.RecDate = GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString();
+                    payment.ChequeDate = GenUtil.str2DDMMYYYY(txtDate.Text);
+                    //payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
 
-                        }
-                        else
-                        {
-                            payment.Cust_ID = Cust_ID;
-                            payment.Amount = TotalAmt;
-                            payment.AccountType = Acc_Type;
-                            payment.ChequeNumber = txtChequeno.Text;
-                            payment.ChequeDate = GenUtil.str2DDMMYYYY(txtDate.Text);
-                            payment.Mode = DropMode.SelectedItem.Text;
-                            payment.Narration = txtNar.Text;
-                            payment.CustBankName = txtCustBankName.Text;
-                            payment.RecDate = GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString();
-                            payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
-                        }
-                    }
-                    else
-                    {
-                        payment.ReceiptNo = ReceiptNo.ToString();
-                    }
-                   
+                    payment.Cust_ID = Cust_ID;
+                    payment.Amount = TotalAmt;
+                    payment.AccountType = Acc_Type;
+                    payment.ChequeNumber = txtChequeno.Text;
+                    payment.ChequeDate = GenUtil.str2DDMMYYYY(txtDate.Text);
+                    payment.Mode = DropMode.SelectedItem.Text;
+                    payment.Narration = txtNar.Text;
+                    payment.CustBankName = txtCustBankName.Text;
+                    payment.RecDate = GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString();
+                    //payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
+                    payment.ReceiptNo = ReceiptNo.ToString();
+
                     using (var client = new HttpClient())
                     {
                         client.BaseAddress = new Uri(BaseUri);
@@ -1330,7 +1333,6 @@ namespace Servosms.Module.Inventory
                     object op = null;
                     PaymentReceiptModel payment = new PaymentReceiptModel();
                     payment.PanReceiptNo = PanReceiptNo.Visible;
-                    payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
                     payment.DiscountType1 = DisType1;
                     payment.DiscountType2 = DisType2;
                     payment.Cust_ID = OldCustID.ToString();
@@ -1341,52 +1343,18 @@ namespace Servosms.Module.Inventory
 
                     if (PanReceiptNo.Visible == true)
                     {
-                        int x = 0;
-                        //dbobj.ExecuteScalar("select cust_id from customer where cust_name=(select ledger_name from ledger_master where ledger_id = '"+customerID+"')",ref OldCustID);
                         if (customerID != Cust_ID)
                         {
                             UpdateLedgerID.Add(customerID);
                             UpdateCustomerID.Add(OldCustID);
                         }
-                        //dbobj1.Insert_or_Update("delete from AccountsLedgerTable where Particulars = 'Receipt ("+DropReceiptNo.SelectedItem.Text+")' and Ledger_ID = '"+customerID+"'",ref x);
-                        dbobj1.Insert_or_Update("delete from AccountsLedgerTable where Particulars = 'Receipt (" + DropReceiptNo.SelectedItem.Text + ")'", ref x);
-                        dbobj1.Insert_or_Update("delete from AccountsLedgerTable where Particulars = 'Receipt_" + DisType1 + " (" + DropReceiptNo.SelectedItem.Text + ")'", ref x);
-                        dbobj1.Insert_or_Update("delete from AccountsLedgerTable where Particulars = 'Receipt_" + DisType2 + " (" + DropReceiptNo.SelectedItem.Text + ")'", ref x);
-                        //dbobj1.Insert_or_Update("delete from CustomerLedgerTable where Particular = 'Payment Received("+DropReceiptNo.SelectedItem.Text+")' and CustID='"+OldCustID+"'",ref x);
-                        dbobj1.Insert_or_Update("delete from CustomerLedgerTable where Particular = 'Payment Received(" + DropReceiptNo.SelectedItem.Text + ")'", ref x);
-                        dbobj1.Insert_or_Update("delete from Payment_Receipt where Receipt_No='" + DropReceiptNo.SelectedItem.Text + "'", ref x);
 
-                        int Curr_Credit = 0;
-                        int Credit_Limit = 0;
-                        dbobj.ExecuteScalar("Select Cr_Limit from customer where Cust_ID = '" + OldCustID + "'", ref Credit_Limit);
-                        dbobj.ExecuteScalar("Select Curr_Credit from customer where Cust_ID = '" + OldCustID + "'", ref Curr_Credit);
-                        //12.09.09 coment by vikas if(Curr_Credit < Credit_Limit)
-                        if (Curr_Credit <= Credit_Limit)
-                        {
-                            Curr_Credit = Curr_Credit + int.Parse(txtRecAmount.Text);
-
-                            Curr_Credit = Curr_Credit - int.Parse(Tot_Rec.ToString());         //Add by vikas 12.09.09
-
-                            if (@Curr_Credit >= @Credit_Limit)
-                                dbobj1.Insert_or_Update("update customer set Curr_Credit = '" + Credit_Limit + "' where Cust_ID  = '" + customerID + "'", ref x);
-                            else
-                                dbobj1.Insert_or_Update("update customer set Curr_Credit = '" + Curr_Credit + "' where Cust_ID  = '" + customerID + "'", ref x);
-                        }
-                        /****************** Add by vikas 12.09.09 **************************************************/
-                        else
-                        {
-                            Curr_Credit = Curr_Credit + int.Parse(txtRecAmount.Text);                                   //Add by vikas 12.09.09
-                            Curr_Credit = Curr_Credit - int.Parse(Tot_Rec.ToString());                                  //Add by vikas 12.09.09
-                            dbobj1.Insert_or_Update("update customer set Cr_Limit = '" + Curr_Credit + "' where Cust_ID  = '" + customerID + "'", ref x);
-                        }
-                        /*******************************************************************************************/
-                        payment.ReceiptNo= DropReceiptNo.SelectedItem.Text; 
-                        payment.SubReceiptNo= "A" + DropReceiptNo.SelectedItem.Text;
+                        payment.ReceiptNo = DropReceiptNo.SelectedItem.Text;
+                        payment.SubReceiptNo = "A" + DropReceiptNo.SelectedItem.Text;
                         payment.InvoiceNo = "";
                         payment.ReceivedAmount = TotalAmt.ToString();
                         payment.ActualAmount = System.Convert.ToString(double.Parse(txtRecAmount.Text));
 
-                        obj.InsertPaymentReceived();
                         payment.CustomerName = _CustName;
                         payment.City = txtCity.Text.ToString();
                         payment.Amount = TotalAmt;
@@ -1401,13 +1369,6 @@ namespace Servosms.Module.Inventory
                         payment.DiscountID2 = DiscID2;
                         payment.DiscountType1 = DisType1;
                         payment.DiscountType2 = DisType2;
-
-                        //dbobj.ExecProc(OprType.Insert,"ProCustLedgerEntry",ref op,"@Cust_Name",DropCustName.Value,"@City",txtCity.Text.ToString(),"@Amount", TotalAmt,"@Rec_Acc_Type",Acc_Type,"@Receipt",Receipt,"@Receipt_No",DropReceiptNo.SelectedItem.Text,"@ActualAmount",txtRecAmount.Text,"@RecDate",System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtReceivedDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())); //Comment by vikas sharma 30.04.09
-                        dbobj.ExecProc(OprType.Insert, "ProCustLedgerEntry", ref op, "@Cust_Name", _CustName, "@City", txtCity.Text.ToString(), "@Amount", TotalAmt, "@Rec_Acc_Type", Acc_Type, "@Receipt", Receipt, "@Receipt_No", DropReceiptNo.SelectedItem.Text, "@ActualAmount", txtRecAmount.Text, "@RecDate", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString()));
-                        if (txtDisc1.Text != "" && txtDisc1.Text != "0")
-                            dbobj.ExecProc(OprType.Insert, "ProSpacialDiscountEntry", ref op, "@Cust_ID", Cust_ID, "@Receipt", "Save", "@Receipt_No", DropReceiptNo.SelectedItem.Text, "@Amount", txtDisc1.Text, "@Ledger_ID", DiscID1, "@RecDate", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString()), "@DisType", DisType1);
-                        if (txtDisc2.Text != "" && txtDisc2.Text != "0")
-                            dbobj.ExecProc(OprType.Insert, "ProSpacialDiscountEntry", ref op, "@Cust_ID", Cust_ID, "@Receipt", "Save", "@Receipt_No", DropReceiptNo.SelectedItem.Text, "@Amount", txtDisc2.Text, "@Ledger_ID", DiscID2, "@RecDate", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString()), "@DisType", DisType2);
                     }
                     else
                     {
@@ -1416,53 +1377,38 @@ namespace Servosms.Module.Inventory
                         payment.InvoiceNo = "";
                         payment.ReceivedAmount = TotalAmt.ToString();
                         payment.ActualAmount = System.Convert.ToString(double.Parse(txtRecAmount.Text));
-                        obj.InsertPaymentReceived();
                         payment.OldCust_ID = OldCustID.ToString();
+                    }
 
-                        //dbobj.ExecProc(OprType.Insert,"ProCustLedgerEntry",ref op,"@Cust_Name",DropCustName.Value,"@City",txtCity.Text.ToString(),"@Amount", TotalAmt,"@Rec_Acc_Type",Acc_Type,"@Receipt",Receipt,"@Receipt_No",ReceiptNo.ToString(),"@ActualAmount",txtRecAmount.Text,"@RecDate",System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtReceivedDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())); //Comment by Vikas sharma 30.04.09
-                        dbobj.ExecProc(OprType.Insert, "ProCustLedgerEntry", ref op, "@Cust_Name", _CustName, "@City", txtCity.Text.ToString(), "@Amount", TotalAmt, "@Rec_Acc_Type", Acc_Type, "@Receipt", Receipt, "@Receipt_No", ReceiptNo.ToString(), "@ActualAmount", txtRecAmount.Text, "@RecDate", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString()));
-                        if (txtDisc1.Text != "" && txtDisc1.Text != "0")
-                            dbobj.ExecProc(OprType.Insert, "ProSpacialDiscountEntry", ref op, "@Cust_ID", Cust_ID, "@Receipt", "Save", "@Receipt_No", ReceiptNo.ToString(), "@Amount", txtDisc1.Text, "@Ledger_ID", DiscID1, "@RecDate", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString()), "@DisType", DisType1);
-                        if (txtDisc2.Text != "" && txtDisc2.Text != "0")
-                            dbobj.ExecProc(OprType.Insert, "ProSpacialDiscountEntry", ref op, "@Cust_ID", Cust_ID, "@Receipt", "Save", "@Receipt_No", ReceiptNo.ToString(), "@Amount", txtDisc2.Text, "@Ledger_ID", DiscID2, "@RecDate", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text) + " " + DateTime.Now.TimeOfDay.ToString()), "@DisType", DisType2);
-
-                        /******************Add by vikas Sharma 12.09.09**********************************************/
-                        int x = 0;
-                        int Curr_Credit = 0;
-                        int Credit_Limit = 0;
-                        dbobj.ExecuteScalar("Select Cr_Limit from customer where Cust_ID = '" + OldCustID + "'", ref Credit_Limit);
-                        dbobj.ExecuteScalar("Select Curr_Credit from customer where Cust_ID = '" + OldCustID + "'", ref Curr_Credit);
-                        //12.09.09 coment by vikas if(Curr_Credit < Credit_Limit)
-                        if (Curr_Credit < Credit_Limit)
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        var myContent = JsonConvert.SerializeObject(payment);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/ReceiptController/UpdatePayment", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
                         {
-                            Curr_Credit = Curr_Credit + int.Parse(txtRecAmount.Text);
-                            if (@Curr_Credit >= @Credit_Limit)
-                                dbobj1.Insert_or_Update("update customer set Curr_Credit = '" + Credit_Limit + "' where Cust_ID  = '" + customerID + "'", ref x);
-                            else
-                                dbobj1.Insert_or_Update("update customer set Curr_Credit = '" + Curr_Credit + "' where Cust_ID  = '" + customerID + "'", ref x);
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            var prod = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductModel>(responseString);
                         }
-                        else
-                        {
-                            Curr_Credit = Curr_Credit + int.Parse(txtRecAmount.Text);          //Add by vikas 12.09.09
-                            Curr_Credit = Curr_Credit - int.Parse(Tot_Rec.ToString());         //Add by vikas 12.09.09
-                            dbobj1.Insert_or_Update("update customer set Cr_Limit = '" + Curr_Credit + "' where Cust_ID  = '" + customerID + "'", ref x);
-                        }
-                        /********************End******************************************************/
-
-
-
                     }
 
 
                     //**************************************** End *******************************************
                     //				
                     //***********************
+                    PaymentReceiptModel paymnt = new PaymentReceiptModel();
+                    payment.PanReceiptNo = PanReceiptNo.Visible;
+
+
+
 
                     if (PanReceiptNo.Visible == true)//Comment by Mahesh on 25.10.008 b'coz this condition is allow insert time also b'coz balance update in insert or update time both.
                     {
-
-                        SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-
                         if (Invoice_Date.IndexOf(" ") > 0)
                         {
                             string[] CheckDate = Invoice_Date.Split(new char[] { ' ' }, Invoice_Date.Length);
@@ -1476,27 +1422,48 @@ namespace Servosms.Module.Inventory
 
                         for (int p = 0; p < UpdateLedgerID.Count; p++)
                         {
-                            string ss = UpdateLedgerID[p].ToString();
-                            dbobj.ExecProc(OprType.Update, "UpdateAccountsLedgerForCustomer", ref op, "@Ledger_ID", UpdateLedgerID[p].ToString(), "@Invoice_Date", Invoice_Date);
-                            dbobj.SelectQuery("select cust_id from customer,ledger_master where Cust_Name=Ledger_Name and Ledger_ID='" + UpdateLedgerID[p].ToString() + "'", ref SqlDtr);
-                            if (SqlDtr.Read())
+                            paymnt.LedgerID = UpdateLedgerID[p].ToString();
+                            paymnt.Invoice_Date = GenUtil.str2MMDDYYYY(Invoice_Date);
+                            using (var client = new HttpClient())
                             {
-                                dbobj.ExecProc(OprType.Update, "UpdateCustomerLedgerForCustomer", ref op, "@Cust_ID", SqlDtr["Cust_ID"].ToString(), "@Invoice_Date", GenUtil.str2MMDDYYYY(Invoice_Date));
+                                client.BaseAddress = new Uri(BaseUri);
+                                var myContent = JsonConvert.SerializeObject(paymnt);
+                                var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                                var byteContent = new ByteArrayContent(buffer);
+                                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                                client.DefaultRequestHeaders.Accept.Clear();
+                                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                                var response = client.PostAsync("api/ReceiptController/UpdateAccountsLedger", byteContent).Result;
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    string responseString = response.Content.ReadAsStringAsync().Result;
+                                    var prod = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductModel>(responseString);
+                                }
                             }
                         }
 
                     }//Comment by Mahesh on 25.10.008 b'coz this condition is allow insert time also b'coz balance update in insert or update time both.
                     else
                     {
-                        object opp = null;
                         for (int i = 0; i < UpdateLedgerID.Count; i++)
                         {
-                            string ss = UpdateLedgerID[i].ToString();
-                            dbobj.ExecProc(OprType.Update, "UpdateAccountsLedgerForCustomer", ref opp, "@Ledger_ID", UpdateLedgerID[i].ToString(), "@Invoice_Date", GenUtil.str2DDMMYYYY(txtReceivedDate.Text));
-                            dbobj.SelectQuery("select cust_id from customer,ledger_master where Cust_Name=Ledger_Name and Ledger_ID='" + UpdateLedgerID[i].ToString() + "'", ref SqlDtr);
-                            if (SqlDtr.Read())
+                            paymnt.LedgerID = UpdateLedgerID[i].ToString();
+                            paymnt.Invoice_Date = GenUtil.str2DDMMYYYY(txtReceivedDate.Text);
+                            using (var client = new HttpClient())
                             {
-                                dbobj.ExecProc(OprType.Update, "UpdateCustomerLedgerForCustomer", ref opp, "@Cust_ID", SqlDtr["Cust_ID"].ToString(), "@Invoice_Date", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtReceivedDate.Text)));
+                                client.BaseAddress = new Uri(BaseUri);
+                                var myContent = JsonConvert.SerializeObject(paymnt);
+                                var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                                var byteContent = new ByteArrayContent(buffer);
+                                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                                client.DefaultRequestHeaders.Accept.Clear();
+                                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                                var response = client.PostAsync("api/ReceiptController/UpdateAccountsLedger", byteContent).Result;
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    string responseString = response.Content.ReadAsStringAsync().Result;
+                                    var prod = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductModel>(responseString);
+                                }
                             }
                         }
 
@@ -1901,61 +1868,93 @@ namespace Servosms.Module.Inventory
 			
 			#region Fetch Place of Customer Regarding Customer Name
 			
+
 			string OldCustomerID = "";
 			int FlagFlag=0;
 			string City_Name="";
-			sql="select Cust_Name,City,cust_id from Ledger_Master l,Customer c where l.ledger_name=c.cust_name and Ledger_ID='"+Cust_ID+"'";
-			SqlDtr = obj.GetRecordSet(sql);
-			if(SqlDtr.Read())
-			{
-				CustName=SqlDtr.GetValue(0).ToString();
-				if(SqlDtr.GetValue(1).ToString().Equals(""))
-				{
-					txtCity.Text="";
-					City_Name="";
-				}
-				else
-				{
-					txtCity.Text=SqlDtr.GetValue(1).ToString();
-					City_Name=SqlDtr.GetValue(1).ToString();
-				}
-				OldCustomerID=SqlDtr.GetValue(2).ToString();
-				FlagFlag=1;
-			}
-			SqlDtr.Close ();
-			if(FlagFlag==0)
-			{
-				sql="select Ledger_Name,city,Ledger_ID from Ledger_Master l,Employee e where l.ledger_name=e.Emp_name and Ledger_ID='"+Cust_ID+"'";
-				SqlDtr = obj.GetRecordSet(sql);
-				if(SqlDtr.Read())
-				{
-					CustName=SqlDtr.GetValue(0).ToString()+":"+SqlDtr.GetValue(2).ToString();
-					if(SqlDtr.GetValue(1).ToString().Equals(""))
-						txtCity.Text="";
-					else
-						txtCity.Text=SqlDtr.GetValue(1).ToString();
-					FlagFlag=1;
-					DropDiscount1.Enabled=false;
-					DropDiscount2.Enabled=false;
-					txtDisc1.Enabled=false;
-					txtDisc2.Enabled=false;
-				}
-				SqlDtr.Close ();
-			}
-			if(FlagFlag==0)
-			{
-				sql="select Ledger_Name,Ledger_ID from Ledger_Master where Ledger_ID='"+Cust_ID+"'";
-				SqlDtr = obj.GetRecordSet(sql);
-				if(SqlDtr.Read())
-				{
-					CustName=SqlDtr.GetValue(0).ToString()+":"+SqlDtr.GetValue(1).ToString();
-					txtCity.Text="";
-					DropDiscount1.Enabled=false;
-					DropDiscount2.Enabled=false;
-					
-				}
-				SqlDtr.Close();
-			}
+            CustomerModel custmer = new CustomerModel();
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(BaseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var Res = client.GetAsync("api/ReceiptController/GetCustomerPlaceByName?CustomerID=" + Cust_ID).Result;
+                if (Res.IsSuccessStatusCode)
+                {
+                    var disc = Res.Content.ReadAsStringAsync().Result;
+                    custmer = JsonConvert.DeserializeObject<CustomerModel>(disc);
+                }
+            }
+
+            if (custmer != null)
+            {
+                CustName = custmer.CustomerName;
+                if (custmer.City.Equals(""))
+                {
+                    txtCity.Text = "";
+                    City_Name = "";
+                }
+                else
+                {
+                    txtCity.Text = custmer.City;
+                    City_Name = custmer.City;
+                }
+                OldCustomerID = custmer.CustomerID;
+                FlagFlag = custmer.Flag;
+            }
+            if (FlagFlag == 0)
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/ReceiptController/GetCustmerName?CustomerID=" + Cust_ID).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        custmer = JsonConvert.DeserializeObject<CustomerModel>(disc);
+                    }
+                }
+                if (custmer != null)
+                {
+                    CustName = custmer.CustomerName;
+                    if (custmer.City.Equals(""))
+                        txtCity.Text = "";
+                    else
+                        txtCity.Text = custmer.City;
+                    FlagFlag = custmer.Flag;
+                    DropDiscount1.Enabled = false;
+                    DropDiscount2.Enabled = false;
+                    txtDisc1.Enabled = false;
+                    txtDisc2.Enabled = false;
+                }
+            }
+            if (FlagFlag == 0)
+            {
+                string customerName = "";
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/ReceiptController/GetCustomerName?CustomerID=" + Cust_ID).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        customerName = JsonConvert.DeserializeObject<string>(disc);
+                    }
+                }
+
+                if (customerName != null)
+                {
+                    CustName = customerName;
+                    txtCity.Text = "";
+                    DropDiscount1.Enabled = false;
+                    DropDiscount2.Enabled = false;
+
+                }
+            }
 			
 			#endregion
 			
@@ -2023,34 +2022,48 @@ namespace Servosms.Module.Inventory
 		/// </summary>
 		public void GetNextReceiptNo()
 		{
-			SqlDataReader rdr=null;
-			dbobj.SelectQuery("select max(Receipt_No)+1 from payment_receipt",ref rdr);
-			if(rdr.Read())
-			{
-				if(rdr.GetValue(0).ToString()!=null && rdr.GetValue(0).ToString()!="")
-					ReceiptNo=System.Convert.ToInt32(rdr.GetValue(0).ToString());
-				else
-					ReceiptNo=1001;
-			}
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(BaseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var Res = client.GetAsync("api/ReceiptController/GetNextReceiptNo").Result;
+                if (Res.IsSuccessStatusCode)
+                {
+                    var disc = Res.Content.ReadAsStringAsync().Result;
+                    var receiptNo = JsonConvert.DeserializeObject<string>(disc);
+                    ReceiptNo = Convert.ToInt32(receiptNo);
+                }
+            }
 		}
-		
-		/// <summary>
-		/// This method is used to get bank info.
-		/// </summary>
-		public void GetBank()
-		{
-			InventoryClass obj = new InventoryClass();
-			SqlDataReader rdr;
-			string str="select Ledger_Name from Ledger_Master where sub_grp_id='117' or sub_grp_id='126' or sub_grp_id='127' order by Ledger_Name";
-			rdr = obj.GetRecordSet(str);
-			DropBankName.Items.Clear();
-			DropBankName.Items.Add("Select");
-			while(rdr.Read())
-			{
-				DropBankName.Items.Add(rdr.GetValue(0).ToString());
-			}
-			rdr.Close();
-		}
+
+        /// <summary>
+        /// This method is used to get bank info.
+        /// </summary>
+        public void GetBank()
+        {
+            List<string> banks = new List<string>();
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(BaseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var Res = client.GetAsync("api/ReceiptController/GetBank").Result;
+                if (Res.IsSuccessStatusCode)
+                {
+                    var disc = Res.Content.ReadAsStringAsync().Result;
+                    banks = JsonConvert.DeserializeObject<List<string>>(disc);
+                }
+            }
+
+            DropBankName.Items.Clear();
+            DropBankName.Items.Add("Select");
+            if (banks != null && banks.Count > 0)
+            {
+                foreach (var bank in banks)
+                    DropBankName.Items.Add(bank);
+            }
+        }
 
 		protected void GridDuePayment_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
@@ -2067,20 +2080,20 @@ namespace Servosms.Module.Inventory
 		{
 			try
 			{
-				if(PanReceiptNo.Visible==true)
-				{
-					string DisType1 = "", DisType2 = "";
-					object obj=null;
-                    if(DropDiscount1.SelectedIndex!=0)
-					{
-						DisType1 = DropDiscount1.SelectedItem.Text.Substring(0,1);
-						DisType1 +="D";
-					}
-					if(DropDiscount2.SelectedIndex!=0)
-					{
-						DisType2 = DropDiscount2.SelectedItem.Text.Substring(0,1);
-						DisType2 +="D";
-					}
+                if (PanReceiptNo.Visible == true)
+                {
+                    string DisType1 = "", DisType2 = "";
+                    object obj = null;
+                    if (DropDiscount1.SelectedIndex != 0)
+                    {
+                        DisType1 = DropDiscount1.SelectedItem.Text.Substring(0, 1);
+                        DisType1 += "D";
+                    }
+                    if (DropDiscount2.SelectedIndex != 0)
+                    {
+                        DisType2 = DropDiscount2.SelectedItem.Text.Substring(0, 1);
+                        DisType2 += "D";
+                    }
 
                     PaymentReceiptModel payment = new PaymentReceiptModel();
                     payment.DiscountType1 = DisType1;
@@ -2090,24 +2103,30 @@ namespace Servosms.Module.Inventory
                     payment.CustomerID = customerID;
                     payment.RecDate = GenUtil.str2DDMMYYYY(txtReceivedDate.Text);
                     //payment.Cust_ID = Cust_ID.ToString();
+                    string message = "";
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        var myContent = JsonConvert.SerializeObject(payment);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/ReceiptController/DeleteReceipt", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            message = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                        }
+                    }
 
-
-                    int x=0,Cust_ID=0;
-					dbobj.Insert_or_Update("delete from AccountsLedgerTable where particulars = 'Receipt ("+DropReceiptNo.SelectedItem.Text+")'",ref x);
-					dbobj1.Insert_or_Update("delete from AccountsLedgerTable where Particulars = 'Receipt_"+DisType1+" ("+DropReceiptNo.SelectedItem.Text+")'",ref x);
-					dbobj1.Insert_or_Update("delete from AccountsLedgerTable where Particulars = 'Receipt_"+DisType2+" ("+DropReceiptNo.SelectedItem.Text+")'",ref x);
-					dbobj.Insert_or_Update("delete from CustomerLedgerTable where particular = 'Payment Received("+DropReceiptNo.SelectedItem.Text+")'",ref x);
-					dbobj.Insert_or_Update("delete from Payment_Receipt where Receipt_No='"+DropReceiptNo.SelectedItem.Text+"'",ref x);
-					dbobj.Insert_or_Update("insert into payment_receipt values("+DropReceiptNo.SelectedItem.Text+",'Deleted','"+GenUtil.str2MMDDYYYY(Invoice_Date)+"','','','','','','','','','','','','','')",ref x);
-					
-					dbobj.ExecuteScalar("select cust_id from customer where cust_name=(select ledger_name from ledger_master where ledger_id = '"+customerID+"')",ref Cust_ID);
-					dbobj.ExecProc(OprType.Insert,"UpdateAccountsLedgerForCustomer",ref obj,"@Ledger_ID",customerID,"@Invoice_Date",GenUtil.str2DDMMYYYY(txtReceivedDate.Text));
-					dbobj.ExecProc(OprType.Insert,"UpdateCustomerLedgerForCustomer",ref obj,"@Cust_ID",Cust_ID,"@Invoice_Date",GenUtil.str2MMDDYYYY(txtReceivedDate.Text));
-					MessageBox.Show("Receipt Cancellation Successfully");
-					Clear();
-				}
-				else
-					MessageBox.Show("Please Select Edit Button First");
+                    if (message != null)
+                        MessageBox.Show("Receipt Cancellation Successfully");
+                    Clear();
+                }
+                else
+                    MessageBox.Show("Please Select Edit Button First");
 				CreateLogFiles.ErrorLog("Form:Payment_Receipt.aspx,Class:InventoryClass.cs,Method:btnDel_Clicked  Payment receipt Deleted. User_ID: " +uid);
 			}
 			catch(Exception ex)
@@ -2132,30 +2151,19 @@ namespace Servosms.Module.Inventory
 		{
 			try
 			{
-				string Cust_ID="";
-				//SqlDataReader rdr1=null;
-				InventoryClass  obj=new InventoryClass ();
-				InventoryClass  obj1=new InventoryClass ();
-				
-				//SqlDataReader rdr = obj.GetRecordSet("select Cust_ID from Customer where Cust_Name='"+ DropCustName.Value +"'"); // Comment by vikas sharma 30.04.09
-				/******************add by vikas 02.05.09************************************/
-				string cust_name=DropCustName.Value;
-				if(cust_name.ToString()!="Select")
-				{
-					cust_name=cust_name.Substring(0,cust_name.IndexOf(";"));
-				}
-				SqlDataReader rdr = obj.GetRecordSet("select Cust_ID from Customer where Cust_Name='"+cust_name+"'");
-				/******************end************************************/
-				if(rdr.Read())
-				{
-					Cust_ID=rdr["Cust_ID"].ToString();
-				}
-				rdr.Close ();
-				object ob=null;
-				if(Cust_ID!="")
-					dbobj.ExecProc(DBOperations.OprType.Insert,"ProInsertLedgerDetails",ref ob,"@Cust_ID",Cust_ID);
-				
-				getRecInfo();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/ReceiptController/GetInfo").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        var msg = JsonConvert.DeserializeObject<string>(disc);
+                    }
+                }
+                getRecInfo();
 				btnPrint.CausesValidation=true;
 				PrintFlag=false;
 				CreateLogFiles.ErrorLog("Form:Payment_Receipt.aspx,Class:InventoryClass.cs,Method:DropCustName_SelectedIndexChanged  Payment Recipt Viewed   userid "+uid);			

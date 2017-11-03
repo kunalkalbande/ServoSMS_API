@@ -18,7 +18,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using System.Data.SqlClient;
 using RMG;
 using DBOperations;
@@ -26,6 +26,10 @@ using System.IO;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Servosms.Module.Accounts
 {
@@ -42,14 +46,16 @@ namespace Servosms.Module.Accounts
 		static ArrayList LedgerID= new ArrayList();
 		static string Invoice_Date = "", Acc_Date = "";
         bool isEditButtonClick = false;
-		/// <summary>
-		/// Put user code to initialize the page here
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// and generate the next ID also.
-		/// </summary>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string BaseUri = "http://localhost:64862";
+
+        /// <summary>
+        /// Put user code to initialize the page here
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// and generate the next ID also.
+        /// </summary>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here
 			try
@@ -76,13 +82,20 @@ namespace Servosms.Module.Accounts
 				btnEdit.Enabled = false;
 				btnDelete.Enabled = false; 
 				txtDate.Text = DateTime.Now.Day.ToString()+"/"+ DateTime.Now.Month.ToString()+"/"+DateTime.Now.Year.ToString();
-				InventoryClass obj = new InventoryClass();
-				SqlDataReader rdr = obj.GetRecordSet("select Acc_Date_from from Organisation");
-				if(rdr.Read())
-				{
-					Acc_Date=GenUtil.trimDate(rdr["Acc_Date_from"].ToString());
-				}
-				rdr.Close();
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/ReceiptController/GetOrgDate").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        var DateFrom = JsonConvert.DeserializeObject<string>(disc);
+                        Acc_Date = GenUtil.trimDate(DateFrom);
+                    }
+                }
 			}
             txtDate.Text = Request.Form["txtDate"] == null ? GenUtil.str2DDMMYYYY(System.DateTime.Now.ToShortDateString()) : Request.Form["txtDate"].ToString().Trim();
         }
@@ -157,12 +170,23 @@ namespace Servosms.Module.Accounts
 				string strCreditNote = "";
 				string strDebitNote = "";
 				string strJournal = "";
-				SqlDataReader SqlDtr = null;
-				dbobj.SelectQuery("Select max(Voucher_ID) from Voucher_Transaction where Voucher_Type ='Contra'",ref SqlDtr);
-				if(SqlDtr.Read())
+                VoucherModel voucher = new VoucherModel();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/VoucherController/GetVoucherTypeInfo").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        voucher = JsonConvert.DeserializeObject<VoucherModel>(disc);
+                    }
+                }
+				if(voucher!=null)
 				{
 					int id1 = 0;
-					txtTempContra.Value = SqlDtr.GetValue(0).ToString();
+					txtTempContra.Value = voucher.Contra;
 					if(txtTempContra.Value.Equals("") || txtTempContra.Value.Equals("0"))
 						txtTempContra.Value="10001~";
 					else
@@ -175,13 +199,10 @@ namespace Servosms.Module.Accounts
 				{
 					txtTempContra.Value = "10001"+"~";   
 				}
-				SqlDtr.Close(); 
-
-				dbobj.SelectQuery("Select max(Voucher_ID) from Voucher_Transaction where Voucher_Type ='Credit Note'",ref SqlDtr);
-				if(SqlDtr.Read())
+				if(voucher != null)
 				{
 					int id3 = 0;
-					txTempCredit.Value = SqlDtr.GetValue(0).ToString();
+					txTempCredit.Value = voucher.Credit;
 					if(txTempCredit.Value.Equals("") || txTempCredit.Value.Equals("0"))
 						txTempCredit.Value = "30001"+"~";
 					else
@@ -194,13 +215,10 @@ namespace Servosms.Module.Accounts
 				{
 					txTempCredit.Value = "30001"+"~";   
 				}
-				SqlDtr.Close(); 
-
-				dbobj.SelectQuery("Select max(Voucher_ID) from Voucher_Transaction where Voucher_Type ='Debit Note'",ref SqlDtr);
-				if(SqlDtr.Read())
+				if(voucher != null)
 				{
 					int id2 = 0;
-					txtTempDebit.Value = SqlDtr.GetValue(0).ToString();
+					txtTempDebit.Value = voucher.Debit;
 					if(txtTempDebit.Value.Equals("") || txtTempDebit.Value.Equals("0"))
 						txtTempDebit.Value = "20001"+"~";
 					else
@@ -213,13 +231,10 @@ namespace Servosms.Module.Accounts
 				{
 					txtTempDebit.Value = "20001"+"~";
 				}
-				SqlDtr.Close(); 
-
-				dbobj.SelectQuery("Select max(Voucher_ID) from Voucher_Transaction where Voucher_Type ='Journal'",ref SqlDtr);
-				if(SqlDtr.Read())
-				{
+                if (voucher != null)
+                {
 					int id4 = 0;
-					txtTempJournal.Value = SqlDtr.GetValue(0).ToString();
+					txtTempJournal.Value = voucher.Journal;
 					if(txtTempJournal.Value.Equals("") || txtTempJournal.Value.Equals("0"))
 						txtTempJournal.Value = "40001"+"~";
 					else
@@ -232,9 +247,8 @@ namespace Servosms.Module.Accounts
 				{
 					txtTempJournal.Value = "40001"+"~";   
 				}
-				SqlDtr.Close(); 
-				
-				/* Coment by vikas Date on 13.08.09
+
+                /* Coment by vikas Date on 13.08.09
 				  dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar),lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg where lm.Sub_grp_ID = lmsg.Sub_grp_ID order by lm.Ledger_Name",ref SqlDtr);
 				//dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar)+':'+c.City,lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg,customer c where lm.Sub_grp_ID = lmsg.Sub_grp_ID and c.cust_name=lm.Ledger_name order by lm.Ledger_Name",ref SqlDtr);
 				while(SqlDtr.Read())
@@ -256,71 +270,29 @@ namespace Servosms.Module.Accounts
 				}
 				SqlDtr.Close();*/
 
-				/***********Add by vikas 13.08.09*************************/
-				dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar),lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg where lm.Sub_grp_ID = lmsg.Sub_grp_ID order by lm.Ledger_Name",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					string subgrpname = SqlDtr.GetValue(1).ToString();
-  
-					if(subgrpname.Trim().StartsWith("Cash") || subgrpname.Trim().StartsWith("Bank"))
-					{
-						strContra = strContra +SqlDtr.GetValue(0).ToString()+"~";
-					}
-				}
-				SqlDtr.Close();
+                /***********Add by vikas 13.08.09*************************/
 
-				dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar)+':'+c.City,lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg,customer c where lm.Sub_grp_ID = lmsg.Sub_grp_ID and c.cust_name=lm.Ledger_name order by lm.Ledger_Name",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					string subgrpname = SqlDtr.GetValue(1).ToString();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/VoucherController/GetLedgerName").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        voucher = JsonConvert.DeserializeObject<VoucherModel>(disc);
+                    }
+                }
 
-					if(subgrpname.Trim().StartsWith("Cash") || subgrpname.Trim().StartsWith("Bank"))
-					{
-						strDebitNote = strDebitNote +SqlDtr.GetValue(0).ToString()+"~";
-						strCreditNote = strCreditNote +SqlDtr.GetValue(0).ToString()+"~";
-					}
-					else
-					{
-					 	strJournal = strJournal + SqlDtr.GetValue(0).ToString()+"~"; 
-						//Coment by vikas 07.09.09  strDebitNote = strDebitNote +SqlDtr.GetValue(0).ToString()+"~";
-						//Coment by vikas 07.09.09  strCreditNote = strCreditNote +SqlDtr.GetValue(0).ToString()+"~";
-						string s=SqlDtr.GetValue(0).ToString();
-						CustName.Add(SqlDtr.GetValue(0).ToString());                         //Add by vikas 07.09.09
-					}
-				}
-				SqlDtr.Close();
-				/**************End******************************/
-				
-				
-				/**************Add by vikas 07.09.09******************************/
-				dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) Ledger_Name from Ledger_Master lm,Ledger_master_sub_grp lmsg where lm.sub_grp_id = lmsg.sub_grp_id and lmsg.sub_grp_name not like 'Bank%'  and lmsg.sub_grp_name != 'Cash in hand' and lmsg.sub_grp_name not like 'Discount%' and lmsg.sub_grp_name != 'Sundry Debtors' Order by Ledger_Name",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					//07.09.09 string subgrpname = SqlDtr.GetValue(1).ToString();
-					string s=SqlDtr.GetValue(0).ToString();
-					CustName.Add(SqlDtr.GetValue(0).ToString());                         //Add by vikas 07.09.09
-				}
-				SqlDtr.Close();
-
-				dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) Ledger_Name,city from Ledger_Master, Employee where Emp_Name=Ledger_Name Order by Ledger_Name",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					//07.09.09 string subgrpname = SqlDtr.GetValue(1).ToString();
-					string s=SqlDtr.GetValue(0).ToString();
-					CustName.Add(SqlDtr.GetValue(0).ToString());                         //Add by vikas 07.09.09
-				}
-				SqlDtr.Close();
-				/**************End******************************/
-
-				/***************Start Add by vikas 23.10.09****************************/
-				dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) Ledger_Name from Ledger_Master lm,Ledger_master_sub_grp lmsg where lm.sub_grp_id = lmsg.sub_grp_id  and lmsg.sub_grp_name like 'Discount%' Order by Ledger_Name",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					string s=SqlDtr.GetValue(0).ToString();
-					CustName.Add(SqlDtr.GetValue(0).ToString());                         //Add by vikas 23.10.09
-				}
-				SqlDtr.Close();
-				/****************End**************************/
+                if (voucher != null)
+                {
+                    strContra = voucher.Contra;
+                    strDebitNote = voucher.Debit;
+                    strCreditNote = voucher.Credit;
+                    strJournal = voucher.Journal;
+                    CustName.Add(voucher.CustomerName);
+                }
 
 				for(int i=0;i<CustName.Count;i++)
 				{
@@ -371,7 +343,7 @@ namespace Servosms.Module.Accounts
 				{
 					dropAccName[k].Value="Select";  
 				}
-				/*Coment by vikas 13.08.09
+                /*Coment by vikas 13.08.09
 				dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar),lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg where lm.Sub_grp_ID = lmsg.Sub_grp_ID ",ref SqlDtr);
 				texthiddenprod.Value="Select,";
 				while(SqlDtr.Read())
@@ -399,94 +371,23 @@ namespace Servosms.Module.Accounts
 				SqlDtr.Close();
 				*/
 
-				/*************Add by vikas 13.08.09 ****************************/
-				if(Vouch_Type.Equals("Contra"))
-				{
-					dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar),lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg where lm.Sub_grp_ID = lmsg.Sub_grp_ID order by lm.Ledger_Name ",ref SqlDtr);
-					texthiddenprod.Value="Select,";
-					while(SqlDtr.Read())
-					{
-						string subgrpname = SqlDtr.GetValue(1).ToString();
-						if(Vouch_Type.Equals("Contra"))
-						{
-							if(subgrpname.Trim().StartsWith("Cash") || subgrpname.Trim().StartsWith("Bank"))
-							{
-								texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-							}
-						}
-					
-						/*13.08.09 if(Vouch_Type.Equals("Journal"))
-						{
-							if(!subgrpname.Trim().StartsWith("Cash") && !subgrpname.Trim().StartsWith("Bank"))
-							{
-								texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-							}
-						}
-						if(Vouch_Type.Equals("Credit Note") || Vouch_Type.Equals("Debit Note"))
-						{
-							texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-						}*/
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
+                /*************Add by vikas 13.08.09 ****************************/
 
-					dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar)+':'+c.City,lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg,customer c where lm.Sub_grp_ID = lmsg.Sub_grp_ID and c.cust_name=lm.Ledger_name order by lm.Ledger_Name",ref SqlDtr);
-					texthiddenprod.Value="Select,";
-					while(SqlDtr.Read())
-					{
-						string subgrpname = SqlDtr.GetValue(1).ToString();
-						/*13.08.09if(Vouch_Type.Equals("Contra"))
-						{
-							if(subgrpname.Trim().StartsWith("Cash") || subgrpname.Trim().StartsWith("Bank"))
-							{
-								texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-							}
-						}
-						*/
-						if(Vouch_Type.Equals("Journal"))
-						{
-							if(!subgrpname.Trim().StartsWith("Cash") && !subgrpname.Trim().StartsWith("Bank"))
-							{
-								texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-							}
-						}
-						if(Vouch_Type.Equals("Credit Note") || Vouch_Type.Equals("Debit Note"))
-						{
-							texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-						}
-					}
-					SqlDtr.Close();
-					
-
-					/************Add by vikas 26.12.2012************************/
-					//coment by vikas 25.4.2013 dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar)+':'+c.City,lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg,Employee c where lm.Sub_grp_ID = lmsg.Sub_grp_ID and c.emp_name=lm.Ledger_name order by lm.Ledger_Name",ref SqlDtr);
-					dbobj.SelectQuery("select lm.Ledger_name+':'+cast(lm.Ledger_ID as varchar),lmsg.sub_grp_name from Ledger_Master lm,Ledger_Master_Sub_grp lmsg where lm.Sub_grp_ID = lmsg.Sub_grp_ID order by Ledger_name",ref SqlDtr);
-					while(SqlDtr.Read())
-					{
-						string subgrpname = SqlDtr.GetValue(1).ToString();
-						if(Vouch_Type.Equals("Journal"))
-						{
-							if(!subgrpname.Trim().StartsWith("Cash") && !subgrpname.Trim().StartsWith("Bank"))
-							{
-								texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-							}
-						}
-						if(Vouch_Type.Equals("Credit Note") || Vouch_Type.Equals("Debit Note"))
-						{
-							texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+",";
-						}
-					}
-					SqlDtr.Close();
-					/************End**vikas 26.12.2012**********************/
-
-				}
-				/*************End*****************************/
-
-
-
-				for(int j=0;j<dropAccName.Length;j++)
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/VoucherController/GetLedgerNames?VoucherType="+Vouch_Type).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        var voucher = JsonConvert.DeserializeObject<string>(disc);
+                        texthiddenprod.Value = voucher;
+                    }
+                }
+                
+                for (int j=0;j<dropAccName.Length;j++)
 				{
 					dropAccName[j].Value =txtAccName[j].Value;      
 				}
@@ -639,13 +540,35 @@ namespace Servosms.Module.Accounts
 						Amount_cr = Amount[i].Text.Trim();
 						L_Type = "Cr";
 					}
- 
-					dbobj.Insert_or_Update("Insert into Voucher_Transaction values("+intID+",'"+Vouch_Type.Trim()+ "',Convert(datetime,'" + date+"',103),"+crID.Trim() +","+Amount_cr.Trim() +","+drID.Trim() +","+Amount_Dr.Trim() +",'"+narration+"','"+L_Type+"')",ref c);
-					object obj = null;
-					dbobj.ExecProc(OprType.Insert,"ProInsertAccountsLedger",ref obj,"@Ledger_ID",drID.Trim(),"@Particulars",Vouch_Type.Trim()+" ("+intID+")","@Debit_Amount",Amount_Dr.Trim(),"@Credit_Amount","0.0","@type","Dr","@Invoice_Date",date);
-					dbobj.ExecProc(OprType.Insert,"ProInsertAccountsLedger",ref obj,"@Ledger_ID",crID.Trim(),"@Particulars",Vouch_Type.Trim()+" ("+intID+")","@Debit_Amount","0.0","@Credit_Amount",Amount_cr.Trim(),"@type","Cr","@Invoice_Date",date);
-					dbobj.ExecProc(OprType.Insert,"ProCustomerLedgerEntry",ref obj,"@Voucher_ID",intID,"@Ledger_ID",drID.Trim(),"@Amount" ,Amount_Dr.Trim(),"@Type","Dr.","@Invoice_Date",date);
-					dbobj.ExecProc(OprType.Insert,"ProCustomerLedgerEntry",ref obj,"@Voucher_ID",intID,"@Ledger_ID",crID.Trim(),"@Amount" ,Amount_cr.Trim(),"@Type","Cr.","@Invoice_Date",date);
+                    VoucherModel voucher = new VoucherModel();
+                    voucher.VoucherID = intID;
+                    voucher.VoucherType = Vouch_Type.Trim();
+                    voucher.VoucherDate = date.ToShortDateString();
+                    voucher.LedgerIDCr = crID.Trim();
+                    voucher.Amount1 = Amount_cr.Trim();
+                    voucher.LedgerIDDr = drID.Trim();
+                    voucher.Amount2 = Amount_Dr.Trim();
+                    voucher.Narration = narration;
+                    voucher.LType = L_Type;
+                    voucher.InvoiceDate = date.ToShortDateString();
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        var myContent = JsonConvert.SerializeObject(voucher);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/VoucherController/InsertVoucher", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            var rr = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                        }
+                    }
+
 					if(txtVouchID.Visible==true)
 					{
 						CustomerInsertUpdate(drID);
@@ -952,13 +875,24 @@ namespace Servosms.Module.Accounts
 				btnAdd.Enabled  = false;
 				btnEdit.Enabled = true;
 				btnDelete.Enabled =  true;
-				SqlDataReader SqlDtr = null;
-				dbobj.SelectQuery("select voucher_id from voucher_transaction where voucher_type != 'Payment' and voucher_type='" + DropVoucherName.SelectedValue.ToString() + "' order by Voucher_ID,Voucher_type", ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					DropDownID.Items.Add(SqlDtr["voucher_id"].ToString());
-				}
-				SqlDtr.Close();
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/VoucherController/GetVoucherId?VoucherName=" + DropVoucherName.SelectedValue.ToString()).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        var Voucherids = JsonConvert.DeserializeObject<List<string>>(disc);
+                        if (Voucherids != null || Voucherids.Count > 0)
+                            foreach (var voucher in Voucherids)
+                                DropDownID.Items.Add(voucher);
+                    }
+
+                }
+                
 				checkPrevileges();
 				btnPrint.CausesValidation=true;
 				PrintFlag=false;
@@ -989,121 +923,56 @@ namespace Servosms.Module.Accounts
 				clear();
 				string voucher_id = DropDownID.SelectedItem.Text;  
 			
-				SqlDataReader SqlDtr = null;
-				SqlDataReader SqlDtr1 = null;
-				SqlDataReader SqlDtr2 = null;
+                VoucherModel vocher = new VoucherModel();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/VoucherController/FetchVoucherByVoucherID?VoucherID="+ voucher_id).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        vocher = JsonConvert.DeserializeObject<VoucherModel>(disc);
+                    }
+                }
 
-				dbobj.SelectQuery("Select * from voucher_transaction where Voucher_ID = "+ voucher_id,ref SqlDtr);
-				if(SqlDtr.Read())
-				{
-					DropVoucherName.SelectedIndex = DropVoucherName.Items.IndexOf(DropVoucherName.Items.FindByText(SqlDtr["Voucher_Type"].ToString()));
-					txtDate.Text = GenUtil.str2DDMMYYYY(trimDate(SqlDtr["voucher_date"].ToString ()));
-					Invoice_Date=SqlDtr["Voucher_Date"].ToString();
-					if(SqlDtr["L_Type"].ToString().Equals("Cr"))  
-					{
-						txtAmount1.Text = SqlDtr["Amount1"].ToString(); 
-						txtAmount5.Text = SqlDtr["Amount2"].ToString();
-						txtLCr.Text = SqlDtr["Amount1"].ToString();
-						txtRDr.Text = SqlDtr["Amount2"].ToString();
-						txtNarration.Text = SqlDtr["Narration"].ToString();  
-						dropType_1.SelectedIndex = dropType_1.Items.IndexOf(dropType_1.Items.FindByText("Cr"));
-						dropType_5.SelectedIndex = dropType_5.Items.IndexOf(dropType_5.Items.FindByText("Dr"));
-						
-						dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Cr"].ToString(),ref SqlDtr1);
-						
-						/**********Add by vikas 13.08.09***********************
-						if(DropVoucherName.SelectedValue=="Contra")
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Cr"].ToString(),ref SqlDtr1);
-						}
-						else
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar)+':'+c.city from Ledger_Master lm, customer c where Ledger_ID="+SqlDtr["Ledg_ID_Cr"].ToString()+" and c.cust_name=lm.Ledger_Name",ref SqlDtr1);
-						}
-						**********End***********************/
-						if(SqlDtr1.Read())
-						{
-							txtAccName1.Value = SqlDtr1.GetValue(0).ToString();  
-						}
-						SqlDtr1.Close();
-
-						dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Dr"].ToString(),ref SqlDtr2);
-						
-						/**********Add by vikas 13.08.09***********************
-						if(DropVoucherName.SelectedValue=="Contra")
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Dr"].ToString(),ref SqlDtr2);
-						}
-						else
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar)+':'+c.city from Ledger_Master lm, customer c where Ledger_ID="+SqlDtr["Ledg_ID_Dr"].ToString()+" and c.cust_name=lm.Ledger_Name",ref SqlDtr2);
-						}
-						**********End***********************/
-
-						if(SqlDtr2.Read())
-						{
-							txtAccName5.Value = SqlDtr2.GetValue(0).ToString();  
-						}
-						SqlDtr2.Close();
-						LedgerID.Add(SqlDtr["Ledg_ID_Dr"].ToString());
-						LedgerID.Add(SqlDtr["Ledg_ID_Cr"].ToString());
-					}
-					else
-					{
-						txtAmount1.Text = SqlDtr["Amount2"].ToString(); 
-						txtAmount5.Text = SqlDtr["Amount1"].ToString();
-						txtLDr.Text = SqlDtr["Amount2"].ToString();
-						txtRCr.Text = SqlDtr["Amount1"].ToString();
-						txtNarration.Text = SqlDtr["Narration"].ToString();  
-						dropType_1.SelectedIndex = dropType_1.Items.IndexOf(dropType_1.Items.FindByText("Dr"));
-						dropType_5.SelectedIndex = dropType_5.Items.IndexOf(dropType_5.Items.FindByText("Cr"));
-						
-						dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Dr"].ToString(),ref SqlDtr1);
-						
-						/**********Add by vikas 13.08.09***********************
-						if(DropVoucherName.SelectedValue=="Contra")
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Dr"].ToString(),ref SqlDtr1);
-						}
-						else
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar)+':'+c.city from Ledger_Master lm, customer c where Ledger_ID="+SqlDtr["Ledg_ID_Dr"].ToString()+" and c.cust_name=lm.Ledger_Name",ref SqlDtr1);
-						}
-						**********End***********************/
-
-						if(SqlDtr1.Read())
-						{
-							txtAccName1.Value = SqlDtr1.GetValue(0).ToString();  
-						}
-						SqlDtr1.Close();
-
-						dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Cr"].ToString(),ref SqlDtr2);
-						
-						/**********Add by vikas 13.08.09***********************
-						if(DropVoucherName.SelectedValue=="Contra")
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar) from Ledger_Master where Ledger_ID="+SqlDtr["Ledg_ID_Cr"].ToString(),ref SqlDtr2);
-						}
-						else
-						{
-							dbobj.SelectQuery("Select Ledger_Name+':'+cast(Ledger_ID as varchar)+':'+c.city from Ledger_Master lm, customer c where Ledger_ID="+SqlDtr["Ledg_ID_Cr"].ToString()+" and c.cust_name=lm.Ledger_Name",ref SqlDtr2);
-						}
-						**********End***********************/
-
-						if(SqlDtr2.Read())
-						{
-							txtAccName5.Value = SqlDtr2.GetValue(0).ToString();  
-						}
-						SqlDtr2.Close();
-						LedgerID.Add(SqlDtr["Ledg_ID_Dr"].ToString());
-						LedgerID.Add(SqlDtr["Ledg_ID_Cr"].ToString());
-					}
-					fillCombo();
-					dropAccName1.Value = txtAccName1.Value.ToString();
-					dropAccName5.Value = txtAccName5.Value.ToString();
-					DropVoucherName.Enabled = false;
-				}
-				SqlDtr.Close(); 
+                if (vocher != null)
+                {
+                    DropVoucherName.SelectedIndex = DropVoucherName.Items.IndexOf(DropVoucherName.Items.FindByText(vocher.VoucherType));
+                    txtDate.Text = GenUtil.str2DDMMYYYY(trimDate(vocher.VoucherDate));
+                    Invoice_Date = vocher.VoucherDate;
+                    if (vocher.LType.Equals("Cr"))
+                    {
+                        txtAmount1.Text = vocher.Amount1;
+                        txtAmount5.Text = vocher.Amount2;
+                        txtLCr.Text = vocher.Amount1;
+                        txtRDr.Text = vocher.Amount2;
+                        txtNarration.Text = vocher.Narration;
+                        dropType_1.SelectedIndex = dropType_1.Items.IndexOf(dropType_1.Items.FindByText("Cr"));
+                        dropType_5.SelectedIndex = dropType_5.Items.IndexOf(dropType_5.Items.FindByText("Dr"));
+                        txtAccName1.Value = vocher.AccName1;
+                        txtAccName5.Value = vocher.AccName5;
+                        LedgerID = vocher.LedgerIDS;
+                    }
+                    else
+                    {
+                        txtAmount1.Text = vocher.Amount1;
+                        txtAmount5.Text = vocher.Amount2;
+                        txtLDr.Text = vocher.Amount1;
+                        txtRCr.Text = vocher.Amount2;
+                        txtNarration.Text = vocher.Narration;
+                        dropType_1.SelectedIndex = dropType_1.Items.IndexOf(dropType_1.Items.FindByText("Dr"));
+                        dropType_5.SelectedIndex = dropType_5.Items.IndexOf(dropType_5.Items.FindByText("Cr"));
+                        txtAccName1.Value = vocher.AccName1;
+                        txtAccName5.Value = vocher.AccName5;
+                        LedgerID = vocher.LedgerIDS;
+                    }
+                    fillCombo();
+                    dropAccName1.Value = txtAccName1.Value.ToString();
+                    dropAccName5.Value = txtAccName5.Value.ToString();
+                    DropVoucherName.Enabled = false;
+                }
 				HtmlInputText[] dropAccName ={dropAccName1, dropAccName2, dropAccName3, dropAccName4, dropAccName5, dropAccName6, dropAccName7, dropAccName8};
 				TextBox[] Amount = {txtAmount1,txtAmount2,txtAmount3,txtAmount4,txtAmount5,txtAmount6,txtAmount7,txtAmount8};
 				DropDownList[] dropType = {dropType_1 ,dropType_2,dropType_3,dropType_4,dropType_5,dropType_6,dropType_7,dropType_8};
@@ -1167,7 +1036,12 @@ namespace Servosms.Module.Accounts
 					else if(DropVoucherName.SelectedItem.Text.Equals("Debit Note"))
 						dbobj.Insert_or_Update("delete from AccountsLedgerTable where Particulars ='Debit Note ("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
 					dbobj.Insert_or_Update("delete from CustomerLedgerTable where Particular ='Voucher("+DropDownID.SelectedItem.Text.Trim()+")'",ref c);
-					Save();
+                    VoucherModel vcher = new VoucherModel();
+                    vcher.VoucherType = DropVoucherName.SelectedItem.Text;
+                    vcher.VoucherID = Convert.ToInt32(DropDownID.SelectedItem.Text.Trim());
+
+
+                    Save();
 					PrintFlag=true;
 				}
 			}
@@ -1324,13 +1198,23 @@ namespace Servosms.Module.Accounts
                     btnAdd.Enabled = false;
                     btnEdit.Enabled = true;
                     btnDelete.Enabled = true;
-                    SqlDataReader SqlDtr = null;
-                    dbobj.SelectQuery("select voucher_id from voucher_transaction where voucher_type != 'Payment' and voucher_type='" + DropVoucherName.SelectedValue.ToString() + "' order by Voucher_ID,Voucher_type", ref SqlDtr);
-                    while (SqlDtr.Read())
+
+                    using (var client = new HttpClient())
                     {
-                        DropDownID.Items.Add(SqlDtr["voucher_id"].ToString());
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/VoucherController/GetVoucherId?VoucherName=" + DropVoucherName.SelectedValue.ToString()).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            var Voucherids = JsonConvert.DeserializeObject<List<string>>(disc);
+                            if (Voucherids != null || Voucherids.Count > 0)
+                                foreach (var voucher in Voucherids)
+                                    DropDownID.Items.Add(voucher);
+                        }
+
                     }
-                    SqlDtr.Close();
                     getAcountName();
                     checkPrevileges();
                     btnPrint.CausesValidation = true;
@@ -1394,10 +1278,6 @@ namespace Servosms.Module.Accounts
         /// </summary>
         public void CustomerUpdate()
 		{
-			SqlDataReader rdr=null;
-			InventoryClass obj =new InventoryClass();
-			SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-			object obj1=null;
 			if(Invoice_Date.IndexOf(" ")>0)
 			{               
                 string[] CheckDate = Invoice_Date.Split(new char[] {' '},Invoice_Date.Length);
@@ -1411,16 +1291,27 @@ namespace Servosms.Module.Accounts
 						
 			for(int k=0;k<LedgerID.Count;k++)
 			{
-				dbobj.ExecProc(OprType.Insert,"UpdateAccountsLedgerForCustomer",ref obj1,"@Ledger_ID",LedgerID[k].ToString(),"@Invoice_Date",Invoice_Date);
-				dbobj.SelectQuery("select cust_id from customer,ledger_master where ledger_name=cust_name and ledger_id='"+LedgerID[k].ToString()+"'",ref rdr);
-				if(rdr.Read())
-				{
-                    string strDate = GenUtil.str2DDMMYYYY(Invoice_Date).Trim();
-                    DateTime dtInvoice_Date = System.Convert.ToDateTime(strDate.ToString());
-                    dbobj.ExecProc(OprType.Insert,"UpdateCustomerLedgerForCustomer",ref obj1,"@Cust_ID",rdr["Cust_ID"].ToString(),"@Invoice_Date", dtInvoice_Date);
-				}
-				rdr.Close();
-			}
+                VoucherModel vouchr = new VoucherModel();
+                vouchr.LedgerID = LedgerID[k].ToString();
+                vouchr.InvoiceDate = Invoice_Date;
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    var myContent = JsonConvert.SerializeObject(vouchr);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VoucherController/CustomerUpdate", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        var meessage = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                    }
+                }
+            }
 		}
 
 		/// <summary>
@@ -1429,19 +1320,27 @@ namespace Servosms.Module.Accounts
 		/// <param name="Ledger_ID"></param>
 		public void CustomerInsertUpdate(string Ledger_ID)
 		{
-			SqlDataReader rdr=null;
-			InventoryClass obj =new InventoryClass();
-			SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-			object obj1 = null;
-			dbobj.ExecProc(OprType.Insert,"UpdateAccountsLedgerForCustomer",ref obj1,"@Ledger_ID",Ledger_ID,"@Invoice_Date", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtDate.Text)));
-			dbobj.SelectQuery("select cust_id from customer,ledger_master where ledger_name=cust_name and ledger_id='"+Ledger_ID+"'",ref rdr);
-			if(rdr.Read())
-			{
-				dbobj.ExecProc(OprType.Insert,"UpdateCustomerLedgerForCustomer",ref obj1,"@Cust_ID",rdr["Cust_ID"].ToString(),"@Invoice_Date", System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(txtDate.Text)));
-			}
-			rdr.Close();
-			
-			
-		}
+            VoucherModel voucher = new VoucherModel();
+            voucher.LedgerID = Ledger_ID;
+            voucher.InvoiceDate = txtDate.Text;
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(BaseUri);
+                var myContent = JsonConvert.SerializeObject(voucher);
+                var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                var byteContent = new ByteArrayContent(buffer);
+                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                var response = client.PostAsync("api/VoucherController/CustomerInsertUpdate", byteContent).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseString = response.Content.ReadAsStringAsync().Result;
+                    var meessage = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                }
+            }
+
+
+        }
 	}
 }
