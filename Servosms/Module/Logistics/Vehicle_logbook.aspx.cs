@@ -18,14 +18,19 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using RMG;
-using DBOperations; 
-using System.Data .SqlClient ;
-using System.IO; 
+using DBOperations;
+using System.Data.SqlClient;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using Servo_API.Models;
 
 namespace Servosms.Module.Logistics
 {
@@ -36,17 +41,18 @@ namespace Servosms.Module.Logistics
 	{
 		DBUtil dbobj=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string uid;
-	
-		/// <summary>
-		/// Put user code to initialize the page here
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// and generate the next ID also.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string baseUri = "http://localhost:64862";
+
+        /// <summary>
+        /// Put user code to initialize the page here
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// and generate the next ID also.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here
 			try
@@ -58,23 +64,44 @@ namespace Servosms.Module.Logistics
 					getID();
 					fillVehicleNo();
 					getVehicleInfo();
-					fillOilCombo(); 
+					fillOilCombo();
 
-					# region Dropdown Route Name
-					SqlConnection con11;
-					SqlCommand cmdselect11;
-					SqlDataReader dtrdrive11;
-					con11=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-					con11.Open ();
-					cmdselect11 = new SqlCommand( "Select Route_name  From Route", con11 );
-					dtrdrive11 = cmdselect11.ExecuteReader();
-					Dropvehicleroute.Items.Add("Select");
-					while(dtrdrive11.Read())
-					{
-						Dropvehicleroute.Items.Add(dtrdrive11.GetString(0));
-					}
-					dtrdrive11.Close();
-					con11.Close ();
+                    #region Dropdown Route Name
+                    List<string> lstVehicleroute = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var Res = client.GetAsync("api/VehicleEntryLogbook/FillDropvehicleroute").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            lstVehicleroute = JsonConvert.DeserializeObject<List<string>>(id);
+                        }
+                    }
+
+                    if (lstVehicleroute != null)
+                    {
+                        foreach (var Route in lstVehicleroute)
+                            Dropvehicleroute.Items.Add(Route);
+                    }
+
+     //               SqlConnection con11;
+					//SqlCommand cmdselect11;
+					//SqlDataReader dtrdrive11;
+					//con11=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+					//con11.Open ();
+					//cmdselect11 = new SqlCommand( "Select Route_name  From Route", con11 );
+					//dtrdrive11 = cmdselect11.ExecuteReader();
+					//Dropvehicleroute.Items.Add("Select");
+					//while(dtrdrive11.Read())
+					//{
+					//	Dropvehicleroute.Items.Add(dtrdrive11.GetString(0));
+					//}
+					//dtrdrive11.Close();
+					//con11.Close ();
 					# endregion
 					btnSave .Enabled = true;
 					btnEdit.Enabled = false;
@@ -150,69 +177,249 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				SqlDataReader SqlDtr = null;
-				//				dbobj.SelectQuery("Select prod_name from products where category = 'Fuel'",ref SqlDtr);
-				//				Dropfuelused.Items.Clear();
-				//				Dropfuelused.Items.Add("Select");   
-				//				while(SqlDtr.Read())
-				//				{
-				//					Dropfuelused.Items.Add(SqlDtr.GetValue(0).ToString());   
-				//				}
-				//				SqlDtr.Close();
+                Dropengineoil.Items.Clear();
+                Dropengineoil.Items.Add("Select");
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Engine Oil%'",ref SqlDtr);
-				Dropengineoil.Items.Clear();
-				Dropengineoil.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropengineoil.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+                List<string> lstDropEngineOil = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/FillDropEngineOil").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropEngineOil = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropEngineOil != null)
+                {
+                    foreach (var EngineOil in lstDropEngineOil)
+                        Dropengineoil.Items.Add(EngineOil);
+                }
+
+                //            while (SqlDtr.Read())
+                //{
+                //	DropEngineOil.Items.Add(SqlDtr.GetValue(0).ToString());   
+                //}
+                //SqlDtr.Close();
+
+                //dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Brake Oil%'",ref SqlDtr);
+                Dropbrakeoil.Items.Clear();
+                Dropbrakeoil.Items.Add("Select");
+
+                List<string> lstDropbreak = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/FillDropbreak").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropbreak = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropbreak != null)
+                {
+                    foreach (var Break in lstDropbreak)
+                        Dropbrakeoil.Items.Add(Break);
+                }
+
+                //            while (SqlDtr.Read())
+                //{
+                //	Dropbreak.Items.Add(SqlDtr.GetValue(0).ToString());   
+                //}
+                //SqlDtr.Close();
+
+                //dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Gear Oil%'",ref SqlDtr);
+
+                Dropgearoil.Items.Clear();
+                Dropgearoil.Items.Add("Select");
+
+                List<string> lstDropGear = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/FillDropGear").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropGear = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropGear != null)
+                {
+                    foreach (var Gear in lstDropGear)
+                        Dropgearoil.Items.Add(Gear);
+                }
+
+                //            while (SqlDtr.Read())
+                //{
+                //	Dropgear.Items.Add(SqlDtr.GetValue(0).ToString());   
+                //}
+                //SqlDtr.Close();
+
+                //				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Collent%'",ref SqlDtr);
+                Dropcoolent.Items.Clear();
+                Dropcoolent.Items.Add("Select");
+
+                List<string> lstDropCoolent = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/FillDropCoolent").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropCoolent = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropCoolent != null)
+                {
+                    foreach (var Coolent in lstDropCoolent)
+                        Dropcoolent.Items.Add(Coolent);
+                }
+
+                //            while (SqlDtr.Read())
+                //{
+                //	Dropcoolent.Items.Add(SqlDtr.GetValue(0).ToString());   
+                //}
+                //SqlDtr.Close();
+
+                //				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Grease%'",ref SqlDtr);
+                Dropgrease.Items.Clear();
+                Dropgrease.Items.Add("Select");
+
+                List<string> lstDropGrease = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/FillDropGrease").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropGrease = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropGrease != null)
+                {
+                    foreach (var Grease in lstDropGrease)
+                        Dropgrease.Items.Add(Grease);
+                }
+
+                //            while (SqlDtr.Read())
+                //{
+                //	Dropgrease.Items.Add(SqlDtr.GetValue(0).ToString());   
+                //}
+                //SqlDtr.Close();
+
+                //				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Transmission Oil%'",ref SqlDtr);
+                Droptranoil.Items.Clear();
+                Droptranoil.Items.Add("Select");
+
+                List<string> lstDropTransmission = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/FillDropTransmission").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstDropTransmission = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstDropTransmission != null)
+                {
+                    foreach (var Transmission in lstDropTransmission)
+                        Droptranoil.Items.Add(Transmission);
+                }
+
+    //            SqlDataReader SqlDtr = null;
+				////				dbobj.SelectQuery("Select prod_name from products where category = 'Fuel'",ref SqlDtr);
+				////				Dropfuelused.Items.Clear();
+				////				Dropfuelused.Items.Add("Select");   
+				////				while(SqlDtr.Read())
+				////				{
+				////					Dropfuelused.Items.Add(SqlDtr.GetValue(0).ToString());   
+				////				}
+				////				SqlDtr.Close();
+
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Engine Oil%'",ref SqlDtr);
+				//Dropengineoil.Items.Clear();
+				//Dropengineoil.Items.Add("Select");   
+				//while(SqlDtr.Read())
+				//{
+				//	Dropengineoil.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
                
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Brake Oil%'",ref SqlDtr);
-				Dropbrakeoil.Items.Clear();
-				Dropbrakeoil.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropbrakeoil.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Brake Oil%'",ref SqlDtr);
+				//Dropbrakeoil.Items.Clear();
+				//Dropbrakeoil.Items.Add("Select");   
+				//while(SqlDtr.Read())
+				//{
+				//	Dropbrakeoil.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Gear Oil%'",ref SqlDtr);
-				Dropgearoil.Items.Clear();
-				Dropgearoil.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropgearoil.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Gear Oil%'",ref SqlDtr);
+				//Dropgearoil.Items.Clear();
+				//Dropgearoil.Items.Add("Select");   
+				//while(SqlDtr.Read())
+				//{
+				//	Dropgearoil.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Collents%'",ref SqlDtr);
-				Dropcoolent.Items.Clear();
-				Dropcoolent.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropcoolent.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Collents%'",ref SqlDtr);
+				//Dropcoolent.Items.Clear();
+				//Dropcoolent.Items.Add("Select");   
+				//while(SqlDtr.Read())
+				//{
+				//	Dropcoolent.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
 			 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Grease%'",ref SqlDtr);
-				Dropgrease.Items.Clear();
-				Dropgrease.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Dropgrease.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Grease%'",ref SqlDtr);
+				//Dropgrease.Items.Clear();
+				//Dropgrease.Items.Add("Select");   
+				//while(SqlDtr.Read())
+				//{
+				//	Dropgrease.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
 
-				dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category = 'Transmission Oil'",ref SqlDtr);
-				Droptranoil.Items.Clear();
-				Droptranoil.Items.Add("Select");   
-				while(SqlDtr.Read())
-				{
-					Droptranoil.Items.Add(SqlDtr.GetValue(0).ToString());   
-				}
-				SqlDtr.Close();
+				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category = 'Transmission Oil'",ref SqlDtr);
+				//Droptranoil.Items.Clear();
+				//Droptranoil.Items.Add("Select");   
+				//while(SqlDtr.Read())
+				//{
+				//	Droptranoil.Items.Add(SqlDtr.GetValue(0).ToString());   
+				//}
+				//SqlDtr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -227,29 +434,45 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				SqlDataReader SqlDtr = null;
-				int id = 0;
-				string strID = "";
-				dbobj.SelectQuery("Select max(VDLB_id) from VDLB",ref SqlDtr); 
-				if(SqlDtr.Read())
-				{
-					strID = SqlDtr.GetValue(0).ToString();
-					if(!strID.Trim().Equals(""))
-					{
-						id = System.Convert.ToInt32(strID);
-						id = id + 1;
-						lblVDLBID.Text = id.ToString(); 
-					}
-					else
-					{
-						lblVDLBID.Text = "1001";
-					}
-				}
-				else
-				{
-					lblVDLBID.Text = "1001";
-				}
-			}
+                string strVehicleLBID = string.Empty;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleDailyLogbook/GetNextVehicledetailID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        strVehicleLBID = JsonConvert.DeserializeObject<string>(id);
+                    }
+                }
+                lblVDLBID.Text = strVehicleLBID;
+
+    //            SqlDataReader SqlDtr = null;
+    //int id = 0;
+    //string strID = "";
+    //dbobj.SelectQuery("Select max(VDLB_id) from VDLB",ref SqlDtr); 
+    //if(SqlDtr.Read())
+    //{
+    //	strID = SqlDtr.GetValue(0).ToString();
+    //	if(!strID.Trim().Equals(""))
+    //	{
+    //		id = System.Convert.ToInt32(strID);
+    //		id = id + 1;
+    //		lblVDLBID.Text = id.ToString(); 
+    //	}
+    //	else
+    //	{
+    //		lblVDLBID.Text = "1001";
+    //	}
+    //}
+    //else
+    //{
+    //	lblVDLBID.Text = "1001";
+    //}
+            }
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:Vehicle_logbook.aspx,Method:getID() "+ " EXCEPTION  "+ex.Message+"   userid "+ uid );
@@ -260,16 +483,37 @@ namespace Servosms.Module.Logistics
 		/// Method to fill the vehcile no combo with vehcile ID and no.
 		/// </summary>
 		public void fillVehicleNo()
-		{
-			try
+		{            
+            try
 			{
-				SqlDataReader SqlDtr = null ;
-				dbobj.SelectQuery("Select vehicle_no+' VID '+cast(vehicledetail_id as varchar) from vehicleentry",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					DropVehicleNo.Items.Add(SqlDtr.GetValue(0).ToString());    
-				}
-				SqlDtr.Close();
+                List<string> lstVehicleNo = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleDailyLogbook/GetFillVehicleNo").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstVehicleNo = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstVehicleNo != null)
+                {
+                    foreach (var Number in lstVehicleNo)
+                        DropVehicleNo.Items.Add(Number);
+                }
+
+    //            SqlDataReader SqlDtr = null ;
+				//dbobj.SelectQuery("Select vehicle_no+' VID '+cast(vehicledetail_id as varchar) from vehicleentry",ref SqlDtr);
+				//while(SqlDtr.Read())
+				//{
+				//	DropVehicleNo.Items.Add(SqlDtr.GetValue(0).ToString());    
+				//}
+				//SqlDtr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -284,36 +528,54 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				string s = "";
-				SqlDataReader SqlDtr = null ;
-				SqlDataReader SqlDtr1 = null;
-				string meter_reading = "";
-				dbobj.SelectQuery("select ve.vehicle_no+' VID '+cast(vehicledetail_id as varchar),vehicle_name,meter_reading,vehicledetail_id from vehicleentry ve",ref SqlDtr );
-				while(SqlDtr.Read())
-				{
-					string emp_name = "";
-					dbobj.SelectQuery("Select emp_name from employee where vehicle_id = "+SqlDtr.GetValue(3).ToString().Trim()+" and designation = 'Driver'",ref SqlDtr1);
-					if(SqlDtr1.HasRows)
-					{
-						if(SqlDtr1.Read())
-							emp_name = SqlDtr1.GetValue(0).ToString();  
+                string strHidden = string.Empty;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleDailyLogbook/GetVehicleInfo").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        strHidden = JsonConvert.DeserializeObject<string>(id);
+                    }
+                }
+
+                txtHidden.Value = strHidden;
+
+
+    //            string s = "";
+				//SqlDataReader SqlDtr = null ;
+				//SqlDataReader SqlDtr1 = null;
+				//string meter_reading = "";
+				//dbobj.SelectQuery("select ve.vehicle_no+' VID '+cast(vehicledetail_id as varchar),vehicle_name,meter_reading,vehicledetail_id from vehicleentry ve",ref SqlDtr );
+				//while(SqlDtr.Read())
+				//{
+				//	string emp_name = "";
+				//	dbobj.SelectQuery("Select emp_name from employee where vehicle_id = "+SqlDtr.GetValue(3).ToString().Trim()+" and designation = 'Driver'",ref SqlDtr1);
+				//	if(SqlDtr1.HasRows)
+				//	{
+				//		if(SqlDtr1.Read())
+				//			emp_name = SqlDtr1.GetValue(0).ToString();  
 					
-					}
-					SqlDtr1.Close();
+				//	}
+				//	SqlDtr1.Close();
 				
-					meter_reading = SqlDtr.GetValue(2).ToString();
-					dbobj.SelectQuery("Select top 1 meter_reading_cur from VDLB where vehicle_no = "+SqlDtr.GetValue(3).ToString().Trim()+" order by DOE desc",ref SqlDtr1);
-					if(SqlDtr1.HasRows)
-					{
-						if(SqlDtr1.Read())
-							meter_reading = SqlDtr1.GetValue(0).ToString();  
+				//	meter_reading = SqlDtr.GetValue(2).ToString();
+				//	dbobj.SelectQuery("Select top 1 meter_reading_cur from VDLB where vehicle_no = "+SqlDtr.GetValue(3).ToString().Trim()+" order by DOE desc",ref SqlDtr1);
+				//	if(SqlDtr1.HasRows)
+				//	{
+				//		if(SqlDtr1.Read())
+				//			meter_reading = SqlDtr1.GetValue(0).ToString();  
 					
-					}
-					SqlDtr1.Close();
-					s  = s + SqlDtr.GetValue(0).ToString()+"~"+SqlDtr.GetValue(1).ToString()+"~"+emp_name+"~"+meter_reading+"#";        
-				}
-				SqlDtr.Close();
-				txtHidden.Value = s;
+				//	}
+				//	SqlDtr1.Close();
+				//	s  = s + SqlDtr.GetValue(0).ToString()+"~"+SqlDtr.GetValue(1).ToString()+"~"+emp_name+"~"+meter_reading+"#";        
+				//}
+				//SqlDtr.Close();
+				//txtHidden.Value = s;
 			}
 			catch(Exception ex)
 			{
@@ -349,14 +611,16 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				string VDLB_ID  =lblVDLBID.Text;
-				string vehicle_no = DropVehicleNo.SelectedItem.Text;
-				string strDOE = txtDOE.Text.Trim();
-				strDOE = GenUtil.str2MMDDYYYY(strDOE);
-				string meter_reading_pre = txtmeterreadpre.Text.Trim();
-				string meter_reading_cur = txtmeterreadcurr.Text.Trim();
+                VehicleDailyLogbookModel vehDLB = new VehicleDailyLogbookModel();
 
-				if(System.Convert.ToDouble(meter_reading_pre) > System.Convert.ToDouble(meter_reading_cur) )
+                vehDLB.VDLB_ID = lblVDLBID.Text;
+                vehDLB.Vehicle_no = DropVehicleNo.SelectedItem.Text;
+				string strDOE = txtDOE.Text.Trim();
+                vehDLB.DOE = GenUtil.str2MMDDYYYY(strDOE);
+                vehDLB.Meter_reading_pre = txtmeterreadpre.Text.Trim();
+                vehDLB.Meter_reading_cur = txtmeterreadcurr.Text.Trim();
+
+				if(System.Convert.ToDouble(vehDLB.Meter_reading_pre) > System.Convert.ToDouble(vehDLB.Meter_reading_cur) )
 				{
 					MessageBox.Show("Current Meter Reading should not be less than Previous Meter Reading");
 					return ;
@@ -366,92 +630,118 @@ namespace Servosms.Module.Logistics
 					MessageBox.Show("The Fuel Used quantity should not be 0.");
 					return;
 				}
-				string vehicle_route = Dropvehicleroute.SelectedItem.Text.Trim();
-				string Fuel_Used = Dropfuelused.SelectedItem.Text.Trim();
-				string Fuel_Used_Qty = txtfuelused.Text.Trim();
+                vehDLB.Vehicle_route = Dropvehicleroute.SelectedItem.Text.Trim();
+                vehDLB.Fuel_Used = Dropfuelused.SelectedItem.Text.Trim();
+                vehDLB.Fuel_Used_Qty = txtfuelused.Text.Trim();
+
 				string engine = Dropengineoil.SelectedItem.Text.Trim();
 				string Engine_Oil = "";
 				string Engine_pack = "";
 				string[] strArr = engine.Split(new char[] {':'}, engine.Length);
 				if(!engine.Trim().Equals("Select"))
-				{ 
-					Engine_Oil = strArr[0].Trim();
-					Engine_pack = strArr[1].Trim();  
+				{
+                    vehDLB.EngineOil = strArr[0].Trim();
+                    vehDLB.Engine_Oil_Pack = strArr[1].Trim();  
 
-				}				
-				string Engine_Oil_Qty = txtengineqty.Text.Trim();
+				}
+                vehDLB.Engine_Oil_Qty = txtengineqty.Text.Trim();
+
 				string Gear = Dropgearoil.SelectedItem.Text.Trim();
 				string Gear_Oil = "";
 				string Gear_pack = "";
 				if(!Gear.Trim().Equals("Select"))
 				{ 
 					strArr = Gear.Split(new char[] {':'}, Gear.Length);
-					Gear_Oil = strArr[0].Trim();
-					Gear_pack = strArr[1].Trim();  
+                    vehDLB.Gear_Oil = strArr[0].Trim();
+                    vehDLB.Gear_Oil_Pack = strArr[1].Trim();  
 
-				}		
-				string Gear_Oil_Qty = txtGearqty.Text.Trim();
-
-				string Grease1 = Dropgrease.SelectedItem.Text.Trim();
+				}
+                vehDLB.Gear_Oil_Qty = txtGearqty.Text.Trim();
+                
+                string Grease1 = Dropgrease.SelectedItem.Text.Trim();
 				string Grease = "";
 				string Grease_pack = "";
 				if(!Grease1.Trim().Equals("Select"))
 				{ 
 					strArr = Grease1.Split(new char[] {':'}, Grease1.Length);
-					Grease = strArr[0].Trim();
-					Grease_pack = strArr[1].Trim();  
+                    vehDLB.Grease = strArr[0].Trim();
+                    vehDLB.Grease_Pack = strArr[1].Trim();  
 
-				}	
-				string Grease_Qty  = txtGreaseqty.Text.Trim();
+				}
+                vehDLB.Grease_Qty = txtGreaseqty.Text.Trim();
+
 				string Brake = Dropbrakeoil.SelectedItem.Text.Trim();
 				string Brake_Oil = "";
 				string Brake_pack = "";
 				if(!Brake.Trim().Equals("Select"))
 				{ 
 					strArr = Brake.Split(new char[] {':'}, Brake.Length);
-					Brake_Oil = strArr[0].Trim();
-					Brake_pack = strArr[1].Trim();  
+                    vehDLB.Brake_Oil = strArr[0].Trim();
+                    vehDLB.Brake_Oil_Pack = strArr[1].Trim();  
 
-				}	
-				string Brake_Oil_Qty = txtBrakeqty.Text.Trim();
+				}
+                vehDLB.Brake_Oil_Qty = txtBrakeqty.Text.Trim();
+
 				string Trans = Droptranoil.SelectedItem.Text.Trim();
 				string Trans_Oil = "";
 				string Trans_pack = "";
 				if(!Trans.Trim().Equals("Select"))
 				{ 
 					strArr = Trans.Split(new char[] {':'}, Trans.Length);
-					Trans_Oil = strArr[0].Trim();
-					Trans_pack = strArr[1].Trim();  
+                    vehDLB.Trans_Oil = strArr[0].Trim();
+                    vehDLB.Trans_Oil_Pack = strArr[1].Trim();  
 
-				}	
-				string Trans_Oil_Qty = txtTranqty.Text.Trim();             
-				string coolent1 = Dropcoolent.SelectedItem.Text.Trim();
+				}
+                vehDLB.Trans_Oil_Qty = txtTranqty.Text.Trim();
+
+
+                string coolent1 = Dropcoolent.SelectedItem.Text.Trim();
 				string coolent = "";
 				string coolent_pack = "";
 				if(!coolent1.Trim().Equals("Select"))
 				{ 
 					strArr = coolent1.Split(new char[] {':'}, coolent1.Length);
-					coolent = strArr[0].Trim();
-					coolent_pack = strArr[1].Trim();  
+                    vehDLB.Coolent = strArr[0].Trim();
+                    vehDLB.Coolent_Oil_Pack = strArr[1].Trim();  
 
-				}	
-				string coolent_Qty = txtCoolentqty.Text.Trim();
-				string Toll = txtTollqty.Text.Trim();
-				string Police = txtPoliceqty.Text.Trim();
-				string Food = txtfoodqty.Text.Trim();
-				string misc = txtMiscqty.Text.Trim();
-				object op = null;
-				// calls the procedure proVDLBEntry to insert the vehicle log details
-				dbobj.ExecProc(OprType.Insert,"proVDLBEntry",ref op,"@VDLB_ID",VDLB_ID,"@vehicle_no",vehicle_no,"@DOE",strDOE,"@Meter_Reading_Pre",meter_reading_pre,"@Meter_Reading_Cur",meter_reading_cur,"@vehicle_route",vehicle_route,"@Fuel_Used",Fuel_Used,"@Fuel_Used_Qty",Fuel_Used_Qty,"@Engine_Oil",Engine_Oil,"@Engine_pack",Engine_pack,"@Engine_Oil_Qty",Engine_Oil_Qty,"@Gear_Oil",Gear_Oil,"@Gear_pack",Gear_pack,"@Gear_Oil_Qty",Gear_Oil_Qty,"@Grease",Grease,"@Grease_pack",Grease_pack,"@Grease_Qty",Grease_Qty, 
-					"@Brake_Oil",Brake_Oil,"@Brake_pack",Brake_pack,"@Brake_Oil_Qty",Brake_Oil_Qty,"@Coolent",coolent,"@Coolent_Pack",coolent_pack,"@Coolent_Qty",coolent_Qty,"@Trans_Oil",Trans_Oil,"@Trans_pack",Trans_pack,"@Trans_Oil_Qty",Trans_Oil_Qty,"@Toll",Toll,"@Police",Police,"@Food",Food,"@Misc",misc);                   
-				MessageBox.Show("Vehicle Log Book Saved");
-				CreateLogFiles.ErrorLog("Form:Vehicle_logbook.aspx,Method:btnSave_Click "+ "vehicle Daily log book for vehicle no."+vehicle_no+" saved.   Userid "+ uid );
+				}
+                vehDLB.Coolent_Oil_Qty = txtCoolentqty.Text.Trim();
+
+                vehDLB.Toll = txtTollqty.Text.Trim();
+                vehDLB.Police = txtPoliceqty.Text.Trim();
+                vehDLB.Food = txtfoodqty.Text.Trim();
+                vehDLB.Misc = txtMiscqty.Text.Trim();
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(vehDLB);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VehicleEntryLogbook/InsertVehicleDailyLogbook", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                    }
+                }
+
+                //object op = null;
+                //// calls the procedure proVDLBEntry to insert the vehicle log details
+                //dbobj.ExecProc(OprType.Insert,"proVDLBEntry",ref op,"@VDLB_ID",VDLB_ID,"@vehicle_no",vehicle_no,"@DOE",strDOE,"@Meter_Reading_Pre",meter_reading_pre,"@Meter_Reading_Cur",meter_reading_cur,"@vehicle_route",vehicle_route,"@Fuel_Used",Fuel_Used,"@Fuel_Used_Qty",Fuel_Used_Qty,"@Engine_Oil",Engine_Oil,"@Engine_pack",Engine_pack,"@Engine_Oil_Qty",Engine_Oil_Qty,"@Gear_Oil",Gear_Oil,"@Gear_pack",Gear_pack,"@Gear_Oil_Qty",Gear_Oil_Qty,"@Grease",Grease,"@Grease_pack",Grease_pack,"@Grease_Qty",Grease_Qty, 
+                //	"@Brake_Oil",Brake_Oil,"@Brake_pack",Brake_pack,"@Brake_Oil_Qty",Brake_Oil_Qty,"@Coolent",coolent,"@Coolent_Pack",coolent_pack,"@Coolent_Qty",coolent_Qty,"@Trans_Oil",Trans_Oil,"@Trans_pack",Trans_pack,"@Trans_Oil_Qty",Trans_Oil_Qty,"@Toll",Toll,"@Police",Police,"@Food",Food,"@Misc",misc);                   
+
+                MessageBox.Show("Vehicle Log Book Saved");
+                CreateLogFiles.ErrorLog("Form:Vehicle_logbook.aspx,Method:btnSave_Click "+ "vehicle Daily log book for vehicle no."+ vehDLB.Vehicle_no + " saved.   Userid "+ uid );
 				makeReport(); 
 				//print(); 
 				clear();
 				getID();
 				getVehicleInfo();    
-				btnSave .Enabled = true;
+				btnSave.Enabled = true;
 				btnEdit.Enabled = false;
 				btnDelete.Enabled = false;
 				checkPrevileges();
@@ -513,14 +803,36 @@ namespace Servosms.Module.Logistics
 				checkPrevileges();
 				DropVDLBID.Items.Clear();
 				DropVDLBID.Items.Add("Select");
-				SqlDataReader SqlDtr = null;
-				dbobj.SelectQuery("Select VDLB_id from vdlb order by VDLB_ID",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					DropVDLBID.Items.Add(SqlDtr.GetValue(0).ToString());
+
+                List<string> lstVehicleLogbookId = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/FillVehicleEntryLogbookID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstVehicleLogbookId = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                }
+
+                if (lstVehicleLogbookId != null)
+                {
+                    foreach (var Number in lstVehicleLogbookId)
+                        DropVDLBID.Items.Add(Number);
+                }
+
+    //            SqlDataReader SqlDtr = null;
+				//dbobj.SelectQuery("Select VDLB_id from vdlb order by VDLB_ID",ref SqlDtr);
+				//while(SqlDtr.Read())
+				//{
+				//	DropVDLBID.Items.Add(SqlDtr.GetValue(0).ToString());
  
-				}
-				SqlDtr.Close();
+				//}
+				//SqlDtr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -535,7 +847,9 @@ namespace Servosms.Module.Logistics
 		/// <param name="e"></param>
 		protected void DropVDLBID_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
-			try
+            VehicleDailyLogbookModel vehDLB = new VehicleDailyLogbookModel();
+            
+            try
 			{			
 				if(DropVDLBID.SelectedIndex == 0)
 				{
@@ -543,34 +857,53 @@ namespace Servosms.Module.Logistics
 					return ;
 				}
 				clear();
-				string vdlb_id = DropVDLBID.SelectedItem.Text.Trim();    
-				SqlDataReader SqlDtr = null;
-				SqlDataReader SqlDtr1 = null;
-				dbobj.SelectQuery("select v.*,(ve.vehicle_no+' VID '+cast(ve.vehicledetail_id as varchar)) as v_no,ve.vehicle_name,ve.vehicledetail_id from vdlb v,vehicleentry ve where  ve.vehicledetail_id = v.vehicle_no and  vdlb_id ="+vdlb_id,ref SqlDtr);
-				if(SqlDtr.Read())
-				{
-					string emp_name = "";
-					dbobj.SelectQuery("Select emp_name from employee where vehicle_id = "+SqlDtr["vehicledetail_id"].ToString().Trim()+" and designation = 'Driver'",ref SqlDtr1);
-					if(SqlDtr1.HasRows)
-					{
-						if(SqlDtr1.Read())
-							emp_name = SqlDtr1.GetValue(0).ToString().Trim();     
+				string vdlb_id = DropVDLBID.SelectedItem.Text.Trim();
+
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/VehicleEntryLogbook/GetDropVehicleID_SelectedData?VehicleID=" + vdlb_id).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        vehDLB = JsonConvert.DeserializeObject<VehicleDailyLogbookModel>(id);
+                    }
+                }
+
+                
+
+    //            SqlDataReader SqlDtr = null;
+				//SqlDataReader SqlDtr1 = null;
+				//dbobj.SelectQuery("select v.*,(ve.vehicle_no+' VID '+cast(ve.vehicledetail_id as varchar)) as v_no,ve.vehicle_name,ve.vehicledetail_id from vdlb v,vehicleentry ve where  ve.vehicledetail_id = v.vehicle_no and  vdlb_id ="+vdlb_id,ref SqlDtr);
+				//if(SqlDtr.Read())
+				//{
+				//	string emp_name = "";
+				//	dbobj.SelectQuery("Select emp_name from employee where vehicle_id = "+SqlDtr["vehicledetail_id"].ToString().Trim()+" and designation = 'Driver'",ref SqlDtr1);
+				//	if(SqlDtr1.HasRows)
+				//	{
+				//		if(SqlDtr1.Read())
+				//			emp_name = SqlDtr1.GetValue(0).ToString().Trim();     
 					
-					}
-					SqlDtr1.Close();
-					string vehicle_no = SqlDtr["v_no"].ToString().Trim();
-					DropVehicleNo.SelectedIndex = DropVehicleNo.Items.IndexOf(DropVehicleNo.Items.FindByText(vehicle_no));
-					txtVehiclename.Text = SqlDtr["vehicle_name"].ToString().Trim();
-					txtDOE.Text = GenUtil.str2DDMMYYYY(trimDate(SqlDtr["DOE"].ToString().Trim()));
-					txtdrivername.Text = emp_name;
-					txtmeterreadpre.Text = SqlDtr["meter_reading_pre"].ToString().Trim();
-					txtmeterreadcurr.Text = SqlDtr["meter_reading_cur"].ToString().Trim();
-					dbobj.SelectQuery("Select route_name From route where route_id ="+SqlDtr["vehicle_route"].ToString().Trim(),ref SqlDtr1);
-					if(SqlDtr1.Read())
-					{
-						Dropvehicleroute.SelectedIndex = Dropvehicleroute.Items.IndexOf(Dropvehicleroute.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-					}
-					SqlDtr1.Close();
+				//	}
+				//	SqlDtr1.Close();
+
+					//string vehicle_no = SqlDtr["v_no"].ToString().Trim();
+					DropVehicleNo.SelectedIndex = DropVehicleNo.Items.IndexOf(DropVehicleNo.Items.FindByText(vehDLB.Vehicle_no));
+					txtVehiclename.Text = vehDLB.Vehicle_Name;
+					txtDOE.Text = GenUtil.str2DDMMYYYY(trimDate(vehDLB.DOE));
+					txtdrivername.Text = vehDLB.DriverName.Trim();
+                    txtmeterreadpre.Text = vehDLB.Meter_reading_pre;
+					txtmeterreadcurr.Text = vehDLB.Meter_reading_cur.Trim();
+					//dbobj.SelectQuery("Select route_name From route where route_id ="+SqlDtr["vehicle_route"].ToString().Trim(),ref SqlDtr1);
+					//if(SqlDtr1.Read())
+					//{
+						Dropvehicleroute.SelectedIndex = Dropvehicleroute.Items.IndexOf(Dropvehicleroute.Items.FindByText(vehDLB.Vehicle_route.Trim())); 
+					//}
+					//SqlDtr1.Close();
 				
 					//					dbobj.SelectQuery("Select Fuel_used From vehicleentry where prod_id ="+SqlDtr["Fuel_Used"].ToString().Trim()+" and Category = 'Fuel'",ref SqlDtr1);
 					//					if(SqlDtr1.Read())
@@ -578,70 +911,68 @@ namespace Servosms.Module.Logistics
 					//						Dropfuelused.SelectedIndex = Dropfuelused.Items.IndexOf(Dropfuelused.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
 					//					}
 					//					SqlDtr1.Close();
-					Dropfuelused.SelectedIndex  = Dropfuelused.Items.IndexOf( Dropfuelused.Items.FindByText(SqlDtr["Fuel_Used"].ToString().Trim()));
-					txtfuelused.Text = SqlDtr["Fuel_Used_Qty"].ToString().Trim();
-					dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Engine_Oil"].ToString().Trim()+" and Category like 'Engine Oil%'",ref SqlDtr1);
-					if(SqlDtr1.Read())
-					{
-						Dropengineoil.SelectedIndex = Dropengineoil.Items.IndexOf(Dropengineoil.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-					}
-					SqlDtr1.Close();
-					txtengineqty.Text = SqlDtr["Engine_Oil_Qty"].ToString().Trim();  
+					Dropfuelused.SelectedIndex  = Dropfuelused.Items.IndexOf( Dropfuelused.Items.FindByText(vehDLB.Fuel_Used.Trim()));
+					txtfuelused.Text = vehDLB.Fuel_Used_Qty;
 
-					dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Gear_Oil"].ToString().Trim()+" and Category like 'Gear Oil%'",ref SqlDtr1);
-					if(SqlDtr1.Read())
-					{
-						Dropgearoil.SelectedIndex = Dropgearoil.Items.IndexOf(Dropgearoil.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-					}
-					SqlDtr1.Close();
-					txtGearqty.Text = SqlDtr["Gear_Oil_Qty"].ToString().Trim();  
+					//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Engine_Oil"].ToString().Trim()+" and Category like 'Engine Oil%'",ref SqlDtr1);
+					//if(SqlDtr1.Read())
+					//{
+						Dropengineoil.SelectedIndex = Dropengineoil.Items.IndexOf(Dropengineoil.Items.FindByText(vehDLB.EngineOil.Trim())); 
+					//}
+					//SqlDtr1.Close();
 
-					dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Grease"].ToString().Trim()+" and Category like 'Grease%'",ref SqlDtr1);
-					if(SqlDtr1.Read())
-					{
-						Dropgrease.SelectedIndex = Dropgrease.Items.IndexOf(Dropgrease.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-					}
-					SqlDtr1.Close();
-					txtGreaseqty.Text = SqlDtr["Grease_Qty"].ToString().Trim();  
+					txtengineqty.Text = vehDLB.Engine_Oil_Qty.Trim();  
 
-					dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Brake_Oil"].ToString().Trim()+" and Category like 'Brake Oil%'",ref SqlDtr1);
-					if(SqlDtr1.Read())
-					{
-						Dropbrakeoil.SelectedIndex = Dropbrakeoil.Items.IndexOf(Dropbrakeoil.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-					}
-					SqlDtr1.Close();
-					txtBrakeqty.Text = SqlDtr["Brake_Oil_Qty"].ToString().Trim();  
+					//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Gear_Oil"].ToString().Trim()+" and Category like 'Gear Oil%'",ref SqlDtr1);
+					//if(SqlDtr1.Read())
+					//{
+						Dropgearoil.SelectedIndex = Dropgearoil.Items.IndexOf(Dropgearoil.Items.FindByText(vehDLB.Gear_Oil.Trim() )); 
+					//}
+					//SqlDtr1.Close();
 
-//					dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Brake_Oil"].ToString().Trim()+" and Category = 'Brake Oil'",ref SqlDtr1);
-//					if(SqlDtr1.Read())
-//					{
-//						Dropbrakeoil.SelectedIndex = Dropbrakeoil.Items.IndexOf(Dropbrakeoil.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-//					}
-//					SqlDtr1.Close();
-//					txtBrakeqty.Text = SqlDtr["Brake_Oil_Qty"].ToString().Trim();  
+					txtGearqty.Text = vehDLB.Gear_Oil_Qty.Trim();  
 
-					dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Coolent"].ToString().Trim()+" and Category like 'Collents%'",ref SqlDtr1);
-					if(SqlDtr1.Read())
-					{
-						Dropcoolent.SelectedIndex = Dropcoolent.Items.IndexOf(Dropcoolent.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-					}
-					SqlDtr1.Close();
-					txtCoolentqty.Text = SqlDtr["Coolent_Qty"].ToString().Trim();  
+					//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Grease"].ToString().Trim()+" and Category like 'Grease%'",ref SqlDtr1);
+					//if(SqlDtr1.Read())
+					//{
+						Dropgrease.SelectedIndex = Dropgrease.Items.IndexOf(Dropgrease.Items.FindByText(vehDLB.Grease.Trim() )); 
+					//}
+					//SqlDtr1.Close();
 
-					dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Trans_Oil"].ToString().Trim()+" and Category like 'Transmission Oil%'",ref SqlDtr1);
-					if(SqlDtr1.Read())
-					{
-						Droptranoil.SelectedIndex = Droptranoil.Items.IndexOf(Droptranoil.Items.FindByText(SqlDtr1.GetValue(0).ToString().Trim() )); 
-					}
-					SqlDtr1.Close();
-					txtTranqty.Text = SqlDtr["Trans_Oil_Qty"].ToString().Trim();  
+					txtGreaseqty.Text = vehDLB.Grease_Qty.Trim();  
+
+					//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Brake_Oil"].ToString().Trim()+" and Category like 'Brake Oil%'",ref SqlDtr1);
+					//if(SqlDtr1.Read())
+					//{
+						Dropbrakeoil.SelectedIndex = Dropbrakeoil.Items.IndexOf(Dropbrakeoil.Items.FindByText(vehDLB.Brake_Oil.Trim() )); 
+					//}
+					//SqlDtr1.Close();
+					txtBrakeqty.Text = vehDLB.Brake_Oil_Qty.Trim();  
+
+					//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Coolent"].ToString().Trim()+" and Category like 'Collents%'",ref SqlDtr1);
+					//if(SqlDtr1.Read())
+					//{
+						Dropcoolent.SelectedIndex = Dropcoolent.Items.IndexOf(Dropcoolent.Items.FindByText(vehDLB.Coolent.Trim() )); 
+					//}
+					//SqlDtr1.Close();
+
+					txtCoolentqty.Text = vehDLB.Coolent_Oil_Qty.Trim();  
+
+					//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where prod_id ="+SqlDtr["Trans_Oil"].ToString().Trim()+" and Category like 'Transmission Oil%'",ref SqlDtr1);
+					//if(SqlDtr1.Read())
+					//{
+						Droptranoil.SelectedIndex = Droptranoil.Items.IndexOf(Droptranoil.Items.FindByText(vehDLB.Trans_Oil.Trim())); 
+					//}
+					//SqlDtr1.Close();
+
+					txtTranqty.Text = vehDLB.Trans_Oil_Qty.Trim();  
                 
-					txtTollqty.Text = SqlDtr["Toll"].ToString().Trim();
-					txtPoliceqty.Text = SqlDtr["Police"].ToString().Trim();
-					txtfoodqty.Text = SqlDtr["Food"].ToString().Trim();
-					txtMiscqty.Text = SqlDtr["misc"].ToString().Trim(); 
-				}
-				SqlDtr.Close();
+					txtTollqty.Text = vehDLB.Toll;
+					txtPoliceqty.Text = vehDLB.Police;
+					txtfoodqty.Text = vehDLB.Food;
+					txtMiscqty.Text = vehDLB.Misc; 
+				//}
+				//SqlDtr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -675,20 +1006,22 @@ namespace Servosms.Module.Logistics
 		/// <param name="e"></param>
 		protected void btnEdit_Click(object sender, System.EventArgs e)
 		{
-			try
+            VehicleDailyLogbookModel vehDLB = new VehicleDailyLogbookModel();
+
+            try
 			{
 				if(DropVDLBID.SelectedIndex == 0)
 				{
 					MessageBox.Show("Please select VDLB ID");
 					return ;
 				}
-				string VDLB_ID  =DropVDLBID.SelectedItem.Text.Trim();
-				string vehicle_no = DropVehicleNo.SelectedItem.Text;
+                vehDLB.VDLB_ID = DropVDLBID.SelectedItem.Text.Trim();
+                vehDLB.Vehicle_no = DropVehicleNo.SelectedItem.Text;
 				string strDOE = txtDOE.Text.Trim();
-				strDOE = GenUtil.str2MMDDYYYY(strDOE);
-				string meter_reading_pre = txtmeterreadpre.Text.Trim();
-				string meter_reading_cur = txtmeterreadcurr.Text.Trim();
-				if(System.Convert.ToDouble(meter_reading_pre) > System.Convert.ToDouble(meter_reading_cur) )
+                vehDLB.DOE = GenUtil.str2MMDDYYYY(strDOE);
+                vehDLB.Meter_reading_pre = txtmeterreadpre.Text.Trim();
+                vehDLB.Meter_reading_cur = txtmeterreadcurr.Text.Trim();
+				if(System.Convert.ToDouble(vehDLB.Meter_reading_pre) > System.Convert.ToDouble(vehDLB.Meter_reading_cur) )
 				{
 					MessageBox.Show("Current Meter Reading should not be less than Previous Meter Reading");
 					return ;
@@ -699,78 +1032,104 @@ namespace Servosms.Module.Logistics
 					return;
 				}
 
-				string vehicle_route = Dropvehicleroute.SelectedItem.Text.Trim();
-				string Fuel_Used = Dropfuelused.SelectedItem.Text.Trim();
-				string Fuel_Used_Qty = txtfuelused.Text.Trim();
-				string engine = Dropengineoil.SelectedItem.Text.Trim();
+                vehDLB.Vehicle_route = Dropvehicleroute.SelectedItem.Text.Trim();
+                vehDLB.Fuel_Used = Dropfuelused.SelectedItem.Text.Trim();
+                vehDLB.Fuel_Used_Qty = txtfuelused.Text.Trim();
+
+                string engine = Dropengineoil.SelectedItem.Text.Trim();
 				string Engine_Oil = "";
 				string Engine_pack = "";
 				string[] strArr = engine.Split(new char[] {':'}, engine.Length);
 				if(!engine.Trim().Equals("Select"))
-				{ 
-					Engine_Oil = strArr[0].Trim();
-					Engine_pack = strArr[1].Trim();  
-				}				
-				string Engine_Oil_Qty = txtengineqty.Text.Trim();
+				{
+                    vehDLB.EngineOil = strArr[0].Trim();
+                    vehDLB.Engine_Oil_Pack = strArr[1].Trim();  
+				}
+                vehDLB.Engine_Oil_Qty = txtengineqty.Text.Trim();
+
 				string Gear = Dropgearoil.SelectedItem.Text.Trim();
 				string Gear_Oil = "";
 				string Gear_pack = "";
 				if(!Gear.Trim().Equals("Select"))
 				{ 
 					strArr = Gear.Split(new char[] {':'}, Gear.Length);
-					Gear_Oil = strArr[0].Trim();
-					Gear_pack = strArr[1].Trim();  
-				}		
-				string Gear_Oil_Qty = txtGearqty.Text.Trim();
+                    vehDLB.Gear_Oil = strArr[0].Trim();
+                    vehDLB.Gear_Oil_Pack = strArr[1].Trim();  
+				}
+                vehDLB.Gear_Oil_Qty = txtGearqty.Text.Trim();
+
 				string Grease1 = Dropgrease.SelectedItem.Text.Trim();
 				string Grease = "";
 				string Grease_pack = "";
 				if(!Grease1.Trim().Equals("Select"))
 				{ 
 					strArr = Grease1.Split(new char[] {':'}, Grease1.Length);
-					Grease = strArr[0].Trim();
-					Grease_pack = strArr[1].Trim();  
-				}	
-				string Grease_Qty  = txtGreaseqty.Text.Trim();
+                    vehDLB.Grease = strArr[0].Trim();
+                    vehDLB.Grease_Pack = strArr[1].Trim();  
+				}
+                vehDLB.Grease_Qty  = txtGreaseqty.Text.Trim();
+
 				string Brake = Dropbrakeoil.SelectedItem.Text.Trim();
 				string Brake_Oil = "";
 				string Brake_pack = "";
 				if(!Brake.Trim().Equals("Select"))
 				{ 
 					strArr = Brake.Split(new char[] {':'}, Brake.Length);
-					Brake_Oil = strArr[0].Trim();
-					Brake_pack = strArr[1].Trim();  
-				}	
-				string Brake_Oil_Qty = txtBrakeqty.Text.Trim();
+                    vehDLB.Brake_Oil = strArr[0].Trim();
+                    vehDLB.Brake_Oil_Pack = strArr[1].Trim();  
+				}
+                vehDLB.Brake_Oil_Qty = txtBrakeqty.Text.Trim();
+
 				string Trans = Droptranoil.SelectedItem.Text.Trim();
 				string Trans_Oil = "";
 				string Trans_pack = "";
 				if(!Trans.Trim().Equals("Select"))
 				{ 
 					strArr = Trans.Split(new char[] {':'}, Trans.Length);
-					Trans_Oil = strArr[0].Trim();
-					Trans_pack = strArr[1].Trim();  
-				}	
-				string Trans_Oil_Qty = txtTranqty.Text.Trim();             
+                    vehDLB.Trans_Oil = strArr[0].Trim();
+                    vehDLB.Trans_Oil_Pack = strArr[1].Trim();  
+				}
+                vehDLB.Trans_Oil_Qty = txtTranqty.Text.Trim(); 
+                            
 				string coolent1 = Dropcoolent.SelectedItem.Text.Trim();
 				string coolent = "";
 				string coolent_pack = "";
 				if(!coolent1.Trim().Equals("Select"))
 				{ 
 					strArr = coolent1.Split(new char[] {':'}, coolent1.Length);
-					coolent = strArr[0].Trim();
-					coolent_pack = strArr[1].Trim();  
-				}	
-				string coolent_Qty = txtCoolentqty.Text.Trim();
-				string Toll = txtTollqty.Text.Trim();
-				string Police = txtPoliceqty.Text.Trim();
-				string Food = txtfoodqty.Text.Trim();
-				string misc = txtMiscqty.Text.Trim();
-				object op = null;
-				dbobj.ExecProc(OprType.Insert,"proVDLBUpdate",ref op,"@VDLB_ID",VDLB_ID,"@vehicle_no",vehicle_no,"@DOE",strDOE,"@Meter_Reading_Pre",meter_reading_pre,"@Meter_Reading_Cur",meter_reading_cur,"@vehicle_route",vehicle_route,"@Fuel_Used",Fuel_Used,"@Fuel_Used_Qty",Fuel_Used_Qty,"@Engine_Oil",Engine_Oil,"@Engine_pack",Engine_pack,"@Engine_Oil_Qty",Engine_Oil_Qty,"@Gear_Oil",Gear_Oil,"@Gear_pack",Gear_pack,"@Gear_Oil_Qty",Gear_Oil_Qty,"@Grease",Grease,"@Grease_pack",Grease_pack,"@Grease_Qty",Grease_Qty, 
-					"@Brake_Oil",Brake_Oil,"@Brake_pack",Brake_pack,"@Brake_Oil_Qty",Brake_Oil_Qty,"@Coolent",coolent,"@Coolent_Pack",coolent_pack,"@Coolent_Qty",coolent_Qty,"@Trans_Oil",Trans_Oil,"@Trans_pack",Trans_pack,"@Trans_Oil_Qty",Trans_Oil_Qty,"@Toll",Toll,"@Police",Police,"@Food",Food,"@Misc",misc);                   
-				MessageBox.Show("Vehicle Log Book Updated");
-				CreateLogFiles.ErrorLog("Form:Vehicle_logbook.aspx,Method:btnEdit_Click "+ "vehicle Daily log book for vehicle no."+vehicle_no+" updated.   Userid "+ uid );
+                    vehDLB.Coolent = strArr[0].Trim();
+                    vehDLB.Coolent_Oil_Pack = strArr[1].Trim();  
+				}
+                vehDLB.Coolent_Oil_Qty = txtCoolentqty.Text.Trim();
+
+                vehDLB.Toll = txtTollqty.Text.Trim();
+                vehDLB.Police = txtPoliceqty.Text.Trim();
+                vehDLB.Food = txtfoodqty.Text.Trim();
+                vehDLB.Misc = txtMiscqty.Text.Trim();
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(vehDLB);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VehicleEntry/UpdateVehicleDailyLogbook", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                    }
+                }
+
+                //object op = null;
+                //dbobj.ExecProc(OprType.Insert,"proVDLBUpdate",ref op,"@VDLB_ID",VDLB_ID,"@vehicle_no",vehicle_no,"@DOE",strDOE,"@Meter_Reading_Pre",meter_reading_pre,"@Meter_Reading_Cur",meter_reading_cur,"@vehicle_route",vehicle_route,"@Fuel_Used",Fuel_Used,"@Fuel_Used_Qty",Fuel_Used_Qty,"@Engine_Oil",Engine_Oil,"@Engine_pack",Engine_pack,"@Engine_Oil_Qty",Engine_Oil_Qty,"@Gear_Oil",Gear_Oil,"@Gear_pack",Gear_pack,"@Gear_Oil_Qty",Gear_Oil_Qty,"@Grease",Grease,"@Grease_pack",Grease_pack,"@Grease_Qty",Grease_Qty, 
+                //	"@Brake_Oil",Brake_Oil,"@Brake_pack",Brake_pack,"@Brake_Oil_Qty",Brake_Oil_Qty,"@Coolent",coolent,"@Coolent_Pack",coolent_pack,"@Coolent_Qty",coolent_Qty,"@Trans_Oil",Trans_Oil,"@Trans_pack",Trans_pack,"@Trans_Oil_Qty",Trans_Oil_Qty,"@Toll",Toll,"@Police",Police,"@Food",Food,"@Misc",misc);                   
+
+                MessageBox.Show("Vehicle Log Book Updated");
+                CreateLogFiles.ErrorLog("Form:Vehicle_logbook.aspx,Method:btnEdit_Click "+ "vehicle Daily log book for vehicle no."+ DropVehicleNo.SelectedItem.Text + " updated.   Userid "+ uid );
 				makeReport(); 
 				//print(); 
 				clear();
@@ -1014,11 +1373,29 @@ namespace Servosms.Module.Logistics
 				}
 
 				string vdlb_id = DropVDLBID.SelectedItem.Text.Trim();
-				int c = 0;
-				dbobj.Insert_or_Update("Delete from vdlb where vdlb_id = "+vdlb_id,ref c);
-				if(c > 0)
-				{
-					MessageBox.Show("Vehicle Log Book Deleted");
+                int c = 0;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(DropVDLBID.SelectedItem.Text.Trim());
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/VehicleEntryLogbook/DeleteVehicleEntryLogbook?vehicleLogbookID=" + DropVDLBID.SelectedItem.Text.Trim(), byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        c = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(responseString);
+                    }
+                }
+
+
+                //dbobj.Insert_or_Update("Delete from vehicleentry where vehicledetail_id = "+DropVehicleID.SelectedItem.Text.Trim(),ref c);    
+                if (c > 0)
+                {
+                    MessageBox.Show("Vehicle Log Book Deleted");
 					CreateLogFiles.ErrorLog("Form:Vehicle_logbook.aspx,Method:btnDelete_Click "+ "vehicle Daily log book for vehicle no."+DropVehicleNo.SelectedItem.Text+" deleted.   Userid "+ uid );
 					clear();
 					getID();

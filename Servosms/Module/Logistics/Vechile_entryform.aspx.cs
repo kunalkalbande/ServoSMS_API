@@ -144,10 +144,7 @@ namespace Servosms.Module.Logistics
 		public void fillOilCombo()
 		{
 			try
-			{
-				SqlDataReader SqlDtr = null;				
-
-				//dbobj.SelectQuery("Select prod_name+':'+pack_type from products where category like 'Engine Oil%'",ref SqlDtr);
+			{				
 				DropEngineOil.Items.Clear();
 				DropEngineOil.Items.Add("Select");
 
@@ -326,13 +323,7 @@ namespace Servosms.Module.Logistics
                 {
                     foreach (var Transmission in lstDropTransmission)
                         Droptransmission.Items.Add(Transmission);
-                }
-
-    //            while (SqlDtr.Read())
-				//{
-				//	Droptransmission.Items.Add(SqlDtr.GetValue(0).ToString());   
-				//}
-				//SqlDtr.Close();
+                }                
 			}
 			catch(Exception ex)
 			{
