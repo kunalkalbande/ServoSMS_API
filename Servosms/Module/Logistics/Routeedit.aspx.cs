@@ -9,7 +9,7 @@
    bbnisys Technologies.
 
 */
-    # region Directives...
+#region Directives...
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -20,11 +20,16 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using System.Data .SqlClient ;
+using System.Data.SqlClient;
 using System.Text;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using RMG;
-# endregion
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using Servo_API.Models;
+#endregion
 
 namespace Servosms.Module.Logistics
 {
@@ -36,18 +41,19 @@ namespace Servosms.Module.Logistics
 		protected System.Web.UI.WebControls.Button btndelete;
 		protected System.Web.UI.WebControls.ValidationSummary ValidationSummary1;
 		string uid;
-	
-		/// <summary>
-		/// Put user code to initialize the page here
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// and generate the next ID also.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		# region Page Load...
-		protected void Page_Load(object sender, System.EventArgs e)
+        string baseUri = "http://localhost:64862";
+
+        /// <summary>
+        /// Put user code to initialize the page here
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// and generate the next ID also.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        #region Page Load...
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			try
 			{
@@ -64,20 +70,45 @@ namespace Servosms.Module.Logistics
 					btnsave.Visible=false;
 					btnEdit.Visible=true;
 					checkPrevileges();
-					SqlConnection con;
-					SqlCommand cmdselect;
-					SqlDataReader dtrdrive;
-					con=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-					con.Open ();
-					cmdselect = new SqlCommand( "Select Route_name  From Route", con );
-					dtrdrive = cmdselect.ExecuteReader();
-					DropDownList1.Items.Add("Select");
-					while (dtrdrive.Read()) 
-					{
-						DropDownList1.Items.Add(dtrdrive.GetString(0));
-					}
-					dtrdrive.Close();
-					con.Close ();
+
+                    List<string> lstRouteNames = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var Res = client.GetAsync("api/RouteMaster/GetFillRouteNames").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            lstRouteNames = JsonConvert.DeserializeObject<List<string>>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+
+                    if (lstRouteNames != null)
+                    {
+                        foreach (var Route in lstRouteNames)
+                            DropDownList1.Items.Add(Route);
+                    }
+
+     //               SqlConnection con;
+					//SqlCommand cmdselect;
+					//SqlDataReader dtrdrive;
+					//con=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+					//con.Open ();
+					//cmdselect = new SqlCommand( "Select Route_name From Route", con );
+					//dtrdrive = cmdselect.ExecuteReader();
+					//DropDownList1.Items.Add("Select");
+					//while (dtrdrive.Read()) 
+					//{
+					//	DropDownList1.Items.Add(dtrdrive.GetString(0));
+					//}
+					//dtrdrive.Close();
+					//con.Close ();
+
 					# endregion
 				}
 			}
@@ -178,25 +209,52 @@ namespace Servosms.Module.Logistics
 				}
 				else
 				{
-					RouteName="";
+                    RouteMasterModel route = new RouteMasterModel();
+                    RouteName ="";
 					btnDel.Enabled=true;
 					btnsave.Enabled=true;
-					SqlConnection con44;
-					SqlCommand cmdselect44;
-					SqlDataReader dtrdrive44;
-					con44=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-					con44.Open ();
-					cmdselect44 = new SqlCommand( "Select Route_name,Route_km  From Route where Route_name=@Route_name", con44 );
-					cmdselect44.Parameters .Add ("@Route_name",DropDownList1.SelectedItem .Text.ToString());
-					dtrdrive44 = cmdselect44.ExecuteReader();
-					while (dtrdrive44.Read()) 
-					{
-						txtrname.Text=dtrdrive44.GetString(0);
-						RouteName=dtrdrive44.GetString(0);
-						txtrkm.Text =dtrdrive44.GetString(1);
-					}
-					dtrdrive44.Close();
-					con44.Close ();
+
+                    string strHidden = string.Empty;
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var Res = client.GetAsync("api/RouteMaster/GetRouteInfo?selectedRoute=" + DropDownList1.SelectedItem.Text.ToString()).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            route = JsonConvert.DeserializeObject<RouteMasterModel>(id);
+
+                            if(route != null)
+                            {
+                                txtrname.Text = route.Route_Name;
+                                RouteName = route.Route_Name;
+                                txtrkm.Text = route.Route_Km;
+                            }
+
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+
+     //               SqlConnection con44;
+					//SqlCommand cmdselect44;
+					//SqlDataReader dtrdrive44;
+					//con44=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+					//con44.Open ();
+					//cmdselect44 = new SqlCommand( "Select Route_name,Route_km  From Route where Route_name=@Route_name", con44 );
+					//cmdselect44.Parameters .Add ("@Route_name",DropDownList1.SelectedItem .Text.ToString());
+					//dtrdrive44 = cmdselect44.ExecuteReader();
+					//while (dtrdrive44.Read()) 
+					//{
+					//	txtrname.Text=dtrdrive44.GetString(0);
+					//	RouteName=dtrdrive44.GetString(0);
+					//	txtrkm.Text =dtrdrive44.GetString(1);
+					//}
+					//dtrdrive44.Close();
+					//con44.Close ();
 				
 				}
 			}
@@ -217,66 +275,73 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				//				if(txtrname.Text=="")
-				//				{
-				//					MessageBox.Show("Please enter the Route Name");
-				//				}
-				//				else if(txtrkm.Text=="")
-				//				{
-				//					MessageBox.Show("Please enter KM");
-				//				}
-				//				else
-				//				{
-				
+								
 				string sRName=txtrname.Text.ToString().Trim();
-				SqlConnection con2;
-				SqlCommand cmdselect2;
-				SqlDataReader dtredit2;
-				con2=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+                
 				int iCount=0;
 				if(sRName.Trim()!=RouteName.Trim())
-				{
-					con2.Open ();
-					cmdselect2=new SqlCommand("Select Count(Route_name) from Route where Route_name='" + sRName +"'",con2);
-					dtredit2=cmdselect2.ExecuteReader();
-					if(dtredit2.Read())
-					{
-						iCount=Convert.ToInt32(dtredit2.GetSqlValue(0).ToString());
-					}
-					dtredit2.Close();
-					con2.Close();
+				{                    
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var Res = client.GetAsync("api/RouteMaster/CheckIfRouteNameExists?routeName=" + sRName).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            iCount = JsonConvert.DeserializeObject<int>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
 				}
+
 				if(iCount==0)
 				{
 					Button1.Visible=true;
 					btnDel.Enabled=true;
 					btnsave.Visible=false;
 					btnEdit.Visible=true;
-				
-					//SqlConnection con2;
-					//SqlCommand cmdselect2;
-					//SqlDataReader dtredit2;
-					string strUpdate;
-					//con2=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-					con2.Open ();
-       
-					strUpdate = "Update Route set Route_name=@Route_name,Route_km=@Route_km where Route_name=@Route2";
-					cmdselect2 = new SqlCommand( strUpdate, con2);
-					if(txtrname.Text=="")
-						cmdselect2.Parameters .Add ("@Route_name","");
-					else
-						cmdselect2.Parameters .Add ("@Route_name",txtrname.Text.Trim());
-					if(txtrkm .Text=="")
-						cmdselect2.Parameters .Add ("@Route_km","");
-					else
-						cmdselect2.Parameters .Add ("@Route_km",txtrkm.Text.Trim());
-					if(DropDownList1.SelectedIndex==0)
-						cmdselect2.Parameters .Add ("@Route2","");
-					else
-						cmdselect2.Parameters .Add ("@Route2",DropDownList1.SelectedItem.Text.ToString());
-					dtredit2 = cmdselect2.ExecuteReader();
-					MessageBox.Show("Route Updated");
-					CreateLogFiles.ErrorLog("Form:Routeedit.aspx,Method:btnsave_Click "+ " Route Name  "+txtrname.Text.Trim().ToString ()+" updated. userid "+ uid );
+
+                    RouteMasterModel route = new RouteMasterModel();
+
+                    if (txtrname.Text == "")
+                        route.Route_Name = "";
+                    else
+                        route.Route_Name = txtrname.Text.Trim();
+
+                    if (txtrkm.Text == "")
+                        route.Route_Km = "";
+                    else
+                        route.Route_Km = txtrkm.Text.Trim();
+
+                    if (DropDownList1.SelectedIndex == 0)
+                        route.Index_Route_Name = "";
+                    else
+                        route.Selected_Route_Name = DropDownList1.SelectedItem.Text.ToString();
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        var myContent = JsonConvert.SerializeObject(route);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/RouteMaster/UpdateRoute", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            MessageBox.Show("Route Updated");
+                            CreateLogFiles.ErrorLog("Form:Routeedit.aspx,Method:btnsave_Click " + " Route Name  " + txtrname.Text.Trim().ToString() + " updated. userid " + uid);
+                        }
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }
+                    
 					Clear();
 					fill();
 					GetNextRouteNo();
@@ -304,32 +369,53 @@ namespace Servosms.Module.Logistics
 		{
 			try
 			{
-				string sRName=txtrname.Text.ToString().Trim();
-				SqlConnection scon=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-				scon.Open();
-				SqlCommand scom=new SqlCommand("Select Count(Route_name) from Route where Route_name='" + sRName +"'",scon);
-				SqlDataReader sdtr=scom.ExecuteReader();
-				int iCount=0;
-				if(sdtr.Read())
-				{
-					iCount=Convert.ToInt32(sdtr.GetSqlValue(0).ToString());
-				}
-				sdtr.Close();
+                int iCount = 0;
+
+                string sRName=txtrname.Text.ToString().Trim();
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/RouteMaster/CheckIfRouteNameExists?routeName=" + sRName).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        iCount = JsonConvert.DeserializeObject<int>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+   
 				if(iCount==0)
 				{
-					SqlConnection con4;
-					string strInsert4;
-					SqlCommand cmdInsert4;
-					con4=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-					con4.Open ();
-					strInsert4 = "Insert Route(Route_name,Route_km)values (@Route_name,@Route_km)";
-					cmdInsert4=new SqlCommand (strInsert4,con4);
-					cmdInsert4.Parameters .Add ("@Route_name",txtrname.Text.Trim().ToString () );
-					cmdInsert4.Parameters .Add ("@Route_km",txtrkm.Text.Trim().ToString () );
-					cmdInsert4.ExecuteNonQuery();
-					con4.Close ();
-					MessageBox.Show("Route details Saved");
-					CreateLogFiles.ErrorLog("Form:Routeedit.aspx,Method:Button1_Click "+ " New Route Name  "+txtrname.Text.Trim().ToString ()+" saved   userid "+ uid );
+                    RouteMasterModel route = new RouteMasterModel();
+                    
+                    route.Route_Name = txtrname.Text.Trim().ToString();
+                    route.Route_Km = txtrkm.Text.Trim().ToString();                    
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        var myContent = JsonConvert.SerializeObject(route);
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/RouteMaster/InsertRoute", byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            MessageBox.Show("Route details Saved");
+                            CreateLogFiles.ErrorLog("Form:Routeedit.aspx,Method:Button1_Click " + " New Route Name  " + txtrname.Text.Trim().ToString() + " saved   userid " + uid);
+                        }
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }
+
 					Clear();
 					fill();
 					GetNextRouteNo();
@@ -363,28 +449,37 @@ namespace Servosms.Module.Logistics
 		# endregion
 
 		/// <summary>
-		/// This method is used to fatch all the Route Name from database and fill the dropdownlist.
+		/// This method is used to fetch all the Route Name from database and fill the dropdownlist.
 		/// </summary>
 		# region Fill Function...
 		public void fill()
 		{
 			try
 			{
-				SqlConnection con;
-				SqlCommand SqlCmd;
-				SqlDataReader dtrdrive;
-				con=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-				con.Open ();
-				DropDownList1.Items.Clear();
-				SqlCmd = new SqlCommand( "Select route_name  From route", con );
-				dtrdrive = SqlCmd.ExecuteReader();
-				DropDownList1.Items.Add("Select");
-				while (dtrdrive.Read()) 
-				{
-					DropDownList1.Items.Add(dtrdrive.GetString(0));
-				}
-				dtrdrive.Close();
-				con.Close ();
+                List<string> lstRouteNames = new List<string>();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/RouteMaster/GetFillRouteNames").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lstRouteNames = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+                if (lstRouteNames != null)
+                {
+                    DropDownList1.Items.Clear();
+                    DropDownList1.Items.Add("Select");
+                    foreach (var Route in lstRouteNames)
+                        DropDownList1.Items.Add(Route);
+                }
 			}
 			catch(Exception ex)
 			{
@@ -456,19 +551,39 @@ namespace Servosms.Module.Logistics
 				//				{
 				if(DropDownList1.Visible==true)
 				{
-					SqlConnection con10;
-					SqlCommand cmdselect10;
-					SqlDataReader dtredit10;
-					string strdelete10;
-					con10=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-					con10.Open ();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        var myContent = JsonConvert.SerializeObject(txtrname.Text.ToString());
+                        var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                        var byteContent = new ByteArrayContent(buffer);
+                        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = client.PostAsync("api/RouteMaster/DeleteRoute?route=" + txtrname.Text.ToString(), byteContent).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseString = response.Content.ReadAsStringAsync().Result;
+                            MessageBox.Show("Route Deleted");
+                            CreateLogFiles.ErrorLog("Form:Routeedit.aspx,Method:btn_Delete " + " Route Name  " + txtrname.Text.Trim().ToString() + " deleted   userid " + uid);
+                        }
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }
 
-					strdelete10 = "Delete Route where Route_name =@Route_name";
-					cmdselect10 = new SqlCommand( strdelete10, con10);
-					cmdselect10.Parameters .Add ("@Route_name",txtrname.Text .ToString ());
-					dtredit10 = cmdselect10.ExecuteReader();
-					MessageBox.Show("Route Deleted");
-					CreateLogFiles.ErrorLog("Form:Routeedit.aspx,Method:btn_Delete "+ " Route Name  "+txtrname.Text.Trim().ToString ()+" deleted   userid "+ uid );
+                    //SqlConnection con10;
+                    //SqlCommand cmdselect10;
+                    //SqlDataReader dtredit10;
+                    //string strdelete10;
+                    //con10=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+                    //con10.Open ();
+
+                    //strdelete10 = "Delete Route where Route_name =@Route_name";
+                    //cmdselect10 = new SqlCommand( strdelete10, con10);
+                    //cmdselect10.Parameters .Add ("@Route_name",txtrname.Text .ToString ());
+                    //dtredit10 = cmdselect10.ExecuteReader();
+
+                    
 					Clear();
 					fill();
 					Button1.Visible=true;
@@ -501,25 +616,49 @@ namespace Servosms.Module.Logistics
 		/// </summary>
 		public void GetNextRouteNo()
 		{
-			InventoryClass obj=new InventoryClass();
-			SqlDataReader SqlDtr;
-			string sql;
+            try
+            {
+                string strVehicleLBID = string.Empty;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-			#region Fetch the Next Route ID
-			sql="select Max(Route_ID)+1 from Route";
-			SqlDtr=obj.GetRecordSet(sql);
-			if(SqlDtr.Read())
-			{
-				lblRouteID.Text=SqlDtr.GetValue(0).ToString();
-				if(lblRouteID.Text=="")
-				{
-					lblRouteID.Text="1";
-				}
-			}
-			else
-				lblRouteID.Text="1";
-			SqlDtr.Close ();		
-			#endregion
-		}
-	}
+                    var Res = client.GetAsync("api/RouteMaster/GetNextRouteID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        strVehicleLBID = JsonConvert.DeserializeObject<string>(id);
+                        lblRouteID.Text = strVehicleLBID;
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                //InventoryClass obj=new InventoryClass();
+                //SqlDataReader SqlDtr;
+                //string sql;
+
+                //#region Fetch the Next Route ID
+                //sql="select Max(Route_ID)+1 from Route";
+                //SqlDtr=obj.GetRecordSet(sql);
+                //if(SqlDtr.Read())
+                //{
+                //	lblRouteID.Text=SqlDtr.GetValue(0).ToString();
+                //	if(lblRouteID.Text=="")
+                //	{
+                //		lblRouteID.Text="1";
+                //	}
+                //}
+                //else
+                //	lblRouteID.Text="1";
+                //SqlDtr.Close ();		
+                //#endregion
+            }
+            catch (Exception ex)
+            {
+                CreateLogFiles.ErrorLog("Form:Routeedit.aspx,Method:GetNextRouteNo " + " EXCEPTION  " + ex.Message + "  userid  " + uid);
+            }
+        }
+    }
 }
