@@ -27,6 +27,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Servo_API.Models;
 
 namespace Servosms.Module.Inventory
 {
@@ -40,16 +44,17 @@ namespace Servosms.Module.Inventory
 		static ArrayList ProductID = new ArrayList();
 		static ArrayList ProductQty = new ArrayList();
 		static string tempDate ="";
+        string baseUri = "http://localhost:64862";
 
-		/// <summary>
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// and generate the next ID also.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected void Page_Load(object sender, System.EventArgs e)
+        /// <summary>
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// and generate the next ID also.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here
 			try
@@ -118,34 +123,42 @@ namespace Servosms.Module.Inventory
 		/// Its fills all the Product Name combos with Product Names and their packege.
 		/// </summary>
 		public void fillCombo()
-		{
-			//DropDownList[] Products = {DropOutProd1,DropOutProd2,DropOutProd3,DropOutProd4,DropInProd1,DropInProd2,DropInProd3,DropInProd4};
+		{			
 			HtmlInputText[] Products = {DropOutProd1,DropOutProd2,DropOutProd3,DropOutProd4,DropInProd1,DropInProd2,DropInProd3,DropInProd4};
 			try
 			{
-				SqlDataReader SqlDtr = null;
-				//for(int i= 0; i< Products.Length; i++)
-				//{
-					//Products[i].Items.Clear();
-					//Products[i].Items.Add("Select"); 
-					//Products[i].Value = "Select";
-				//}
-				
-				dbobj.SelectQuery("Select case when pack_type != '' then Prod_Name+':'+Pack_Type else Prod_Name  end from products order by Prod_Name",ref SqlDtr);
-				if(SqlDtr.HasRows)
-				{
-					texthiddenprod.Value="Select,";
-					while(SqlDtr.Read())
-					{
-						//					for(int i= 0; i< Products.Length; i++)
-						//					{
-						//						Products[i].Items.Add(SqlDtr.GetValue(0).ToString() ); 
-						//					}
-						texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+","; 
-					}
-				}
-				SqlDtr.Close();
-			}
+                string strVehicleLBID = string.Empty;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/StockAdjustment/GetFillCombo").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        texthiddenprod.Value = JsonConvert.DeserializeObject<string>(id);                        
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+                //dbobj.SelectQuery("Select case when pack_type != '' then Prod_Name+':'+Pack_Type else Prod_Name  end from products order by Prod_Name",ref SqlDtr);
+                //if(SqlDtr.HasRows)
+                //{
+                //	texthiddenprod.Value="Select,";
+                //	while(SqlDtr.Read())
+                //	{
+                //		//					for(int i= 0; i< Products.Length; i++)
+                //		//					{
+                //		//						Products[i].Items.Add(SqlDtr.GetValue(0).ToString() ); 
+                //		//					}
+                //		texthiddenprod.Value+=SqlDtr.GetValue(0).ToString()+","; 
+                //	}
+                //}
+                //SqlDtr.Close();
+            }
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:StockAdjustment.aspx,Method:fillCombo()  EXCEPTION: "+ ex.Message+".  UserID: "+uid);	
@@ -158,43 +171,61 @@ namespace Servosms.Module.Inventory
 		/// </summary>
 		public void getStoreIn()
 		{
-			SqlDataReader SqlDtr = null;
-			SqlDataReader SqlDtr1= null;
-			SqlDataReader SqlDtr2 = null;
-			string product_info="";
-			string product_info1 = "";
-			string product_info2 = "";
+			//SqlDataReader SqlDtr = null;
+			//SqlDataReader SqlDtr1= null;
+			//SqlDataReader SqlDtr2 = null;
+			//string product_info="";
+			//string product_info1 = "";
+			//string product_info2 = "";
 			try
 			{
-				dbobj.SelectQuery("Select case when pack_type != '' then Prod_Name+':'+Pack_Type else Prod_Name  end,Category,Store_In,Pack_Type,Prod_ID from products",ref SqlDtr);
-				while(SqlDtr.Read())
-				{
-					if(SqlDtr.GetValue(1).ToString().Equals("Fuel"))
-					{
-						dbobj.SelectQuery("Select Prod_AbbName from tank where Tank_ID = '"+SqlDtr.GetValue(2).ToString()+"'", ref SqlDtr1);
-						if(SqlDtr1.Read())
-						{
-							product_info = product_info+SqlDtr.GetValue(0).ToString().Trim() +"~"+SqlDtr.GetValue(1).ToString().Trim() +"~"+SqlDtr1.GetValue(0).ToString().Trim()+"~"+" "+"#";    
-							product_info1 = product_info1+SqlDtr.GetValue(0).ToString().Trim()+"~"+"1X1#";
-						}
-						SqlDtr1.Close();
-					}
-					else
-					{
-						product_info = product_info+SqlDtr.GetValue(0).ToString().Trim() +"~"+SqlDtr.GetValue(1).ToString().Trim() +"~"+SqlDtr.GetValue(2).ToString().Trim() +"~"+SqlDtr.GetValue(3).ToString().Trim()+"#";    
-						product_info1 = product_info1+SqlDtr.GetValue(0).ToString().Trim()+"~"+SqlDtr.GetValue(3).ToString()+"#";
-					}
-					dbobj.SelectQuery("Select top 1 Closing_Stock from Stock_Master where ProductID = "+SqlDtr.GetValue(4).ToString()+" order by stock_date desc",ref SqlDtr2);
-					if(SqlDtr2.Read())
-					{
-						product_info2 = product_info2 + SqlDtr.GetValue(0).ToString().Trim() +"~"  +SqlDtr2.GetValue(0).ToString()+"#";  
-					}
-					SqlDtr2.Close() ;
-				}
-				SqlDtr.Close();
-				txtTemp.Value = product_info;
-				txtTemp1.Value = product_info1;
-				txtQty.Value = product_info2;
+                StockAdjustmentModel stockAdjust = new StockAdjustmentModel();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/StockAdjustment/GetStoreIn").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        stockAdjust = JsonConvert.DeserializeObject<StockAdjustmentModel>(id);
+                        txtTemp.Value = stockAdjust.product_info;
+                        txtTemp1.Value = stockAdjust.product_info1;
+                        txtQty.Value = stockAdjust.product_info2;
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+    //            dbobj.SelectQuery("Select case when pack_type != '' then Prod_Name+':'+Pack_Type else Prod_Name  end,Category,Store_In,Pack_Type,Prod_ID from products",ref SqlDtr);
+				//while(SqlDtr.Read())
+				//{
+				//	if(SqlDtr.GetValue(1).ToString().Equals("Fuel"))
+				//	{
+				//		dbobj.SelectQuery("Select Prod_AbbName from tank where Tank_ID = '"+SqlDtr.GetValue(2).ToString()+"'", ref SqlDtr1);
+				//		if(SqlDtr1.Read())
+				//		{
+				//			product_info = product_info+SqlDtr.GetValue(0).ToString().Trim() +"~"+SqlDtr.GetValue(1).ToString().Trim() +"~"+SqlDtr1.GetValue(0).ToString().Trim()+"~"+" "+"#";    
+				//			product_info1 = product_info1+SqlDtr.GetValue(0).ToString().Trim()+"~"+"1X1#";
+				//		}
+				//		SqlDtr1.Close();
+				//	}
+				//	else
+				//	{
+				//		product_info = product_info+SqlDtr.GetValue(0).ToString().Trim() +"~"+SqlDtr.GetValue(1).ToString().Trim() +"~"+SqlDtr.GetValue(2).ToString().Trim() +"~"+SqlDtr.GetValue(3).ToString().Trim()+"#";    
+				//		product_info1 = product_info1+SqlDtr.GetValue(0).ToString().Trim()+"~"+SqlDtr.GetValue(3).ToString()+"#";
+				//	}
+				//	dbobj.SelectQuery("Select top 1 Closing_Stock from Stock_Master where ProductID = "+SqlDtr.GetValue(4).ToString()+" order by stock_date desc",ref SqlDtr2);
+				//	if(SqlDtr2.Read())
+				//	{
+				//		product_info2 = product_info2 + SqlDtr.GetValue(0).ToString().Trim() +"~"  +SqlDtr2.GetValue(0).ToString()+"#";  
+				//	}
+				//	SqlDtr2.Close() ;
+				//}
+				//SqlDtr.Close();
+				
 			}
 			catch(Exception ex)
 			{
@@ -207,18 +238,34 @@ namespace Servosms.Module.Inventory
 		/// </summary>
 		public void getID()
 		{
-			SqlDataReader SqlDtr = null;
+			//SqlDataReader SqlDtr = null;
 			try
 			{
-				dbobj.SelectQuery("Select max(SAV_ID)+1 from Stock_Adjustment",ref SqlDtr);
-				if(SqlDtr.Read())
-				{
-					if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))   
-						lblSAV_ID.Text  = SqlDtr.GetValue(0).ToString();
-					else
-						lblSAV_ID.Text = "1001";
-				}
-				SqlDtr.Close();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var Res = client.GetAsync("api/StockAdjustment/GetNextStockAdjustID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        lblSAV_ID.Text = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+    //            dbobj.SelectQuery("Select max(SAV_ID)+1 from Stock_Adjustment",ref SqlDtr);
+				//if(SqlDtr.Read())
+				//{
+				//	if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))   
+				//		lblSAV_ID.Text  = SqlDtr.GetValue(0).ToString();
+				//	else
+				//		lblSAV_ID.Text = "1001";
+				//}
+				//SqlDtr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -421,39 +468,57 @@ namespace Servosms.Module.Inventory
 		{
 			try
 			{
-				SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-				InventoryClass obj = new InventoryClass();
-				SqlDataReader rdr;
-				SqlCommand cmd;
-				//coment by vikas 18.06.09 rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+dropInvoiceNo.SelectedItem.Text+"'");
-				rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+DropSavID.SelectedItem.Text+"' and trans_type='Stock Adjustment (OUT)'");
-				while(rdr.Read())
-				{
-					//******************************
-					string s="update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'";
-					Con.Open();
-					cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
-					//cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"' and stock_date='"+GenUtil.str2MMDDYYYY(tempInvoiceDate.Value)+"'",Con);
-					cmd.ExecuteNonQuery();
-					cmd.Dispose();
-					Con.Close();
-					
-					/*******Add by vikas 19.06.09**********************/
-					Con.Open();
-					cmd = new SqlCommand("update BatchNo set Qty=Qty+"+rdr["Qty"].ToString()+" where Prod_ID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
-					cmd.ExecuteNonQuery();
-					cmd.Dispose();
-					Con.Close();
-					/************************************************/
-				}
-				rdr.Close();
-				Con.Open();
-				cmd = new SqlCommand("delete Batch_Transaction where Trans_ID='"+DropSavID.SelectedItem.Text+"' and Trans_Type='Stock Adjustment (OUT)'",Con);
-				cmd.ExecuteNonQuery();
-				cmd.Dispose();
-				Con.Close();
-				
-			}
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(DropSavID.SelectedItem.Text.Trim());
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/StockAdjustment/UpdateBatchNo?DropSavID=" + DropSavID.SelectedItem.Text.Trim(), byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;                                               
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+
+                //SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+                //InventoryClass obj = new InventoryClass();
+                //SqlDataReader rdr;
+                //SqlCommand cmd;
+                ////coment by vikas 18.06.09 rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+dropInvoiceNo.SelectedItem.Text+"'");
+                //rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+DropSavID.SelectedItem.Text+"' and trans_type='Stock Adjustment (OUT)'");
+                //while(rdr.Read())
+                //{
+                //	//******************************
+                //	string s="update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'";
+                //	Con.Open();
+                //	cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
+                //	//cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"' and stock_date='"+GenUtil.str2MMDDYYYY(tempInvoiceDate.Value)+"'",Con);
+                //	cmd.ExecuteNonQuery();
+                //	cmd.Dispose();
+                //	Con.Close();
+
+                //	/*******Add by vikas 19.06.09**********************/
+                //	Con.Open();
+                //	cmd = new SqlCommand("update BatchNo set Qty=Qty+"+rdr["Qty"].ToString()+" where Prod_ID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
+                //	cmd.ExecuteNonQuery();
+                //	cmd.Dispose();
+                //	Con.Close();
+                //	/************************************************/
+                //}
+                //rdr.Close();
+                //Con.Open();
+                //cmd = new SqlCommand("delete Batch_Transaction where Trans_ID='"+DropSavID.SelectedItem.Text+"' and Trans_Type='Stock Adjustment (OUT)'",Con);
+                //cmd.ExecuteNonQuery();
+                //cmd.Dispose();
+                //Con.Close();
+
+            }
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form : SalesInvoice.aspx, Method : UpdateBatchNo() EXCEPTION :  "+ ex.Message+"   "+uid);
@@ -466,39 +531,58 @@ namespace Servosms.Module.Inventory
 		{
 			try
 			{
-				SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-				InventoryClass obj = new InventoryClass();
-				SqlDataReader rdr;
-				SqlCommand cmd;
-				//coment by vikas 18.06.09 rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+dropInvoiceNo.SelectedItem.Text+"'");
-				rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+DropSavID.SelectedItem.Text+"' and trans_type='Stock Adjustment (IN)'");
-				while(rdr.Read())
-				{
-					//******************************
-					string s="update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'";
-					Con.Open();
-					cmd = new SqlCommand("update StockMaster_Batch set Receipt=Receipt-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock-"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
-					//cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"' and stock_date='"+GenUtil.str2MMDDYYYY(tempInvoiceDate.Value)+"'",Con);
-					cmd.ExecuteNonQuery();
-					cmd.Dispose();
-					Con.Close();
-					
-					/*******Add by vikas 19.06.09**********************/
-					Con.Open();
-					cmd = new SqlCommand("update BatchNo set Qty=Qty-"+rdr["Qty"].ToString()+" where Prod_ID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
-					cmd.ExecuteNonQuery();
-					cmd.Dispose();
-					Con.Close();
-					/************************************************/
-				}
-				rdr.Close();
-				Con.Open();
-				cmd = new SqlCommand("delete Batch_Transaction where Trans_ID='"+DropSavID.SelectedItem.Text+"' and Trans_Type='Stock Adjustment (IN)'",Con);
-				cmd.ExecuteNonQuery();
-				cmd.Dispose();
-				Con.Close();
-				
-			}
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(DropSavID.SelectedItem.Text.Trim());
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/StockAdjustment/UpdateBatchNo_In?DropSavID=" + DropSavID.SelectedItem.Text.Trim(), byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        MessageBox.Show("Route Deleted");
+                        
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+                //SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
+                //InventoryClass obj = new InventoryClass();
+                //SqlDataReader rdr;
+                //SqlCommand cmd;
+                ////coment by vikas 18.06.09 rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+dropInvoiceNo.SelectedItem.Text+"'");
+                //rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+DropSavID.SelectedItem.Text+"' and trans_type='Stock Adjustment (IN)'");
+                //while(rdr.Read())
+                //{
+                //	//******************************
+                //	string s="update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'";
+                //	Con.Open();
+                //	cmd = new SqlCommand("update StockMaster_Batch set Receipt=Receipt-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock-"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
+                //	//cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"' and stock_date='"+GenUtil.str2MMDDYYYY(tempInvoiceDate.Value)+"'",Con);
+                //	cmd.ExecuteNonQuery();
+                //	cmd.Dispose();
+                //	Con.Close();
+
+                //	/*******Add by vikas 19.06.09**********************/
+                //	Con.Open();
+                //	cmd = new SqlCommand("update BatchNo set Qty=Qty-"+rdr["Qty"].ToString()+" where Prod_ID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
+                //	cmd.ExecuteNonQuery();
+                //	cmd.Dispose();
+                //	Con.Close();
+                //	/************************************************/
+                //}
+                //rdr.Close();
+                //Con.Open();
+                //cmd = new SqlCommand("delete Batch_Transaction where Trans_ID='"+DropSavID.SelectedItem.Text+"' and Trans_Type='Stock Adjustment (IN)'",Con);
+                //cmd.ExecuteNonQuery();
+                //cmd.Dispose();
+                //Con.Close();
+
+            }
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form : SalesInvoice.aspx, Method : UpdateBatchNo() EXCEPTION :  "+ ex.Message+"   "+uid);

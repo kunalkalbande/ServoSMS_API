@@ -103,18 +103,9 @@ namespace Servosms.Module.Admin
 		/// This method is used to fatch the next Role ID from Roles table and stored in textbox.
 		/// </summary>
 		public void GetNextRoleID()
-		{
-			//EmployeeClass obj=new EmployeeClass();
-			//SqlDataReader SqlDtr;
-			//string sql;
+		{			
 			try
-			{
-                //#region Fetch Next Role ID
-                //sql="select max(Role_ID)+1 from Roles";
-                //SqlDtr =obj.GetRecordSet(sql);
-                //while(SqlDtr.Read())
-                //{
-                //	lblRoleID.Text=SqlDtr.GetSqlValue(0).ToString ();
+			{                
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(baseUri);
@@ -126,12 +117,11 @@ namespace Servosms.Module.Admin
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lblRoleID.Text = JsonConvert.DeserializeObject<string>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 if (lblRoleID.Text=="Null")
-						lblRoleID.Text ="1001";
-				//}		
-				//SqlDtr.Close();
-				//#endregion
+						lblRoleID.Text ="1001";				
 			}
 			catch(Exception ex)
 			{
@@ -165,19 +155,18 @@ namespace Servosms.Module.Admin
                         if (response.IsSuccessStatusCode)
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
-                            //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                            CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:btnUpdateClick   Role  name " + obj.Role_Name + " Updated   " + uid);
+                            MessageBox.Show("Role Updated");
                         }
-                    }
-                    //obj.UpdateRoles();
-                    CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:btnUpdateClick   Role  name "+obj.Role_Name +" Updated   "+uid);
-					MessageBox.Show("Role Updated");
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }                                       
 				}
 				else
 				{
 					#region Check Role Already Created or Not
 					int count=0;
-					//DBOperations.DBUtil  dbobj=new DBOperations.DBUtil();
-					//dbobj.ExecuteScalar("select count(*) from Roles where Role_Name='"+ txtRoleName.Text.Trim() +"'",ref count);
+					
                     using (var client = new HttpClient())
                     {
                         client.BaseAddress = new Uri(baseUri);
@@ -189,6 +178,8 @@ namespace Servosms.Module.Admin
                             var id = Res.Content.ReadAsStringAsync().Result;
                             count = JsonConvert.DeserializeObject<int>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     if (count>0)
@@ -213,13 +204,12 @@ namespace Servosms.Module.Admin
                         if (response.IsSuccessStatusCode)
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
-                            //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                            CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:btnUpdate_Click   Role Name " + obj.Role_Name + " Created   " + uid);
+                            MessageBox.Show("Role Created");
                         }
-                    }
-
-                    //obj.InsertRoles();	
-					CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:btnUpdate_Click   Role Name "+obj.Role_Name +" Created   "+uid);
-					MessageBox.Show("Role Created");
+                        else
+                            response.EnsureSuccessStatusCode();
+                    }                    
 				}
 				Clear();
 				GetNextRoleID();
@@ -263,6 +253,8 @@ namespace Servosms.Module.Admin
                         var id = Res.Content.ReadAsStringAsync().Result;
                         lstDropRoleID = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (lstDropRoleID != null)
@@ -270,16 +262,6 @@ namespace Servosms.Module.Admin
                     foreach (var RoleID in lstDropRoleID)
                         dropRoleID.Items.Add(RoleID);
                 }
-
-    //            DBOperations.DBUtil obj=new DBOperations.DBUtil();
-				//SqlDataReader SqlDtr=null;
-
-				//obj.SelectQuery("select Role_ID from Roles",ref SqlDtr);
-				//while(SqlDtr.Read())
-				//{
-				//	dropRoleID.Items.Add(SqlDtr.GetValue(0).ToString());
-				//}
-				//SqlDtr.Close();
 				#endregion
 			}
 			catch(Exception ex)
@@ -299,8 +281,7 @@ namespace Servosms.Module.Admin
                 RolesModel role = new RolesModel();
 
                 DBOperations.DBUtil obj=new DBOperations.DBUtil();
-				//SqlDataReader SqlDtr=null;
-
+				
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(baseUri);
@@ -313,15 +294,16 @@ namespace Servosms.Module.Admin
                         var id = Res.Content.ReadAsStringAsync().Result;
                         role = JsonConvert.DeserializeObject<RolesModel>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
-
-                //obj.SelectQuery("select * from roles where Role_Id='"+ dropRoleID.SelectedItem.Value +"'",ref SqlDtr);
+                
 				if(role != null)
 				{
 					txtRoleName.Text= role.Role_Name.ToString();
 					txtDesc.Text= role.Description.ToString();
 				}
-				//SqlDtr.Close();
+				
 				CreateLogFiles.ErrorLog("Form:Roles.aspx,Method:dropRoleID_SelectedIndexChanged    "+"  userid "+uid);
 			
 			}
@@ -357,6 +339,8 @@ namespace Servosms.Module.Admin
                         var id = Res.Content.ReadAsStringAsync().Result;
                         output = JsonConvert.DeserializeObject<int>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 //DBOperations.DBUtil obj=new DBOperations.DBUtil();
@@ -382,13 +366,14 @@ namespace Servosms.Module.Admin
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
                             output = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(responseString);
+                            dropRoleID.Items.Remove(dropRoleID.SelectedItem.Value);
+                            MessageBox.Show("Role Deleted");
+                            CreateLogFiles.ErrorLog("Form:Roles.aspx,Method: btnDelete_Click" + uid);
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
-
-                    //obj.Insert_or_Update("delete from roles where Role_Id='"+ dropRoleID.SelectedItem.Value +"'",ref output);
-					dropRoleID.Items.Remove(dropRoleID.SelectedItem.Value); 
-					MessageBox.Show("Role Deleted");
-					CreateLogFiles.ErrorLog("Form:Roles.aspx,Method: btnDelete_Click"+ uid);
+                    
 					Clear();
 					lblRoleID.Visible=true;
 					dropRoleID.Visible=false;
