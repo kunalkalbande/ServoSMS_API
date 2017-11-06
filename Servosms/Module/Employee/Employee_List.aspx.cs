@@ -19,8 +19,11 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using RMG;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Servosms.Module.Employee
 {
@@ -33,9 +36,9 @@ namespace Servosms.Module.Employee
 		DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string uid;
 		string View_flag="0", Add_Flag="0", Edit_Flag="0", Del_Flag="0";
-		
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
+        string BaseUri = "http://localhost:64862";
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
 		{
 			//
 			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
@@ -73,7 +76,8 @@ namespace Servosms.Module.Employee
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:EmployeeList.aspx,Class:Employee.cs,Method:btnSearch_Click"+  "EXCEPTION"+ ex.Message+  uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 		
 		/// <summary>
@@ -227,12 +231,31 @@ namespace Servosms.Module.Employee
 			try
 			{
 				int Count=0;
-				SqlDataReader rdr=null;
-				dbobj.SelectQuery("select count(*) from AccountsLedgerTable where Ledger_ID='"+e.Item.Cells[0].Text+"'",ref rdr);
-				if(rdr.Read())
-				{
-					Count=int.Parse(rdr.GetValue(0).ToString());
-				}
+				//SqlDataReader rdr=null;
+
+                string str;
+                int Count1=0;
+                str = e.Item.Cells[0].Text;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/EmployeeList/FetchData?str="+str).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        Count1 = JsonConvert.DeserializeObject<int>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                Count = Count1;
+    //            dbobj.SelectQuery("select count(*) from AccountsLedgerTable where Ledger_ID='"+e.Item.Cells[0].Text+"'",ref rdr);
+				//if(rdr.Read())
+				//{
+				//	Count=int.Parse(rdr.GetValue(0).ToString());
+				//}
 				if(Count>1)
 				{
 					MessageBox.Show("Please Remove The All Transaction Concerning Employee");
@@ -240,21 +263,53 @@ namespace Servosms.Module.Employee
 				}
 				string strCon=System.Configuration.ConfigurationSettings.AppSettings["Servosms"];
 				SqlCommand sqlCmd=new SqlCommand();
-				sqlCmd.CommandText="Delete from Employee Where Emp_ID='"+e.Item.Cells[1].Text+"'";
-				sqlConn.ConnectionString=strCon;
-				sqlConn.Open();
-				sqlCmd.Connection=sqlConn;
-				sqlCmd.ExecuteNonQuery();
-				//*********	
-				sqlConn.Close();
-				sqlCmd.Dispose();
-				sqlCmd.CommandText="Delete from Ledger_Master Where Ledger_ID='"+e.Item.Cells[0].Text+"'";
-				sqlConn.ConnectionString=strCon;
-				sqlConn.Open();
-				sqlCmd.Connection=sqlConn;
-				sqlCmd.ExecuteNonQuery();
-				sqlConn.Close();
-				sqlCmd.Dispose();
+
+                str = e.Item.Cells[1].Text;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/EmployeeList/DeleteEmployee?str=" + str).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        //LedgerName = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+                //            sqlCmd.CommandText="Delete from Employee Where Emp_ID='"+e.Item.Cells[1].Text+"'";
+                //sqlConn.ConnectionString=strCon;
+                //sqlConn.Open();
+                //sqlCmd.Connection=sqlConn;
+                //sqlCmd.ExecuteNonQuery();
+                ////*********	
+                //sqlConn.Close();
+                //sqlCmd.Dispose();
+                str = e.Item.Cells[0].Text;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/EmployeeList/DeleteLedgerMaster?str=" + str).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        //LedgerName = JsonConvert.DeserializeObject<List<string>>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+    //            sqlCmd.CommandText="Delete from Ledger_Master Where Ledger_ID='"+e.Item.Cells[0].Text+"'";
+				//sqlConn.ConnectionString=strCon;
+				//sqlConn.Open();
+				//sqlCmd.Connection=sqlConn;
+				//sqlCmd.ExecuteNonQuery();
+				//sqlConn.Close();
+				//sqlCmd.Dispose();
 				CreateLogFiles.ErrorLog("Form:EmployeeList.aspx,Class:Employee.cs,Method:GridSearch_DeleteCommand"+" Employee "+ e.Item.Cells[1].Text+" IS DELETED "+"  "+" USER ID "+ uid);
 				MessageBox.Show("Employee Deleted");
 				Response.Redirect("Employee_List.aspx",false);
@@ -262,7 +317,8 @@ namespace Servosms.Module.Employee
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:EmployeeList.aspx,Class:Employee.cs,Method:GridSearch_DeleteCommand"+" Employee "+ e.Item.Cells[1].Text+" IS DELETED "+"  "+ex.Message+"  USERID  "+ uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		protected void GridSearch_SelectedIndexChanged(object sender, System.EventArgs e)

@@ -93,6 +93,8 @@ namespace Servosms.Module.Accounts
                         var id = Res.Content.ReadAsStringAsync().Result;
                         str = JsonConvert.DeserializeObject<string>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 Acc_Date = str;
                 //SqlDataReader rdr = obj.GetRecordSet("select Acc_Date_from from Organisation");
@@ -167,6 +169,8 @@ namespace Servosms.Module.Accounts
                         var id = Res.Content.ReadAsStringAsync().Result;
                         str = JsonConvert.DeserializeObject<string>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 texthiddenprod.Value = str;
                 //dbobj.SelectQuery("Select Ledger_Name,Ledger_ID from Ledger_Master lm,Ledger_master_sub_grp lmsg  where  lm.sub_grp_id = lmsg.sub_grp_id and lmsg.sub_grp_name not like 'Bank%' and lmsg.sub_grp_name <> 'Cash in hand' and lmsg.sub_grp_name <> 'Discount' Order by Ledger_Name", ref SqlDtr);
@@ -193,6 +197,8 @@ namespace Servosms.Module.Accounts
                         var id = Res.Content.ReadAsStringAsync().Result;
                         payment = JsonConvert.DeserializeObject<PaymentModels>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 foreach (var item in payment.DropBy1)
                 {
@@ -261,6 +267,7 @@ namespace Servosms.Module.Accounts
             catch (Exception ex)
             {
                 CreateLogFiles.ErrorLog("Form:Payment,Method:btnSave_click Exception: " + ex.Message + "  User: " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
             }
         }
 
@@ -325,6 +332,8 @@ namespace Servosms.Module.Accounts
                         string responseString = response.Content.ReadAsStringAsync().Result;
                         payment = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentModels>(responseString);
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
                 //payment.c=
 
@@ -426,6 +435,8 @@ namespace Servosms.Module.Accounts
                             var id = Res.Content.ReadAsStringAsync().Result;
                             payment = JsonConvert.DeserializeObject<PaymentModels>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();  
                     }
                     addr = payment.addr;
                     city = payment.city;
@@ -606,6 +617,8 @@ namespace Servosms.Module.Accounts
                         var id = Res.Content.ReadAsStringAsync().Result;
                         LedgerName = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 if (LedgerName != null)
                 {
@@ -627,6 +640,7 @@ namespace Servosms.Module.Accounts
             catch (Exception ex)
             {
                 CreateLogFiles.ErrorLog("Form:Payment,Method:btnEdit1_Click Exception: " + ex.Message + "  User: " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
             }
         }
 
@@ -661,6 +675,8 @@ namespace Servosms.Module.Accounts
                         var id = Res.Content.ReadAsStringAsync().Result;
                         payment = JsonConvert.DeserializeObject<PaymentModels>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
 
                 }
 
@@ -696,6 +712,7 @@ namespace Servosms.Module.Accounts
             catch (Exception ex)
             {
                 CreateLogFiles.ErrorLog("Form:Payment,Method:DropLedgerName1_SelectedIndexChanged Exception: " + ex.Message + "  User: " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
             }
         }
 
@@ -753,6 +770,7 @@ namespace Servosms.Module.Accounts
             catch (Exception ex)
             {
                 CreateLogFiles.ErrorLog("Form:Payment,Method:btnEdit_Click Exception: " + ex.Message + "  User: " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
             }
         }
 
@@ -809,6 +827,8 @@ namespace Servosms.Module.Accounts
                     string pay = JsonConvert.DeserializeObject<string>(id);
                     By_ID1 = pay;
                 }
+                else
+                    Res.EnsureSuccessStatusCode();
             }
 
 
@@ -838,6 +858,8 @@ namespace Servosms.Module.Accounts
                     Cust_ID = payment.Ledger_ID1;
                     OldCust_ID = payment.OldLedger_ID;
                 }
+                else
+                    Res.EnsureSuccessStatusCode();
             }
 
             //dbobj.SelectQuery("select Cust_ID from Customer,Ledger_Master where Ledger_Name = Cust_Name and Ledger_ID = '" + Ledger_ID1 + "'", ref rdr);
@@ -881,6 +903,8 @@ namespace Servosms.Module.Accounts
                         string responseString = response.Content.ReadAsStringAsync().Result;
                         payment1 = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentModels>(responseString);
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //dbobj.Insert_or_Update("Update Payment_transaction set Ledger_ID_Dr = " + Ledger_ID1 + ",Amount1 = " + Amount1 + ",Ledger_ID_Cr = " + By_ID1 + ",Amount2 = " + Amount1 + ",Bank_Name='" + Bank_name1 + "',Cheque_No='" + Cheque_No1 + "',Cheque_date = CONVERT(datetime,'" + dtDate + "', 103),Narration ='" + narration1 + "',Entered_By = '" + uid + "', Entry_Date= CONVERT(datetime,'" + Entry_Date + "', 103) where Voucher_ID = " + strArr[1].Trim(), ref c);
@@ -933,6 +957,8 @@ namespace Servosms.Module.Accounts
                         string responseString = response.Content.ReadAsStringAsync().Result;
                         payment1 = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentModels>(responseString);
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //dbobj.Insert_or_Update("delete from payment_transaction where voucher_id = " + strArr[1].Trim(), ref c);
@@ -999,6 +1025,8 @@ namespace Servosms.Module.Accounts
                         var id = Res.Content.ReadAsStringAsync().Result;
                         payment = JsonConvert.DeserializeObject<PaymentModels>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
 
                 }
 
@@ -1030,6 +1058,7 @@ namespace Servosms.Module.Accounts
             catch (Exception ex)
             {
                 CreateLogFiles.ErrorLog("Form:Payment,Method:btnDelete_Click Exception: " + ex.Message + "  User: " + uid);
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
             }
         }
 
@@ -1097,6 +1126,8 @@ namespace Servosms.Module.Accounts
                     var id = Res.Content.ReadAsStringAsync().Result;
                     payment = JsonConvert.DeserializeObject<PaymentModels>(id);
                 }
+                else
+                    Res.EnsureSuccessStatusCode();
             }
 
             //dbobj.SelectQuery("select * from AccountsLedgerTable where Ledger_ID=(select Ledger_ID from Ledger_Master where sub_grp_id=118) and Entry_Date>='" + Invoice_Date + "' order by entry_date", ref rdr);
@@ -1195,6 +1226,8 @@ namespace Servosms.Module.Accounts
                         var id = Res.Content.ReadAsStringAsync().Result;
                         //LedgerName = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 //dbobj.ExecProc(DBOperations.OprType.Insert, "UpdateAccountsLedgerForCustomer", ref obj1, "@Ledger_ID", LedgerID[k].ToString(), "@Invoice_Date", Invoice_Date);
@@ -1243,6 +1276,8 @@ namespace Servosms.Module.Accounts
                     var id = Res.Content.ReadAsStringAsync().Result;
                     //LedgerName = JsonConvert.DeserializeObject<List<string>>(id);
                 }
+                else
+                    Res.EnsureSuccessStatusCode();
             }
 
             //rdr = obj.GetRecordSet("select top 1 Entry_Date from AccountsLedgerTable where Ledger_ID='" + Ledger_ID.ToString() + "' and Entry_Date<=Convert(datetime,'" + Invoice_Date + "',103) order by entry_date desc");

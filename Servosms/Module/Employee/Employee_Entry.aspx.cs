@@ -112,12 +112,14 @@ namespace Servosms.Module.Employee
                         client.BaseAddress = new Uri(BaseUri);
                         client.DefaultRequestHeaders.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        var Res = client.GetAsync("api/payment/FetchCity").Result;
+                        var Res = client.GetAsync("api/EmployeeEntry/FetchCity").Result;
                         if (Res.IsSuccessStatusCode)
                         {
                             var id = Res.Content.ReadAsStringAsync().Result;
                             DropCity1 = JsonConvert.DeserializeObject<List<string>>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
                     foreach (var item in DropCity1)
                     {
@@ -141,12 +143,14 @@ namespace Servosms.Module.Employee
                         client.BaseAddress = new Uri(BaseUri);
                         client.DefaultRequestHeaders.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        var Res = client.GetAsync("api/payment/FetchState").Result;
+                        var Res = client.GetAsync("api/EmployeeEntry/FetchState").Result;
                         if (Res.IsSuccessStatusCode)
                         {
                             var id = Res.Content.ReadAsStringAsync().Result;
                             DropState1 = JsonConvert.DeserializeObject<List<string>>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
                     foreach (var item in DropState1)
                     {
@@ -171,12 +175,14 @@ namespace Servosms.Module.Employee
                         client.BaseAddress = new Uri(BaseUri);
                         client.DefaultRequestHeaders.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        var Res = client.GetAsync("api/payment/FetchCountry").Result;
+                        var Res = client.GetAsync("api/EmployeeEntry/FetchCountry").Result;
                         if (Res.IsSuccessStatusCode)
                         {
                             var id = Res.Content.ReadAsStringAsync().Result;
                             DropCountry1 = JsonConvert.DeserializeObject<List<string>>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
                     foreach (var item in DropCountry1)
                     {
@@ -206,7 +212,8 @@ namespace Servosms.Module.Employee
 				catch(Exception ex)
 				{
 					CreateLogFiles.ErrorLog("Form:Employee_Entry.aspx,Method:pageload "+ " EXCEPTION  "+ex.Message+"  "+ uid );
-				}
+                    Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+                }
 			}
 		}
 
@@ -227,12 +234,14 @@ namespace Servosms.Module.Employee
                     client.BaseAddress = new Uri(BaseUri);
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var Res = client.GetAsync("api/payment/FetchData").Result;
+                    var Res = client.GetAsync("api/EmployeeEntry/FetchData").Result;
                     if (Res.IsSuccessStatusCode)
                     {
                         var id = Res.Content.ReadAsStringAsync().Result;
                         str = JsonConvert.DeserializeObject<string>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 txtbeatname.Text = str;
     //            sql ="select city,state,country from beat_master";
@@ -248,7 +257,8 @@ namespace Servosms.Module.Employee
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:Employee_Entry.aspx,class:Inventoryclass.cs,method:getbeat()"+"Exception"+ex.Message+uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
@@ -268,12 +278,14 @@ namespace Servosms.Module.Employee
                 client.BaseAddress = new Uri(BaseUri);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var Res = client.GetAsync("api/payment/FetchVehicle").Result;
+                var Res = client.GetAsync("api/EmployeeEntry/FetchVehicle").Result;
                 if (Res.IsSuccessStatusCode)
                 {
                     var id = Res.Content.ReadAsStringAsync().Result;
                     Vehicle = JsonConvert.DeserializeObject<List<string>>(id);
                 }
+                else
+                    Res.EnsureSuccessStatusCode();
             }
             foreach (var item in Vehicle)
             {
@@ -405,7 +417,8 @@ namespace Servosms.Module.Employee
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form:Employee_Entry.aspx,Class:Employeee.cs,Methd: btnUpdate_Click   Exception: "+ex.Message +"   userid  "+str2+"  "+uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 
 		/// <summary>
