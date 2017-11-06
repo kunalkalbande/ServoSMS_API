@@ -12,15 +12,19 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient ;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using Servosms.Sysitem.Classes ;
+using Servosms.Sysitem.Classes;
 using RMG;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Servosms.Module.Employee
 {
@@ -32,15 +36,15 @@ namespace Servosms.Module.Employee
 		protected System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
 		DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string uid;
-
-		/// <summary>
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string BaseUri = "http://localhost:64862";
+        /// <summary>
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			try
 			{
@@ -89,17 +93,36 @@ namespace Servosms.Module.Employee
 
 					#region Fetch Employee ID and Name of All Employee
 					EmployeeClass  obj=new EmployeeClass();
-					SqlDataReader SqlDtr;
-					string sql;
-	
-					//coment by vikas 17.11.2012 sql="select Emp_ID,Emp_Name from Employee order by Emp_Name";
-					sql="select Emp_ID,Emp_Name from Employee where status='1' order by Emp_Name";
-					SqlDtr=obj.GetRecordSet(sql);
-					while(SqlDtr.Read())
-					{
-						DropEmpName.Items.Add(SqlDtr.GetValue(0).ToString ()+":"+SqlDtr.GetValue(1).ToString());				
-					}
-					SqlDtr.Close();
+					
+
+                    List<string> Employee = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/OTCompensation/GetEmployeeData").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            Employee = JsonConvert.DeserializeObject<List<string>>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+
+                    }
+                    foreach (var item in Employee)
+                    {
+                        DropEmpName.Items.Add(item);
+                    }
+
+     //               sql ="select Emp_ID,Emp_Name from Employee where status='1' order by Emp_Name";
+					//SqlDtr=obj.GetRecordSet(sql);
+					//while(SqlDtr.Read())
+					//{
+					//	DropEmpName.Items.Add(SqlDtr.GetValue(0).ToString ()+":"+SqlDtr.GetValue(1).ToString());				
+					//}
+					//SqlDtr.Close();
 					#endregion
 				}
 				catch(Exception ex)
@@ -168,21 +191,81 @@ namespace Servosms.Module.Employee
                     MessageBox.Show("Date From Should be less than Date To");
                     return;
 				}
-				int Count=0;
-				string str ="";
-				str = "select count(*) from OverTime_Register where Emp_ID='"+DropEmpName.SelectedItem.Value.Substring(0,DropEmpName.SelectedItem.Value.LastIndexOf(":"))+"' and cast(floor(cast(cast(ot_from as datetime) as float)) as datetime) <='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"' and cast(floor(cast(cast(ot_to as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"'";
-				dbobj.ExecuteScalar(str,ref Count);
+				int Count=0,Count1=0;
+				string str ="",str1,str2,str3;
+
+                str1=DropEmpName.SelectedItem.Value.Substring(0, DropEmpName.SelectedItem.Value.LastIndexOf(":"));
+                str2=GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]);
+                str3 = GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]);
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/OTCompensation/CountOTRegister?str1="+str1+"&str2="+str2+"&str3="+str3).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        Count1 = JsonConvert.DeserializeObject<int>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+
+                }
+                Count = Count1;
+    //            str = "select count(*) from OverTime_Register where Emp_ID='"+DropEmpName.SelectedItem.Value.Substring(0,DropEmpName.SelectedItem.Value.LastIndexOf(":"))+"' and cast(floor(cast(cast(ot_from as datetime) as float)) as datetime) <='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"' and cast(floor(cast(cast(ot_to as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"'";
+				//dbobj.ExecuteScalar(str,ref Count);
 				if(Count>0)
 				{
 					MessageBox.Show("OverTime already Saved");
 					return;
 				}
 				int x=0;
-				str = "select * from OverTime_Register where Emp_ID='"+DropEmpName.SelectedItem.Value.Substring(0,DropEmpName.SelectedItem.Value.LastIndexOf(":"))+"' and cast(floor(cast(cast(ot_from as datetime) as float)) as datetime) <='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"' and cast(floor(cast(cast(ot_to as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"'";
-				dbobj.ExecuteScalar(str,ref Count);
-				if(Count>0)
+                str1 = DropEmpName.SelectedItem.Value.Substring(0, DropEmpName.SelectedItem.Value.LastIndexOf(":"));
+                str2 = GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]);
+                str3 = GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]);
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/OTCompensation/GetOTRegisterData?str1=" + str1 + "&str2=" + str2 + "&str3=" + str3).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        Count1 = JsonConvert.DeserializeObject<int>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+
+                }
+
+    //            str = "select * from OverTime_Register where Emp_ID='"+DropEmpName.SelectedItem.Value.Substring(0,DropEmpName.SelectedItem.Value.LastIndexOf(":"))+"' and cast(floor(cast(cast(ot_from as datetime) as float)) as datetime) <='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"' and cast(floor(cast(cast(ot_to as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"'";
+				//dbobj.ExecuteScalar(str,ref Count);
+                Count = Count1;
+                if (Count>0)
 				{
-					dbobj.Insert_or_Update("delete from OverTime_Register where Emp_ID='"+DropEmpName.SelectedItem.Value.Substring(0,DropEmpName.SelectedItem.Value.LastIndexOf(":"))+"' and cast(floor(cast(cast(ot_from as datetime) as float)) as datetime) <='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"' and cast(floor(cast(cast(ot_to as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"'",ref x);
+                    str1 = DropEmpName.SelectedItem.Value.Substring(0, DropEmpName.SelectedItem.Value.LastIndexOf(":"));
+                    str2 = GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]);
+                    str3 = GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]);
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/OTCompensation/DeleteOTRegisterData?str1=" + str1 + "&str2=" + str2 + "&str3=" + str3).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            //Count1 = JsonConvert.DeserializeObject<int>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+
+                    }
+                    //dbobj.Insert_or_Update("delete from OverTime_Register where Emp_ID='"+DropEmpName.SelectedItem.Value.Substring(0,DropEmpName.SelectedItem.Value.LastIndexOf(":"))+"' and cast(floor(cast(cast(ot_from as datetime) as float)) as datetime) <='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"' and cast(floor(cast(cast(ot_to as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(Request.Form["txtDateFrom"]) +"'",ref x);
 				}
 				#endregion
 				obj.Leave_ID=NextOt_Id();
@@ -198,7 +281,26 @@ namespace Servosms.Module.Employee
 				// calls fuction to insert the leave
 				//obj.InsertLeave();
 				x=0;
-				dbobj.Insert_or_Update("Insert into OverTime_Register (OT_ID,OT_Date,Emp_Id,OT_From,Ot_To) values("+ Convert.ToInt32(obj.Leave_ID)+",'"+ GenUtil.str2MMDDYYYY(todate)+"',"+Emp_id+",'"+ GenUtil.str2MMDDYYYY(txtDateFrom.Text) + "','"+ GenUtil.str2MMDDYYYY(txtDateTO.Text)+"')",ref x);
+                int LeaveID = Convert.ToInt32(obj.Leave_ID);
+                string Todate = GenUtil.str2MMDDYYYY(todate);                   
+                string datefrom = GenUtil.str2MMDDYYYY(txtDateFrom.Text);
+                string dateto = GenUtil.str2MMDDYYYY(txtDateTO.Text);
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/OTCompensation/InsertOTRegisterData?LeaveID=" + LeaveID + "&Todate=" + Todate + "&Emp_id=" + Emp_id + "&datefrom=" + datefrom + "&dateto=" + dateto).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        //Count1 = JsonConvert.DeserializeObject<int>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+
+                }
+                //dbobj.Insert_or_Update("Insert into OverTime_Register (OT_ID,OT_Date,Emp_Id,OT_From,Ot_To) values("+ Convert.ToInt32(obj.Leave_ID)+",'"+ GenUtil.str2MMDDYYYY(todate)+"',"+Emp_id+",'"+ GenUtil.str2MMDDYYYY(txtDateFrom.Text) + "','"+ GenUtil.str2MMDDYYYY(txtDateTO.Text)+"')",ref x);
 				MessageBox.Show("OverTime Information Saved");
 				Clear();
 				
@@ -207,7 +309,8 @@ namespace Servosms.Module.Employee
 			catch(Exception ex)
 			{
 				CreateLogFiles.ErrorLog("Form : OT_Compensation.aspx,Method:btnApply_Click"+"  empname  :" + obj.Emp_Name    +"  is saved  "+"  EXCEPTION  "+ex.Message  +"  userid:   "+uid);
-			}
+                Response.Redirect("../../Sysitem/ErrorPage.aspx", false);
+            }
 		}
 		string Next_id="";
 		public string NextOt_Id()
@@ -216,19 +319,36 @@ namespace Servosms.Module.Employee
 			{
 				Next_id="1";
 				EmployeeClass obj=new EmployeeClass();
-				SqlDataReader rdr=null;
-				string str = "select max(OT_ID) from OverTime_Register";
-				rdr=obj.GetRecordSet(str);
-				while(rdr.Read())
-				{
-					if(rdr.GetValue(0).ToString()!=null && rdr.GetValue(0).ToString()!="")
-					{
-						Next_id=rdr.GetValue(0).ToString();                       
-					}
-					else
-						Next_id="1";
-				}
-				rdr.Close();
+				//SqlDataReader rdr=null;
+                string Nextid = "";
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/OTCompensation/GetNextOTID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        Nextid = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+
+                }
+                Next_id = Nextid;
+    //            string str = "select max(OT_ID) from OverTime_Register";
+    //rdr=obj.GetRecordSet(str);
+    //while(rdr.Read())
+    //{
+    //	if(rdr.GetValue(0).ToString()!=null && rdr.GetValue(0).ToString()!="")
+    //	{
+    //		Next_id=rdr.GetValue(0).ToString();                       
+    //	}
+    //	else
+    //		Next_id="1";
+    //}
+    //rdr.Close();
                 int newID = Convert.ToInt32(Next_id) + 1;
                 Next_id = newID.ToString();
                 return Next_id;
