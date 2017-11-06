@@ -236,7 +236,7 @@ namespace Servosms.Module.Admin
                     client.BaseAddress = new Uri(BaseUri);
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var Res = client.GetAsync("api/OrganizationDetailsController/GetExtraCities").Result;
+                    var Res = client.GetAsync("api/OrganizationDetailsController/GetExtraStates").Result;
                     if (Res.IsSuccessStatusCode)
                     {
                         var disc = Res.Content.ReadAsStringAsync().Result;
@@ -257,7 +257,7 @@ namespace Servosms.Module.Admin
                     client.BaseAddress = new Uri(BaseUri);
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var Res = client.GetAsync("api/OrganizationDetailsController/GetExtraCities").Result;
+                    var Res = client.GetAsync("api/OrganizationDetailsController/GetExtraCountry").Result;
                     if (Res.IsSuccessStatusCode)
                     {
                         var disc = Res.Content.ReadAsStringAsync().Result;

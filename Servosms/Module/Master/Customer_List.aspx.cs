@@ -22,6 +22,9 @@ using System.Data.SqlClient;
 using Servosms.Sysitem.Classes;
 using RMG;
 using DBOperations;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace Servosms.Module.Master
 {
@@ -30,18 +33,17 @@ namespace Servosms.Module.Master
 	/// </summary>
 	public partial class Customer_List : System.Web.UI.Page
 	{
-		DBUtil dbobj=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		string View_flag="0", Add_Flag="0", Edit_Flag="0", Del_Flag="0";
 		string uid;
-
-		/// <summary>
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string BaseUri = "http://localhost:64862";
+        /// <summary>
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			try
 			{
@@ -118,16 +120,38 @@ namespace Servosms.Module.Master
 		{
 			try
 			{
-				PartiesClass obj=new PartiesClass();
-				DataSet ds;
-				ds=obj.ShowCustomerInfo(txtCustID.Text,txtName.Text,txtPlace.Text);
-				//****
-				DataTable dt=ds.Tables[0];
-				DataView dv=new DataView(dt);
-				dv.Sort=System.Convert.ToString(Cache["strorderby"]);
-				//***
-				if(dv.Count>0)
-					//if(ds.Tables[0].Rows.Count>0)
+                PartiesClass obj = new PartiesClass();
+                CustomerModel customer = new CustomerModel();
+                DataSet ds;
+                ds = obj.ShowCustomerInfo(txtCustID.Text, txtName.Text, txtPlace.Text);
+                //****
+                DataTable dt = ds.Tables[0];
+                DataView dv=new DataView(dt);
+                customer.CustomerID = txtCustID.Text;
+                customer.CustomerName = txtName.Text;
+                customer.Place = txtPlace.Text;
+
+                //dv.Sort = System.Convert.ToString(Cache["strorderby"]);
+                //using (var client = new HttpClient())
+                //{
+                //    client.BaseAddress = new Uri(BaseUri);
+                //    var myContent = JsonConvert.SerializeObject(customer);
+                //    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                //    var byteContent = new ByteArrayContent(buffer);
+                //    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                //    client.DefaultRequestHeaders.Accept.Clear();
+                //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                //    var response = client.PostAsync("api/CustomerController/GetCustomersData", byteContent).Result;
+                //    if (response.IsSuccessStatusCode)
+                //    {
+                //        string responseString = response.Content.ReadAsStringAsync().Result;
+                //        dv = JsonConvert.DeserializeObject<DataView>(responseString);
+                //    }
+                //    else
+                //        response.EnsureSuccessStatusCode();
+                //}
+                //dv.Sort = System.Convert.ToString(Cache["strorderby"]);
+                if (dv.Count>0)
 				{
 					GridSearch.DataSource=dv;
 					GridSearch.DataBind();
@@ -235,49 +259,70 @@ namespace Servosms.Module.Master
 					return;
 				}
 				int Count=0;
-				SqlDataReader rdr=null;
-				dbobj.SelectQuery("select count(*) from AccountsLedgerTable where Ledger_ID='"+e.Item.Cells[0].Text+"'",ref rdr);
-				if(rdr.Read())
-				{
-					Count=int.Parse(rdr.GetValue(0).ToString());
-				}
-				if(Count>1)
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/CustomerController/GetCount?Customer="+ e.Item.Cells[0].Text).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        Count = JsonConvert.DeserializeObject<int>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                if (Count>1)
 				{
 					MessageBox.Show("Please Remove The All Transaction Concerning Customer");
 					return;
 				}
-				SqlConnection sqlConn=new SqlConnection();
-				string strCon=System.Configuration.ConfigurationSettings.AppSettings["Servosms"];
-				SqlCommand sqlCmd=new SqlCommand();
-				sqlCmd.CommandText="Delete from Customer Where Cust_ID='"+e.Item.Cells[1].Text+"'";
-				sqlConn.ConnectionString=strCon;
-				sqlConn.Open();
-				sqlCmd.Connection=sqlConn;
-				sqlCmd.ExecuteNonQuery();
-				sqlConn.Close();
-				sqlCmd.Dispose();
-				sqlCmd.CommandText="Delete from Ledger_Master Where Ledger_ID='"+e.Item.Cells[0].Text+"'";
-				sqlConn.ConnectionString=strCon;
-				sqlConn.Open();
-				sqlCmd.Connection=sqlConn;
-				sqlCmd.ExecuteNonQuery();
-				sqlConn.Close();
-				sqlCmd.Dispose();
-//				sqlCmd.CommandText="Delete from LedgDetails Where Cust_ID='"+e.Item.Cells[1].Text+"'";
-//				sqlConn.ConnectionString=strCon;
-//				sqlConn.Open();
-//				sqlCmd.Connection=sqlConn;
-//				sqlCmd.ExecuteNonQuery();
-//				sqlConn.Close();
-//				sqlCmd.Dispose();
-//				sqlCmd.CommandText="Delete from Invoice_Transaction Where Cust_ID='"+e.Item.Cells[1].Text+"'";
-//				sqlConn.ConnectionString=strCon;
-//				sqlConn.Open();
-//				sqlCmd.Connection=sqlConn;
-//				sqlCmd.ExecuteNonQuery();
-//				sqlConn.Close();
-//				sqlCmd.Dispose();
-				CreateLogFiles.ErrorLog("Form:Customer_list.aspx,Method:GridSearch_DeleteCommand"+"  Customer ID  "+e.Item.Cells[1].Text+"  IS DELETED   "+" USERID      "+uid );
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/CustomerController/DeleteCustomer?Customer="+ e.Item.Cells[1].Text).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        var mesg = JsonConvert.DeserializeObject<string>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/CustomerController/DeleteLedger?Customer="+ e.Item.Cells[0].Text).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        var mesg = JsonConvert.DeserializeObject<string>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+                //				sqlCmd.CommandText="Delete from LedgDetails Where Cust_ID='"+e.Item.Cells[1].Text+"'";
+                //				sqlConn.ConnectionString=strCon;
+                //				sqlConn.Open();
+                //				sqlCmd.Connection=sqlConn;
+                //				sqlCmd.ExecuteNonQuery();
+                //				sqlConn.Close();
+                //				sqlCmd.Dispose();
+                //				sqlCmd.CommandText="Delete from Invoice_Transaction Where Cust_ID='"+e.Item.Cells[1].Text+"'";
+                //				sqlConn.ConnectionString=strCon;
+                //				sqlConn.Open();
+                //				sqlCmd.Connection=sqlConn;
+                //				sqlCmd.ExecuteNonQuery();
+                //				sqlConn.Close();
+                //				sqlCmd.Dispose();
+                CreateLogFiles.ErrorLog("Form:Customer_list.aspx,Method:GridSearch_DeleteCommand"+"  Customer ID  "+e.Item.Cells[1].Text+"  IS DELETED   "+" USERID      "+uid );
 				MessageBox.Show("Customer Deleted");
 				gridInit();
 				Response.Redirect("Customer_List.aspx",false);

@@ -23,6 +23,10 @@ using Servosms.Sysitem.Classes;
 using DBOperations;
 using RMG;
 using System.Text;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Servosms.Module.Master
 {
@@ -34,16 +38,16 @@ namespace Servosms.Module.Master
 		DBUtil dbobj=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		protected System.Web.UI.WebControls.TextBox TextBox1;
 		string uid;
-
-		/// <summary>
-		/// This method is used for setting the Session variable for userId and 
-		/// after that filling the required dropdowns with database values 
-		/// and also check accessing priviledges for particular user
-		/// and generate the next ID also.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string BaseUri = "http://localhost:64862";
+        /// <summary>
+        /// This method is used for setting the Session variable for userId and 
+        /// after that filling the required dropdowns with database values 
+        /// and also check accessing priviledges for particular user
+        /// and generate the next ID also.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			try
 			{
@@ -60,18 +64,28 @@ namespace Servosms.Module.Master
 			{
 				try
 				{
-					# region Fill dropType
-					PartiesClass obj=new PartiesClass();
-					SqlDataReader SqlDtr;
-					string sql;
-					SqlDtr=obj.GetRecordSet("select * from CustomerType order by CustomerTypeName");
-					DropType.Items.Clear();
-					DropType.Items.Add("Select");
-					while(SqlDtr.Read())
-					{
-						DropType.Items.Add(SqlDtr.GetValue(1).ToString());
-					}
-					SqlDtr.Close();
+                    #region Fill dropType
+                    List<string> DrpType = new List<string>();
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/CustomerController/GetCustomerType").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            DrpType = JsonConvert.DeserializeObject<List<string>>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    DropType.Items.Clear();
+                    if (DrpType != null && DrpType.Count > 0)
+                        foreach (var typr in DrpType)
+                            DropType.Items.Add(typr);
+
 					#endregion
 					#region Check Privileges
 					int i;
@@ -102,49 +116,101 @@ namespace Servosms.Module.Master
 					}
 					GetNextCustomerID();
 					getbeat();
-			
-					#region Fetch Extra Cities from Database and add to the ComboBox
-					sql="select distinct City from Beat_Master order by City asc";
-					SqlDtr=obj.GetRecordSet(sql);
-					while(SqlDtr.Read())
-					{
-						DropCity.Items.Add(SqlDtr.GetValue(0).ToString()); 
-					}
-					SqlDtr.Close();
-					#endregion
 
-					#region Fetch Extra Cities from Database and add to the ComboBox
-					sql="select distinct state from Beat_Master order by state asc";
-					SqlDtr=obj.GetRecordSet(sql);
-					while(SqlDtr.Read())
-					{
-						DropState.Items.Add(SqlDtr.GetValue(0).ToString()); 
-					}
-					SqlDtr.Close();
-					#endregion
+                    #region Fetch Extra Cities from Database and add to the ComboBox
+                    List<string> cities = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/OrganizationDetailsController/GetExtraCities").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            cities = JsonConvert.DeserializeObject<List<string>>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    if (cities != null && cities.Count > 0)
+                    {
+                        foreach (var city in cities)
+                            DropCity.Items.Add(city);
 
-					#region Fetch Extra Cities from Database and add to the ComboBox
-					sql="select distinct country from Beat_Master order by country asc";
-					SqlDtr=obj.GetRecordSet(sql);
-					while(SqlDtr.Read())
-					{
-						DropCountry.Items.Add(SqlDtr.GetValue(0).ToString()); 
-					}
-					SqlDtr.Close();
-					#endregion
+                    }
+                    #endregion
 
-					#region Fetch SSR Employee from Employee Table and add to the ComboBox
-					sql="select Emp_Name from Employee where Designation='Servo Sales Representative' order by Emp_Name";
-					SqlDtr=obj.GetRecordSet(sql);
-					DropSSR.Items.Clear();
-					DropSSR.Items.Add("Select");
-					while(SqlDtr.Read())
-					{
-						DropSSR.Items.Add(SqlDtr.GetValue(0).ToString());
-					}
-					SqlDtr.Close();
-					#endregion
-				}
+                    #region Fetch Extra Cities from Database and add to the ComboBox
+                    List<string> states = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/OrganizationDetailsController/GetExtraStates").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            states = JsonConvert.DeserializeObject<List<string>>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    if (states != null && states.Count > 0)
+                    {
+                        foreach (var state in states)
+                            DropState.Items.Add(state);
+                    }
+                    #endregion
+
+                    #region Fetch Extra Cities from Database and add to the ComboBox
+                    List<string> countries = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/OrganizationDetailsController/GetExtraCountry").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            countries = JsonConvert.DeserializeObject<List<string>>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    if (countries != null && countries.Count > 0)
+                    {
+                        foreach (var country in countries)
+                            DropCountry.Items.Add(country);
+                    }
+                    #endregion
+
+                    #region Fetch SSR Employee from Employee Table and add to the ComboBox
+                    List<string> SSR = new List<string>();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/CustomerController/FetchSSREmployee").Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            SSR = JsonConvert.DeserializeObject<List<string>>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    DropSSR.Items.Clear();
+                    if (SSR != null && SSR.Count > 0)
+                    {
+                        foreach (var ss in SSR)
+                            DropSSR.Items.Add(ss);
+                    }
+                    #endregion
+                }
 				catch(Exception ex)
 				{
 					CreateLogFiles.ErrorLog("Form:Customer_Entry.aspx,Class:PartiesClass.cs ,Method:onpageload" + ex.Message+" EXCEPTION  "+uid);
@@ -178,18 +244,21 @@ namespace Servosms.Module.Master
 		{
 			try
 			{
-				InventoryClass obj=new InventoryClass();
-				SqlDataReader sqldtr;
-				string sql;
-				string str="";
-				sql="select city,state,country from beat_master";
-				sqldtr=obj.GetRecordSet(sql);
-				while(sqldtr.Read())
-				{
-					str=str+sqldtr.GetValue(0).ToString()+":";
-					str=str+sqldtr.GetValue(1).ToString()+":";
-					str=str+sqldtr.GetValue(2).ToString()+"#";
-				}
+                string str = "";
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/OrganizationDetailsController/GetBeat").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        str = JsonConvert.DeserializeObject<string>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
 				txtbeatname.Value=str;
 			}
 			catch(Exception ex)
@@ -221,27 +290,29 @@ namespace Servosms.Module.Master
 		/// <returns></returns>
 		public bool checkAcc_Period()
 		{
-			int c = 0;
-			try
-			{
-				SqlDataReader SqlDtr = null;
-				
-				dbobj.SelectQuery("Select count(Acc_Date_From) from Organisation",ref SqlDtr);
-				if(SqlDtr.Read())
-				{
-					c = System.Convert.ToInt32(SqlDtr.GetValue(0).ToString());  
-				}
-				SqlDtr.Close();
-			}
-			catch(Exception ex)
-			{
-				CreateLogFiles.ErrorLog("Form:Customer_Entry.aspx,Class:PartiesClass.cs ,Method:checkAcc_Period(). EXCEPTION : " + ex.Message+"  User_ID: "+uid);
-			}
-
-			if(c > 0)
-				return true;
-			else
-				return false;
+            bool c = false;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/LedgerController/CheckAcc_Period").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        c = JsonConvert.DeserializeObject<bool>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+            }
+            catch (Exception ex)
+            {
+                CreateLogFiles.ErrorLog("Form:Customer_Entry.aspx,Class:PartiesClass.cs ,Method:checkAcc_Period(). EXCEPTION : " + ex.Message + "  User_ID: " + uid);
+            }
+            return c;
 		}
 
 		/// <summary>
@@ -251,9 +322,9 @@ namespace Servosms.Module.Master
 		/// <param name="e"></param>
 		protected void btnUpdate_Click(object sender, System.EventArgs e)
 		{
-			PartiesClass obj=new PartiesClass();
-			try
-			{
+			//PartiesClass obj=new PartiesClass();
+            try
+            {
                 StringBuilder errorMessage = new StringBuilder();
                 if (txtTinNo.Text != string.Empty)
                 {
@@ -270,131 +341,187 @@ namespace Servosms.Module.Master
                     return;
                 }
                 if (!checkAcc_Period())
-				{
-					MessageBox.Show("Please enter the Accounts Period from Organization Details");
-					return;
-				}
-				SqlDataReader SqlDtr;
-				//string cname=StringUtil.FirstCharUpper((txtFName.Text.ToString().Trim())) +" "+ StringUtil.FirstCharUpper((txtMName.Text.ToString().Trim() ))+" "+ StringUtil.FirstCharUpper((txtLName.Text.ToString().Trim() )); 
-				string cname="";
-				if(txtFName.Text.Trim()!="")
-					cname=txtFName.Text.Trim();
-				
-				//Coment by vikas 16.05.09
-				/*if(txtMName.Text.Trim()!="")
+                {
+                    MessageBox.Show("Please enter the Accounts Period from Organization Details");
+                    return;
+                }
+                //string cname=StringUtil.FirstCharUpper((txtFName.Text.ToString().Trim())) +" "+ StringUtil.FirstCharUpper((txtMName.Text.ToString().Trim() ))+" "+ StringUtil.FirstCharUpper((txtLName.Text.ToString().Trim() )); 
+                string cname = "";
+                if (txtFName.Text.Trim() != "")
+                    cname = txtFName.Text.Trim();
+
+                //Coment by vikas 16.05.09
+                /*if(txtMName.Text.Trim()!="")
 					cname+=" "+txtMName.Text.Trim();
 				if(txtLName.Text.Trim()!="")
 					cname+=" "+txtLName.Text.Trim();*/
 
-				//((txtFName.Text.ToString().Trim() )) +" "+ StringUtil.FirstCharUpper((txtMName.Text.ToString().Trim() ))+" "+ StringUtil.FirstCharUpper((txtLName.Text.ToString().Trim() ));
-				string sql1="select Cust_Id from Customer where Cust_Name='"+cname.Trim()+"'";
-				SqlDtr=obj.GetRecordSet(sql1);
-				if(SqlDtr.HasRows)
-				{
-					MessageBox.Show("Customer Name  "+cname+" Already Exist");
-					return;
-				}
-				SqlDtr.Close();
-				sql1="select * from Ledger_Master where Ledger_Name='"+cname.Trim()+"'";
-				SqlDtr=obj.GetRecordSet(sql1);
-				if(SqlDtr.HasRows)
-				{
-					MessageBox.Show("Ledger Name  "+cname+" Already Exist");
-					return;
-				}
-				SqlDtr.Close();
-				if(!txtTinNo.Text.Trim().Equals(""))
-				{
-					sql1 = "Select Tin_No,Cust_ID from customer where Tin_No = '"+txtTinNo.Text.Trim()+"' and Tin_No<>'unregister' and Tin_No<>'UNREGISTERED' and Tin_No<>'Un Register'";
-					SqlDtr= obj.GetRecordSet(sql1);
-					if(SqlDtr.HasRows)
-					{
-						if(SqlDtr.Read())
-						{
-							if(!LblCustomerID.Text.Equals(SqlDtr["Cust_ID"].ToString() ) )
-							{
-								MessageBox.Show("The Tin No. "+txtTinNo.Text.Trim()+" Already Exist");
-								return;
-							}
-						}
-				
-					}
-					SqlDtr.Close();
-				}
-				else
-				{
-					txtTinNo.Text="Un Register";
-				}
-				obj.Cust_ID=LblCustomerID.Text;
-				//obj.Cust_Name =StringUtil.FirstCharUpper((txtFName.Text.ToString().Trim() )) +" "+ StringUtil.FirstCharUpper((txtMName.Text.ToString().Trim()))+" "+ StringUtil.FirstCharUpper((txtLName.Text.ToString().Trim())); 
-				//string Name = StringUtil.FirstCharUpper((txtFName.Text.ToString().Trim() ));
-				string Name = txtFName.Text.ToString().Trim();
-			
-				//Coment By vikas 16.05.09
-				/*if(!txtMName.Text.ToString().Trim().Equals(""))
+                //((txtFName.Text.ToString().Trim() )) +" "+ StringUtil.FirstCharUpper((txtMName.Text.ToString().Trim() ))+" "+ StringUtil.FirstCharUpper((txtLName.Text.ToString().Trim() ));
+                bool custExists = false;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/CustomerController/GetCustID?custName="+ cname.Trim()).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        custExists = JsonConvert.DeserializeObject<bool>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                if (custExists)
+                {
+                    MessageBox.Show("Customer Name  " + cname + " Already Exist");
+                    return;
+                }
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/CustomerController/GetLedger?custName=" + cname.Trim()).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        custExists = JsonConvert.DeserializeObject<bool>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                if (custExists)
+                {
+                    MessageBox.Show("Ledger Name  " + cname + " Already Exist");
+                    return;
+                }
+
+                if (!txtTinNo.Text.Trim().Equals(""))
+                {
+                    string customerID = "";
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/CustomerController/GetTinNoExists?TinNo="+ txtTinNo.Text.Trim()).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            customerID = JsonConvert.DeserializeObject<string>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    if (!LblCustomerID.Text.Equals(customerID))
+                    {
+                        MessageBox.Show("The Tin No. " + txtTinNo.Text.Trim() + " Already Exist");
+                        return;
+                    }
+                }
+                else
+                {
+                    txtTinNo.Text = "Un Register";
+                }
+                CustomerModel customer = new CustomerModel();
+
+                customer.CustomerID = LblCustomerID.Text;
+                //obj.Cust_Name =StringUtil.FirstCharUpper((txtFName.Text.ToString().Trim() )) +" "+ StringUtil.FirstCharUpper((txtMName.Text.ToString().Trim()))+" "+ StringUtil.FirstCharUpper((txtLName.Text.ToString().Trim())); 
+                //string Name = StringUtil.FirstCharUpper((txtFName.Text.ToString().Trim() ));
+                string Name = txtFName.Text.ToString().Trim();
+
+                //Coment By vikas 16.05.09
+                /*if(!txtMName.Text.ToString().Trim().Equals(""))
 					Name += " "+txtMName.Text.ToString().Trim();
 				if(!txtLName.Text.ToString().Trim().Equals(""))
 					Name += " "+txtLName.Text.ToString().Trim();*/
 
-				obj.Cust_Name =Name;
-				obj.Cust_Type=DropType.SelectedItem.Value.ToString(); 
-				obj.Address=txtAddress.Text.Trim();
-				obj.City=DropCity.SelectedItem.Value.ToString();
-				obj.State=DropState.SelectedItem.Value.ToString();
-				obj.Country=DropCountry.SelectedItem.Value.ToString(); 
-				if(DropSSR.SelectedIndex==0)
-					obj.SSR="";
-				else
-				{
-					SqlDtr=obj.GetRecordSet("select Emp_ID from Employee where Emp_Name='"+DropSSR.SelectedItem.Text+"'");
-					if(SqlDtr.Read())
-						obj.SSR=SqlDtr["Emp_ID"].ToString();
-					else
-						obj.SSR="";
-					SqlDtr.Close();
-				}
+                customer.CustomerName = Name;
+                customer.CustomerType = DropType.SelectedItem.Value.ToString();
+                customer.Address = txtAddress.Text.Trim();
+                customer.City = DropCity.SelectedItem.Value.ToString();
+                customer.State = DropState.SelectedItem.Value.ToString();
+                customer.Country = DropCountry.SelectedItem.Value.ToString();
+                if (DropSSR.SelectedIndex == 0)
+                    customer.SSR = "";
+                else
+                {
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/CustomerController/GetEmpSSR?SSR="+ DropSSR.SelectedItem.Text).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var disc = Res.Content.ReadAsStringAsync().Result;
+                            customer.SSR = JsonConvert.DeserializeObject<string>(disc);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                }
 
-				if(txtPhoneOff.Text=="")
-					obj.Tel_Off="0";
-				else
-					obj.Tel_Off =txtPhoneOff.Text;
-				if(txtPhoneRes.Text=="")
-					obj.Tel_Res="0";
-				else
-					obj.Tel_Res =txtPhoneRes.Text;
-				if(txtMobile.Text=="")
-					obj.Mobile="0";
-				else
-					obj.Mobile =txtMobile.Text;
-				obj.EMail =txtEMail.Text.Trim();
-				obj.CR_Limit=txtCRLimit.Text ;
-				if(DropCrDay.SelectedIndex==0)
-					obj.CR_Days="0";
-				else
-					obj.CR_Days=DropCrDay.SelectedItem.Value.ToString();
-				if(txtOpBalance.Text=="")
-					obj.Op_Balance="0";
-				else
-					obj.Op_Balance=txtOpBalance.Text;
-				obj.Balance_Type =DropBal.SelectedItem.Value.ToString();
-				obj.EntryDate=ToMMddYYYY(DateTime.Now.Date.ToShortDateString()).ToString();
-				obj.Tin_No = txtTinNo.Text.Trim();
-				if(txtcode.Text.Trim().Equals(""))
-					obj.sadbhavnacd="0";
-				else
-					obj.sadbhavnacd=txtcode.Text.Trim().ToString();
-				obj.ContactPerson=txtContactPerson.Text;
-				// Call to this method Inserts the customer details into the customer table.
-				obj.InsertCustomer();
-				MessageBox.Show("Customer Saved");
-				CreateLogFiles.ErrorLog("Form:Customer_Entry.aspx,Class:PartiesClass.cs: Method:btnUpdate_Click "+" Cust Name  "+ obj.Cust_Name    +" Cust id  "+obj.Cust_ID +"Cust Type    "+ obj.Cust_Type  +"  Cust Address  "+ obj.Address   +" Cust City "+obj.City  +" Cust State  "+ obj.State   +" Cust Cuntry "+ ToMMddYYYY(DateTime.Now.Date.ToShortDateString()).ToShortDateString()+"obj.Country" +" Opening Balance  "+  obj.Op_Balance  +"  date  "+obj.EntryDate +"    IS  SAVED    User  "+uid );
-				Clear();
-				GetNextCustomerID();
-			}
-			catch(Exception ex)
-			{
-				CreateLogFiles.ErrorLog("Form:Customer_Entry.aspx,Class:PartiesClass.cs: Method:btnUpdate_Click "+" Cust Name  "+  obj.Cust_Name   +" Cust id  "+  obj.Cust_ID+"Cust Type    "+ obj.Cust_Type  +"  Cust Address  "+ obj.Address    +" Cust City "+ obj.City +" Cust State  "+ obj.State     +" Cust Cuntry "+ obj.Country +" Opening Balance  "+     obj.Op_Balance   +"  EXCEPTION "+ ex.Message  + "  User Type "+uid);
-			}
+                if (txtPhoneOff.Text == "")
+                    customer.Tel_Off = "0";
+                else
+                    customer.Tel_Off = txtPhoneOff.Text;
+                if (txtPhoneRes.Text == "")
+                    customer.Tel_Res = "0";
+                else
+                    customer.Tel_Res = txtPhoneRes.Text;
+                if (txtMobile.Text == "")
+                    customer.Mobile = "0";
+                else
+                    customer.Mobile = txtMobile.Text;
+                customer.EMail = txtEMail.Text.Trim();
+                customer.CR_Limit = txtCRLimit.Text;
+                if (DropCrDay.SelectedIndex == 0)
+                    customer.CR_Days = "0";
+                else
+                    customer.CR_Days = DropCrDay.SelectedItem.Value.ToString();
+                if (txtOpBalance.Text == "")
+                    customer.Op_Balance = "0";
+                else
+                    customer.Op_Balance = txtOpBalance.Text;
+                customer.Balance_Type = DropBal.SelectedItem.Value.ToString();
+                customer.EntryDate = ToMMddYYYY(DateTime.Now.Date.ToShortDateString()).ToString();
+                customer.TinNo = txtTinNo.Text.Trim();
+                if (txtcode.Text.Trim().Equals(""))
+                    customer.sadbhavnacd = "0";
+                else
+                    customer.sadbhavnacd = txtcode.Text.Trim().ToString();
+                customer.ContactPerson = txtContactPerson.Text;
+                // Call to this method Inserts the customer details into the customer table.
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    var myContent = JsonConvert.SerializeObject(customer);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/CustomerController/InsertCustomer", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                        var msg = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(responseString);
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+                MessageBox.Show("Customer Saved");
+                CreateLogFiles.ErrorLog("Form:Customer_Entry.aspx,Class:PartiesClass.cs: Method:btnUpdate_Click " + " Cust Name  " + customer.CustomerName + " Cust id  " + customer.CustomerName + "Cust Type    " + customer.CustomerType + "  Cust Address  " + customer.Address + " Cust City " + customer.City + " Cust State  " + customer.State + " Cust Cuntry " + ToMMddYYYY(DateTime.Now.Date.ToShortDateString()).ToShortDateString() + "obj.Country" + " Opening Balance  " + customer.Op_Balance + "  date  " + customer.EntryDate + "    IS  SAVED    User  " + uid);
+                Clear();
+                GetNextCustomerID();
+            }
+            catch (Exception ex)
+            {
+                CreateLogFiles.ErrorLog("Form:Customer_Entry.aspx,Class:PartiesClass.cs: Method:btnUpdate_Click  EXCEPTION " + ex.Message + "  User Type " + uid);
+            }
 		}
 
 		/// <summary>
@@ -432,19 +559,20 @@ namespace Servosms.Module.Master
 		{
 			try
 			{
-				PartiesClass obj=new PartiesClass();
-				SqlDataReader SqlDtr;
-
-				#region Fetch Next Customer ID
-				SqlDtr =obj.GetNextCustomerID();
-				while(SqlDtr.Read())
-				{
-					LblCustomerID.Text =SqlDtr.GetSqlValue(0).ToString ();
-					if (LblCustomerID.Text=="Null")
-						LblCustomerID.Text ="1001";
-				}	
-				SqlDtr.Close();
-				#endregion
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/CustomerController/GetNextID").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var disc = Res.Content.ReadAsStringAsync().Result;
+                        LblCustomerID.Text = JsonConvert.DeserializeObject<string>(disc);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
 			}
 			catch(Exception ex)
 			{
