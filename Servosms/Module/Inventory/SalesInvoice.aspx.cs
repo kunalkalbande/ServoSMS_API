@@ -175,6 +175,8 @@ namespace Servosms.Module.Inventory
                             var result = Res.Content.ReadAsStringAsync().Result;
                             resFromDateToDate = JsonConvert.DeserializeObject<List<string>>(result);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();                    
                     }
 
                     if (resFromDateToDate != null)
@@ -212,6 +214,8 @@ namespace Servosms.Module.Inventory
                                 texthiddenprod.Value = res;
                             }
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }                    
                     #endregion
                     
@@ -228,6 +232,8 @@ namespace Servosms.Module.Inventory
                             var id = Res.Content.ReadAsStringAsync().Result;
                             salesMan = JsonConvert.DeserializeObject<List<string>>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     if (salesMan != null)
@@ -258,7 +264,10 @@ namespace Servosms.Module.Inventory
                             var result = Res.Content.ReadAsStringAsync().Result;
                             custNameCity = JsonConvert.DeserializeObject<List<string>>(result);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
+
                     if (custNameCity != null)
                     {
                         texthidden.Value = custNameCity[0];
@@ -298,6 +307,8 @@ namespace Servosms.Module.Inventory
                             var result = Res.Content.ReadAsStringAsync().Result;
                             discount = JsonConvert.DeserializeObject<List<string>>(result);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     if (discount != null)
@@ -320,41 +331,7 @@ namespace Servosms.Module.Inventory
                         }
 
                     }
-
-                    //               sql ="select * from SetDis";
-                    //SqlDtr=obj.GetRecordSet(sql);
-                    //if(SqlDtr.Read())
-                    //{
-                    //	if(SqlDtr["CashDisSalesStatus"].ToString()=="1")
-                    //	{
-                    //		txtCashDisc.Text=SqlDtr["CashDisSales"].ToString();
-                    //		if(SqlDtr["CashDisLtrSales"].ToString()=="Rs.")
-                    //			DropCashDiscType.SelectedIndex=0;
-                    //		else
-                    //			DropCashDiscType.SelectedIndex=1;
-                    //	}
-                    //	else
-                    //		txtCashDisc.Text="0";
-                    //	if(SqlDtr["DiscountSalesStatus"].ToString()=="1")
-                    //	{
-                    //		txtDisc.Text=SqlDtr["DiscountSales"].ToString();
-                    //		if(SqlDtr["DisLtrSales"].ToString()=="Rs.")
-                    //			DropDiscType.SelectedIndex=0;
-                    //		else
-                    //			DropDiscType.SelectedIndex=1;
-                    //	}
-                    //	else
-                    //		txtDisc.Text="0";
-                    //}
-                    //else
-                    //{
-                    //	txtDisc.Text="0";
-                    //	txtCashDisc.Text="0";
-                    //	DropCashDiscType.SelectedIndex=0;
-                    //	DropDiscType.SelectedIndex=0;
-                    //}
-
-                    //SqlDtr.Close ();
+                    
                     #endregion
                     //getvalue();
                     PriceUpdation();
@@ -450,6 +427,8 @@ namespace Servosms.Module.Inventory
                             var id = Res.Content.ReadAsStringAsync().Result;
                             invoiceNo = JsonConvert.DeserializeObject<List<string>>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     if (invoiceNo != null)
@@ -520,25 +499,9 @@ namespace Servosms.Module.Inventory
                         txtMainIGST.Value = res;
                     }
                 }
-            }
-
-            // InventoryClass obj = new InventoryClass();         
-            //var dsPriceUpdation= obj.ProPriceUpdation();
-            // var dtTable = dsPriceUpdation.Tables[0];
-            // for (int i = 0; i < dtTable.Rows.Count; i++)
-            // {
-            //     txtMainIGST.Value = txtMainIGST.Value+ dtTable.Rows[i][0].ToString();//ProductCode
-            //     txtMainIGST.Value = txtMainIGST.Value + "|" + dtTable.Rows[i][1];//ProductName 
-            //     txtMainIGST.Value = txtMainIGST.Value + "|" + dtTable.Rows[i][2];//ProductId
-            //     txtMainIGST.Value = txtMainIGST.Value + "|" + dtTable.Rows[i][3];//IGST
-            //     txtMainIGST.Value = txtMainIGST.Value + "|" + dtTable.Rows[i][4];//cGST
-            //     txtMainIGST.Value = txtMainIGST.Value + "|" + dtTable.Rows[i][5];//sGST
-            //     txtMainIGST.Value = txtMainIGST.Value + "|" + dtTable.Rows[i][6];//HSN
-            //     txtMainIGST.Value = txtMainIGST.Value + "~";
-
-
-            // }
-            // txtMainIGST.Value= txtMainIGST.Value.Substring(0,txtMainIGST.Value.LastIndexOf("~"));
+                else
+                    response.EnsureSuccessStatusCode();
+            }            
         }
 
         public void SaveDataInControlsOnPageLoad()
@@ -612,68 +575,15 @@ namespace Servosms.Module.Inventory
                         var id = Res.Content.ReadAsStringAsync().Result;
                         orderInvoice = JsonConvert.DeserializeObject<List<string>>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 if (orderInvoice != null)
                 {
                     foreach (var order in orderInvoice)
                         DropOrderInvoice.Items.Add(order);
-                }
-
-                //InventoryClass  obj=new InventoryClass ();
-                //SqlDataReader SqlDtr;						//rdr=null;
-                //string sql;
-                //ArrayList order_no=new ArrayList();         // add by vikas 10.12.2012
-                //#region Fetch the Next Invoice Number
-                //DropOrderInvoice.Items.Clear();
-                //DropOrderInvoice.Items.Add("Select");
-                //sql="select Order_No from Order_col_Master where status=0 order by Order_No";
-                //SqlDtr=obj.GetRecordSet(sql);
-                //while(SqlDtr.Read())
-                //{
-                //	DropOrderInvoice.Items.Add(SqlDtr.GetValue(0).ToString());
-                //	//coment by vikas 10.12.2012 order_no.Add(SqlDtr.GetValue(0).ToString());
-                //}
-                //SqlDtr.Close ();
-                ///**********Add by vikas 10.12.2012***********************/
-                //sql=" select distinct Order_id,bo_1,bo_2,bo_3 from ovd where cast(item_qty as float)>cast(sale_qty as float) ";
-                //SqlDtr=obj.GetRecordSet(sql);
-                //while(SqlDtr.Read())
-                //{
-                //	if(SqlDtr["Bo_3"].ToString()==null || SqlDtr["Bo_3"].ToString()=="")
-                //	{
-                //		if(SqlDtr["Bo_2"]==null || SqlDtr["Bo_2"].ToString()=="")
-                //		{
-                //			if(SqlDtr["Bo_1"].ToString()==null || SqlDtr["Bo_1"].ToString()=="")
-                //			{
-                //			}
-                //			else
-                //			{
-                //				if(SqlDtr["Bo_1"].ToString()!=null && SqlDtr["Bo_1"].ToString()!="")
-                //				{
-                //					DropOrderInvoice.Items.Add("BO:"+SqlDtr["Bo_1"].ToString());
-                //				}
-                //			}
-                //		}
-                //		else 
-                //		{
-                //			if(SqlDtr["Bo_2"].ToString()!=null && SqlDtr["Bo_2"].ToString()!="")
-                //			{
-                //				DropOrderInvoice.Items.Add("BO:"+SqlDtr["Bo_2"].ToString());
-                //			}
-                //		}
-                //	}
-                //	else 
-                //	{
-                //		if(SqlDtr["Bo_3"].ToString()!=null && SqlDtr["Bo_3"].ToString()!="")
-                //		{
-                //			DropOrderInvoice.Items.Add("BO:"+SqlDtr["Bo_3"].ToString());
-                //		}
-                //	}
-                //}
-                //SqlDtr.Close ();
-                /**********End***********************/
-                //#endregion
+                }               
             }
             catch (Exception ex)
             {
@@ -716,9 +626,10 @@ namespace Servosms.Module.Inventory
                     var response = client.PostAsync("api/sales/DeleteSalesMasterData?id=" + strInvoiceNo, byteContent).Result;
                     if (response.IsSuccessStatusCode)
                     {
-                        string responseString = response.Content.ReadAsStringAsync().Result;
-                        //var prodd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProductModel>>(responseString);
+                        string responseString = response.Content.ReadAsStringAsync().Result;                        
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
 
@@ -744,6 +655,8 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 List<string> ProductType1 = new List<string>();
@@ -808,6 +721,8 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 using (var client = new HttpClient())
@@ -824,6 +739,8 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 using (var client = new HttpClient())
@@ -840,6 +757,8 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 /***********Add by vikas 16.11.2012*****************/
@@ -1067,6 +986,8 @@ namespace Servosms.Module.Inventory
                             temptextfoe.Value = res;
                         }
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
             }
             catch (Exception ex)
@@ -1293,40 +1214,9 @@ namespace Servosms.Module.Inventory
                             TxtVen.Value = res;
                         }
                     }
-                }
-                //InventoryClass obj=new InventoryClass();
-                //InventoryClass obj1=new InventoryClass();
-                //SqlDataReader rdr1=null;
-                //SqlDataReader rdr3=null;
-                //string str1="";
-                //DateTime duedate;
-                //string duedatestr ="";
-
-                ////coment by vikas 25.10.2012 rdr3 = obj.GetRecordSet("select c.City,CR_Days,Curr_Credit,Cust_ID,SSR,Cust_Name,Emp_Name  from Customer c,Employee e where e.Emp_ID=c.SSR order by Cust_Name");
-
-                //rdr3 = obj.GetRecordSet("select c.City,CR_Days,Curr_Credit,Cust_ID,SSR,Cust_Name,Emp_Name,ct.group_name  from Customer c,Employee e,customertype ct where e.Emp_ID=c.SSR and c.cust_type=ct.customertypename order by Cust_Name");
-                //while(rdr3.Read())
-                //{
-                //	duedate=DateTime.Now.AddDays(System.Convert.ToDouble(rdr3["CR_Days"]));
-                //	duedatestr=duedate.ToShortDateString();
-                //	str1 = str1+rdr3["Cust_Name"].ToString()+"~"+rdr3["City"].ToString().Trim()+"~"+GenUtil.str2DDMMYYYY(duedatestr.Trim())+"~"+GenUtil.strNumericFormat(rdr3["Curr_Credit"].ToString().Trim())+"~";
-                //	rdr1 = obj1.GetRecordSet("select top 1 Balance,BalanceType from customerledgertable where CustID="+rdr3["Cust_ID"]+" order by EntryDate Desc");
-                //	//dbobj.SelectQuery("select top 1 Balance,BalanceType from customerledgertable where CustID="+rdr3["Cust_ID"]+" order by EntryDate Desc",ref rdr1);
-                //	if(rdr1.Read())
-                //	{
-                //		string str15 = GenUtil.strNumericFormat(rdr1["Balance"].ToString().Trim())+"~"+rdr1["BalanceType"].ToString().Trim()+"~";	
-                //		str1 = str1+GenUtil.strNumericFormat(rdr1["Balance"].ToString().Trim())+"~"+rdr1["BalanceType"].ToString().Trim()+"~";	
-                //	}
-                //	else
-                //	{
-                //		str1 = str1+"0"+"~"+" "+"~";	
-                //	}
-                //	rdr1.Close();
-                //	//coment by vikas 25.10.2012 str1+=rdr3["Emp_Name"].ToString()+"#";
-                //	str1+=rdr3["Emp_Name"].ToString()+"~"+rdr3["group_name"].ToString()+"#";
-                //}
-                //rdr3.Close();
-                //TxtVen.Value =str1; 
+                    else
+                        response.EnsureSuccessStatusCode();
+                }                
             }
             catch (Exception ex)
             {
@@ -1678,8 +1568,10 @@ namespace Servosms.Module.Inventory
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
-                    //obj.InsertSalesDetail();
+                    
                 }
                 else
                 {
@@ -1698,6 +1590,8 @@ namespace Servosms.Module.Inventory
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
                     //obj.InsertSalesDetail(); 
                 }
@@ -1785,6 +1679,8 @@ namespace Servosms.Module.Inventory
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
                     //obj.InsertSaleSchemeDetail();
                 }
@@ -1806,6 +1702,8 @@ namespace Servosms.Module.Inventory
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
 
                     //obj.InsertSaleSchemeDetail();
@@ -1982,6 +1880,8 @@ namespace Servosms.Module.Inventory
                             var id = Res.Content.ReadAsStringAsync().Result;
                             count = JsonConvert.DeserializeObject<int>(id);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     // This part of code is use to solve the double click problem, Its checks the sales invoice no. and display the popup, that it is saved.
@@ -2125,6 +2025,8 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
+                                else
+                                    response.EnsureSuccessStatusCode();
                             }
 
                             //Update data to CustomerBalance
@@ -2142,6 +2044,8 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
+                                else
+                                    response.EnsureSuccessStatusCode();
                             }
 
                             //obj.InsertSalesMaster();
@@ -2171,6 +2075,8 @@ namespace Servosms.Module.Inventory
                             {
                                 string responseString = response.Content.ReadAsStringAsync().Result;
                             }
+                            else
+                                response.EnsureSuccessStatusCode();
                         }
 
                         using (var client = new HttpClient())
@@ -2187,6 +2093,8 @@ namespace Servosms.Module.Inventory
                             {
                                 string responseString = response.Content.ReadAsStringAsync().Result;
                             }
+                            else
+                                response.EnsureSuccessStatusCode();
                         }
 
                         //obj.InsertSalesMaster();
@@ -2239,6 +2147,8 @@ namespace Servosms.Module.Inventory
                         {
                             string responseString = response.Content.ReadAsStringAsync().Result;
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
 
                     //               dbobj.Insert_or_Update("delete from customerledgertable where particular='Sales Invoice ("+FromDate.ToString()+ToDate+dropInvoiceNo.SelectedItem.Text+")'",ref x);
@@ -2279,6 +2189,8 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
+                                else
+                                    response.EnsureSuccessStatusCode();
                             }
 
                             //Add by vikas 16.09.09
@@ -2303,6 +2215,8 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
+                                else
+                                    response.EnsureSuccessStatusCode();
                             }
 
                             //dbobj.Insert_or_Update("update customer_balance set DR_Amount=DR_Amount-"+NetAmount+" where cust_id='"+CustID+"'",ref x);
@@ -2323,9 +2237,9 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
-                            }
-                            //obj.UpdateCustomerBalance();
-
+                                else
+                                    response.EnsureSuccessStatusCode();
+                            }                           
                         }
                         else
                         {
@@ -2353,9 +2267,10 @@ namespace Servosms.Module.Inventory
                             {
                                 string responseString = response.Content.ReadAsStringAsync().Result;
                             }
+                            else
+                                response.EnsureSuccessStatusCode();
                         }
-
-                        //obj.UpdateSalesMaster();
+                        
                         CustomerUpdate();
                     }
 
@@ -3714,33 +3629,9 @@ namespace Servosms.Module.Inventory
                                 var id = Res.Content.ReadAsStringAsync().Result;
                                 cat = JsonConvert.DeserializeObject<string>(id);
                             }
-                        }
-
-                        //                  sql ="select prod_id,category from Products where prod_name='"+arrProdName[1].ToString()+"' and pack_type='"+arrProdName[2].ToString()+"'";
-                        //SqlDtr=obj.GetRecordSet(sql);
-                        //while(SqlDtr.Read())
-                        //{
-                        //	//txtmwid1.Text=SqlDtr.GetValue(0).ToString();
-                        //	prod_id=SqlDtr.GetValue(0).ToString();
-                        //	if(SqlDtr.GetValue(1).ToString().StartsWith("2T") || SqlDtr.GetValue(1).ToString().StartsWith("4T") || SqlDtr.GetValue(1).ToString().StartsWith("2t") || SqlDtr.GetValue(1).ToString().StartsWith("4t"))                        
-                        //		cat=SqlDtr.GetValue(1).ToString();
-                        //}
-                        //SqlDtr.Close ();
-
-                        /*****This code is hide bcoz deleted all invoice_no according to select the dropdown list
-                        int flag=0;
-                        if(ProductName[cc]!=null && ProductName[cc]!="")
-                        {
-                            sql="select prod_id from Products where prod_name='"+ProductName[cc]+"' and pack_type='"+ProductPack[cc]+"'";
-                            SqlDtr=obj.GetRecordSet(sql);
-                            while(SqlDtr.Read())
-                            {
-                                Oldprod_id=SqlDtr.GetValue(0).ToString();
-                                flag=1;
-                            }
-                            SqlDtr.Close ();
-                        }
-                        */
+                            else
+                                Res.EnsureSuccessStatusCode();
+                        }                        
 
                         if (lblInvoiceNo.Visible == false)
                         {
@@ -3760,6 +3651,8 @@ namespace Servosms.Module.Inventory
                                     {
                                         string responseString = response.Content.ReadAsStringAsync().Result;
                                     }
+                                    else
+                                        response.EnsureSuccessStatusCode();
                                 }
 
                                 //                        con1.Open ();
@@ -3802,39 +3695,11 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
+                                else
+                                    response.EnsureSuccessStatusCode();
                             }
 
-                            con1.Open();
-
-                            ////cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid1.Text+"',"+GenUtil.changeqty(txtPack1.Value,bi)+","+GenUtil.changeqty(txtPack1.Value,ri)+","+GenUtil.changeqty(txtPack1.Value,oi)+","+GenUtil.changeqty(txtPack1.Value,fi)+","+GenUtil.changeqty(txtPack1.Value,ii)+","+GenUtil.changeqty(txtPack1.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(Session["CurrentDate"].ToString()))+"')",con1);
-                            //if(cat=="")
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",0,0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);                                  
-                            //	//Mahesh11.04.007 cmd=new SqlCommand("insert into Sales_Oil values("+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+invoice+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(Session["CurrentDate"].ToString()))+"')",con1);
-                            //	//Mahesh 05.11.007 cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(Session["CurrentDate"].ToString()))+"')",con1);
-
-                            //	//Comment by vikas 1.05.09 cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-
-                            //else if(cat.StartsWith("2t") || cat.StartsWith("2T"))
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+","+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //	//Mahesh11.04.007 cmd=new SqlCommand("insert into Sales_Oil values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+invoice+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(Session["CurrentDate"].ToString()))+"')",con1);
-                            //	//**cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-
-                            //	//Comment by vikas 1.05.09cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-
-                            //else if(cat.StartsWith("4t") || cat.StartsWith("4T"))
-                            //	// cmd=new SqlCommand("insert into Sales_Oil values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",0,"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+invoice+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(Session["CurrentDate"].ToString()))+"')",con1);
-
-                            //	// Comment by vikas 1.05.09 cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",0,"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",0,"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-
-                            //cmd.ExecuteNonQuery();
-                            //con1.Close();
-                            //cmd.Dispose();
+                            con1.Open();                           
                         }
                         else
                         {
@@ -3862,34 +3727,9 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
-                            }
-
-                            //                     con1.Open ();
-                            ////cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid1.Text+"',"+GenUtil.changeqty(txtPack1.Value,bi)+","+GenUtil.changeqty(txtPack1.Value,ri)+","+GenUtil.changeqty(txtPack1.Value,oi)+","+GenUtil.changeqty(txtPack1.Value,fi)+","+GenUtil.changeqty(txtPack1.Value,ii)+","+GenUtil.changeqty(txtPack1.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //if(cat=="")
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",0,0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //	//**cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-
-                            //	// Comment by vikas 1.05.09 cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);                                
-
-                            //else if (cat.StartsWith("2t") || cat.StartsWith("2T"))
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+","+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",0,'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //	//**cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-
-                            //	//Comment by vikas 1.05.09 cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+","+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-
-                            //else if(cat.StartsWith("4t") || cat.StartsWith("4T"))
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",0,"+GenUtil.changeqty(txtPack1.Value,int.Parse(txtQty1.Text))+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                            //	//**cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",0,"+GenUtil.changeqty(PackType[cc].Value,int.Parse(Qty[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-
-                            //	//Comment by vikas 1.05.09cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",0,"+GenUtil.changeqty(arrProdName[1].ToString(),int.Parse(Qty[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",0,"+GenUtil.changeqty(arrProdName[2].ToString(),int.Parse(Qty[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-
-                            //cmd.ExecuteNonQuery();
-                            //con1.Close();
-                            //cmd.Dispose();
+                                else
+                                    response.EnsureSuccessStatusCode();
+                            }                            
                         }
                     }
                     //if(ProdName1[cc].Text != "" && Qty1[cc].Text != "")
@@ -3910,18 +3750,9 @@ namespace Servosms.Module.Inventory
                                 var id = Res.Content.ReadAsStringAsync().Result;
                                 cat = JsonConvert.DeserializeObject<string>(id);
                             }
-                        }
-
-                        //                  //sql="select prod_id,category from Products where prod_name='"+ProdName1[cc].Text+"' and pack_type='"+PackType1[cc].Text+"'";
-                        //                  sql ="select prod_id,category from Products where prod_name='"+arrProdschName1[0].ToString()+"' and pack_type='"+arrProdschName1[1].ToString()+"'";
-                        //SqlDtr=obj.GetRecordSet(sql);
-                        //while(SqlDtr.Read())
-                        //{
-                        //	prod_id=SqlDtr.GetValue(0).ToString();
-                        //	if(SqlDtr.GetValue(1).ToString().StartsWith("2T") || SqlDtr.GetValue(1).ToString().StartsWith("4T") || SqlDtr.GetValue(1).ToString().StartsWith("2t") || SqlDtr.GetValue(1).ToString().StartsWith("4t"))
-                        //		cat=SqlDtr.GetValue(1).ToString();
-                        //}
-                        //SqlDtr.Close ();
+                            else
+                                Res.EnsureSuccessStatusCode();
+                        }                        
 
                         if (lblInvoiceNo.Visible == false)
                         {
@@ -3949,24 +3780,10 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
+                                else
+                                    response.EnsureSuccessStatusCode();
                             }
-
-                            //                     con1.Open ();
-                            //if(cat=="")
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-
-                            //	//Comment By vikas 1.05.09 cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-
-                            //else if(cat.StartsWith("2t") || cat.StartsWith("2T"))
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+","+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+","+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-                            //else if(cat.StartsWith("4t") || cat.StartsWith("4T"))
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",0,"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",0,"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-                            //cmd.ExecuteNonQuery();
-                            //con1.Close();
-                            //cmd.Dispose();
+                            
                         }
                         else
                         {
@@ -3994,632 +3811,13 @@ namespace Servosms.Module.Inventory
                                 {
                                     string responseString = response.Content.ReadAsStringAsync().Result;
                                 }
-                            }
-
-                            //                     con1.Open ();
-                            //if(cat=="")
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+","+prod_id+",'"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",0,0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-                            //else if(cat.StartsWith("2t") || cat.StartsWith("2T"))
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+","+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+","+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",0,Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-                            //else if(cat.StartsWith("4t") || cat.StartsWith("4T"))
-                            //	//cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",0,"+GenUtil.changeqty(PackType1[cc].Text,int.Parse(Qty1[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103))",con1);
-                            //	cmd=new SqlCommand("insert into Sales_Oil values("+FromDate+ToDate+lblInvoiceNo.Text+",'"+prod_id+"','"+txtcusttype.Text+"',"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",0,"+GenUtil.changeqty(arrProdschName1[1].ToString(),int.Parse(Qty1[cc].Text))+",Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103))",con1);
-                            //cmd.ExecuteNonQuery();
-                            //con1.Close();
-                            //cmd.Dispose();
+                                else
+                                    response.EnsureSuccessStatusCode();
+                            }                            
                         }
                     }
                 }
-                //				if(txtProdName2.Value =="" && txtQty2.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr; 
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName2.Value+"' and pack_type='"+txtPack2.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid2.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty2.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty2.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty2.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty2.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty2.Text);
-                //					//****************
-                //					if(DropType2.SelectedItem.Text.Equals(cat))// || DropType2.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty2.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid2.Text+"',"+GenUtil.changeqty(txtPack2.Value,bi)+","+GenUtil.changeqty(txtPack2.Value,ri)+","+GenUtil.changeqty(txtPack2.Value,oi)+","+GenUtil.changeqty(txtPack2.Value,fi)+","+GenUtil.changeqty(txtPack2.Value,ii)+","+GenUtil.changeqty(txtPack2.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid2.Text+"',"+GenUtil.changeqty(txtPack2.Value,bi)+","+GenUtil.changeqty(txtPack2.Value,ri)+","+GenUtil.changeqty(txtPack2.Value,oi)+","+GenUtil.changeqty(txtPack2.Value,fi)+","+GenUtil.changeqty(txtPack2.Value,ii)+","+GenUtil.changeqty(txtPack2.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName3.Value =="" && txtQty3.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName3.Value+"' and pack_type='"+txtPack3.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid3.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty3.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty3.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty3.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty3.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty3.Text);
-                //					//****************
-                //					if(DropType3.SelectedItem.Text.Equals(cat))// || DropType3.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty3.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid3.Text+"',"+GenUtil.changeqty(txtPack3.Value,bi)+","+GenUtil.changeqty(txtPack3.Value,ri)+","+GenUtil.changeqty(txtPack3.Value,oi)+","+GenUtil.changeqty(txtPack3.Value,fi)+","+GenUtil.changeqty(txtPack3.Value,ii)+","+GenUtil.changeqty(txtPack3.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid3.Text+"',"+GenUtil.changeqty(txtPack3.Value,bi)+","+GenUtil.changeqty(txtPack3.Value,ri)+","+GenUtil.changeqty(txtPack3.Value,oi)+","+GenUtil.changeqty(txtPack3.Value,fi)+","+GenUtil.changeqty(txtPack3.Value,ii)+","+GenUtil.changeqty(txtPack3.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName4.Value =="" && txtQty4.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName4.Value+"' and pack_type='"+txtPack4.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid4.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty4.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty4.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty4.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty4.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty4.Text);
-                //					//****************
-                //					if(DropType4.SelectedItem.Text.Equals(cat))// || DropType4.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty4.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid4.Text+"',"+GenUtil.changeqty(txtPack4.Value,bi)+","+GenUtil.changeqty(txtPack4.Value,ri)+","+GenUtil.changeqty(txtPack4.Value,oi)+","+GenUtil.changeqty(txtPack4.Value,fi)+","+GenUtil.changeqty(txtPack4.Value,ii)+","+GenUtil.changeqty(txtPack4.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid4.Text+"',"+GenUtil.changeqty(txtPack4.Value,bi)+","+GenUtil.changeqty(txtPack4.Value,ri)+","+GenUtil.changeqty(txtPack4.Value,oi)+","+GenUtil.changeqty(txtPack4.Value,fi)+","+GenUtil.changeqty(txtPack4.Value,ii)+","+GenUtil.changeqty(txtPack4.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName5.Value =="" && txtQty5.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName5.Value+"' and pack_type='"+txtPack5.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid5.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty5.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty5.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty5.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty5.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty5.Text);
-                //					//****************
-                //					if(DropType5.SelectedItem.Text.Equals(cat))// || DropType5.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty5.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid5.Text+"',"+GenUtil.changeqty(txtPack5.Value,bi)+","+GenUtil.changeqty(txtPack5.Value,ri)+","+GenUtil.changeqty(txtPack5.Value,oi)+","+GenUtil.changeqty(txtPack5.Value,fi)+","+GenUtil.changeqty(txtPack5.Value,ii)+","+GenUtil.changeqty(txtPack5.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid5.Text+"',"+GenUtil.changeqty(txtPack5.Value,bi)+","+GenUtil.changeqty(txtPack5.Value,ri)+","+GenUtil.changeqty(txtPack5.Value,oi)+","+GenUtil.changeqty(txtPack5.Value,fi)+","+GenUtil.changeqty(txtPack5.Value,ii)+","+GenUtil.changeqty(txtPack5.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName6.Value =="" && txtQty6.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName6.Value+"' and pack_type='"+txtPack6.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid6.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty6.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty6.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty6.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty6.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty6.Text);
-                //					//****************
-                //					if(DropType6.SelectedItem.Text.Equals(cat))// || DropType6.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty6.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid6.Text+"',"+GenUtil.changeqty(txtPack6.Value,bi)+","+GenUtil.changeqty(txtPack6.Value,ri)+","+GenUtil.changeqty(txtPack6.Value,oi)+","+GenUtil.changeqty(txtPack6.Value,fi)+","+GenUtil.changeqty(txtPack6.Value,ii)+","+GenUtil.changeqty(txtPack6.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid6.Text+"',"+GenUtil.changeqty(txtPack6.Value,bi)+","+GenUtil.changeqty(txtPack6.Value,ri)+","+GenUtil.changeqty(txtPack6.Value,oi)+","+GenUtil.changeqty(txtPack6.Value,fi)+","+GenUtil.changeqty(txtPack6.Value,ii)+","+GenUtil.changeqty(txtPack6.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName7.Value =="" && txtQty7.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName7.Value+"' and pack_type='"+txtPack7.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid7.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty7.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty7.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty7.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty7.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty7.Text);
-                //					//****************
-                //					if(DropType7.SelectedItem.Text.Equals(cat))// || DropType7.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty7.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid7.Text+"',"+GenUtil.changeqty(txtPack7.Value,bi)+","+GenUtil.changeqty(txtPack7.Value,ri)+","+GenUtil.changeqty(txtPack7.Value,oi)+","+GenUtil.changeqty(txtPack7.Value,fi)+","+GenUtil.changeqty(txtPack7.Value,ii)+","+GenUtil.changeqty(txtPack7.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid7.Text+"',"+GenUtil.changeqty(txtPack7.Value,bi)+","+GenUtil.changeqty(txtPack7.Value,ri)+","+GenUtil.changeqty(txtPack7.Value,oi)+","+GenUtil.changeqty(txtPack7.Value,fi)+","+GenUtil.changeqty(txtPack7.Value,ii)+","+GenUtil.changeqty(txtPack7.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName8.Value =="" && txtQty8.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName8.Value+"' and pack_type='"+txtPack8.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid8.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty8.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty8.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty8.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty8.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty8.Text);
-                //					//****************
-                //					if(DropType8.SelectedItem.Text.Equals(cat) || DropType8.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty8.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid8.Text+"',"+GenUtil.changeqty(txtPack8.Value,bi)+","+GenUtil.changeqty(txtPack8.Value,ri)+","+GenUtil.changeqty(txtPack8.Value,oi)+","+GenUtil.changeqty(txtPack8.Value,fi)+","+GenUtil.changeqty(txtPack8.Value,ii)+","+GenUtil.changeqty(txtPack8.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid8.Text+"',"+GenUtil.changeqty(txtPack8.Value,bi)+","+GenUtil.changeqty(txtPack8.Value,ri)+","+GenUtil.changeqty(txtPack8.Value,oi)+","+GenUtil.changeqty(txtPack8.Value,fi)+","+GenUtil.changeqty(txtPack8.Value,ii)+","+GenUtil.changeqty(txtPack8.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				//*************************
-                //				if(txtProdName9.Value =="" && txtQty9.Text == "")
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName9.Value+"' and pack_type='"+txtPack9.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid9.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty9.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty9.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty9.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty9.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty9.Text);
-                //					//****************
-                //					if(DropType9.SelectedItem.Text.Equals(cat))// || DropType9.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty9.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid9.Text+"',"+GenUtil.changeqty(txtPack9.Value,bi)+","+GenUtil.changeqty(txtPack9.Value,ri)+","+GenUtil.changeqty(txtPack9.Value,oi)+","+GenUtil.changeqty(txtPack9.Value,fi)+","+GenUtil.changeqty(txtPack9.Value,ii)+","+GenUtil.changeqty(txtPack9.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid9.Text+"',"+GenUtil.changeqty(txtPack9.Value,bi)+","+GenUtil.changeqty(txtPack9.Value,ri)+","+GenUtil.changeqty(txtPack9.Value,oi)+","+GenUtil.changeqty(txtPack9.Value,fi)+","+GenUtil.changeqty(txtPack9.Value,ii)+","+GenUtil.changeqty(txtPack9.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName10.Value =="" && txtQty10.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName10.Value+"' and pack_type='"+txtPack10.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid10.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty10.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty10.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty10.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty10.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty10.Text);
-                //					//****************
-                //					if(DropType10.SelectedItem.Text.Equals(cat))// || DropType10.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty10.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid10.Text+"',"+GenUtil.changeqty(txtPack10.Value,bi)+","+GenUtil.changeqty(txtPack10.Value,ri)+","+GenUtil.changeqty(txtPack10.Value,oi)+","+GenUtil.changeqty(txtPack10.Value,fi)+","+GenUtil.changeqty(txtPack10.Value,ii)+","+GenUtil.changeqty(txtPack10.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid10.Text+"',"+GenUtil.changeqty(txtPack10.Value,bi)+","+GenUtil.changeqty(txtPack10.Value,ri)+","+GenUtil.changeqty(txtPack10.Value,oi)+","+GenUtil.changeqty(txtPack10.Value,fi)+","+GenUtil.changeqty(txtPack10.Value,ii)+","+GenUtil.changeqty(txtPack10.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName11.Value =="" && txtQty11.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName11.Value+"' and pack_type='"+txtPack11.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid11.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty11.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty11.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty11.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty11.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty11.Text);
-                //					//****************
-                //					if(DropType11.SelectedItem.Text.Equals(cat))// || DropType11.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty11.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid11.Text+"',"+GenUtil.changeqty(txtPack11.Value,bi)+","+GenUtil.changeqty(txtPack11.Value,ri)+","+GenUtil.changeqty(txtPack11.Value,oi)+","+GenUtil.changeqty(txtPack11.Value,fi)+","+GenUtil.changeqty(txtPack11.Value,ii)+","+GenUtil.changeqty(txtPack11.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid11.Text+"',"+GenUtil.changeqty(txtPack11.Value,bi)+","+GenUtil.changeqty(txtPack11.Value,ri)+","+GenUtil.changeqty(txtPack11.Value,oi)+","+GenUtil.changeqty(txtPack11.Value,fi)+","+GenUtil.changeqty(txtPack11.Value,ii)+","+GenUtil.changeqty(txtPack11.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //				if(txtProdName12.Value =="" && txtQty12.Text == "" )
-                //				{
-                //				}	
-                //				else
-                //				{
-                //					InventoryClass obj=new InventoryClass();
-                //					SqlDataReader SqlDtr;
-                //					string sql,cat="";
-                //					string prod_id="";
-                //					sql="select prod_id,category from Products where prod_name='"+txtProdName12.Value+"' and pack_type='"+txtPack12.Value+"'";
-                //					SqlDtr=obj.GetRecordSet(sql);
-                //					while(SqlDtr.Read())
-                //					{
-                //						txtmwid12.Text=SqlDtr.GetValue(0).ToString();
-                //						prod_id=SqlDtr.GetValue(0).ToString();
-                //						cat=SqlDtr.GetValue(1).ToString();
-                //					}
-                //					SqlDtr.Close ();
-                //					int bi=0,ri=0,oi=0,ii=0,fi=0,ti=0;
-                //					if(txtcusttype.Text=="Bazzar")
-                //						bi=System.Convert.ToInt32(txtQty12.Text);
-                //					if(txtcusttype.Text=="Ro-1" || txtcusttype.Text=="Ro-2" || txtcusttype.Text=="Ro-3")
-                //						ri=System.Convert.ToInt32(txtQty12.Text);
-                //					if(txtcusttype.Text=="Oe(muv)"  || txtcusttype.Text=="Oe(lcv)" || txtcusttype.Text=="Oe(tractor)" || txtcusttype.Text=="Oe(hcv)" || txtcusttype.Text=="Oe(maruti)" || txtcusttype.Text=="Oe(hyundai)" || txtcusttype.Text=="Oe(force)" || txtcusttype.Text=="Oe(eicher)" || txtcusttype.Text=="Oe(garage)"|| txtcusttype.Text=="Oe(others)")
-                //						oi=System.Convert.ToInt32(txtQty12.Text);
-                //					if(txtcusttype.Text=="Fleet")
-                //						fi=System.Convert.ToInt32(txtQty12.Text);
-                //					if(txtcusttype.Text=="Ibp")
-                //						ii=System.Convert.ToInt32(txtQty12.Text);
-                //					//****************
-                //					if(DropType12.SelectedItem.Text.Equals(cat))// || DropType12.SelectedItem.Text.Equals("2T/4T"))
-                //						ti=System.Convert.ToInt32(txtQty12.Text);
-                //					//********************
-                //					if(lblInvoiceNo.Visible==false)
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("delete from monthwise1 where invoice_no='"+dropInvoiceNo.SelectedItem.Text.Trim()+"' and prod_id='"+prod_id+"'",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+dropInvoiceNo.SelectedItem.Text.Trim()+",'"+txtmwid12.Text+"',"+GenUtil.changeqty(txtPack12.Value,bi)+","+GenUtil.changeqty(txtPack12.Value,ri)+","+GenUtil.changeqty(txtPack12.Value,oi)+","+GenUtil.changeqty(txtPack12.Value,fi)+","+GenUtil.changeqty(txtPack12.Value,ii)+","+GenUtil.changeqty(txtPack12.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //					else
-                //					{
-                //						con1.Open ();
-                //						cmd=new SqlCommand("insert into monthwise1 values("+lblInvoiceNo.Text+",'"+txtmwid12.Text+"',"+GenUtil.changeqty(txtPack12.Value,bi)+","+GenUtil.changeqty(txtPack12.Value,ri)+","+GenUtil.changeqty(txtPack12.Value,oi)+","+GenUtil.changeqty(txtPack12.Value,fi)+","+GenUtil.changeqty(txtPack12.Value,ii)+","+GenUtil.changeqty(txtPack12.Value,ti)+",'"+System.Convert.ToDateTime(GenUtil.str2DDMMYYYY(lblInvoiceDate.Text))+"')",con1);
-                //						cmd.ExecuteNonQuery();
-                //						con1.Close();
-                //						cmd.Dispose();
-                //					}
-                //				}
-                //*************************
+                
             }
             catch (Exception ex)
             {
@@ -4781,460 +3979,7 @@ namespace Servosms.Module.Inventory
             TextSelect.Text = dropInvoiceNo.SelectedItem.Value.ToString();
             try
             {
-                DropInvoiceNo_Selected();
-                //if(TextSelect.Text=="Select")
-                //{
-                //	MessageBox.Show("Please Select Invoice No");
-                //}
-                //else
-                //{					
-
-                //	Clear();                    
-
-                //	HtmlInputText[] ProdType={DropType1, DropType2, DropType3, DropType4, DropType5, DropType6, DropType7, DropType8, DropType9, DropType10, DropType11, DropType12};                    
-
-                //	TextBox[]  Qty={txtQty1, txtQty2, txtQty3, txtQty4, txtQty5, txtQty6, txtQty7, txtQty8, txtQty9, txtQty10, txtQty11, txtQty12}; 
-                //	TextBox[]  Rate={txtRate1, txtRate2, txtRate3, txtRate4, txtRate5, txtRate6, txtRate7, txtRate8, txtRate9, txtRate10, txtRate11, txtRate12}; 
-                //	TextBox[]  Amount={txtAmount1, txtAmount2, txtAmount3, txtAmount4, txtAmount5, txtAmount6, txtAmount7, txtAmount8, txtAmount9, txtAmount10, txtAmount11, txtAmount12};			
-                //	TextBox[]  AvStock = {txtAvStock1,txtAvStock2,txtAvStock3,txtAvStock4,txtAvStock5,txtAvStock6,txtAvStock7,txtAvStock8,txtAvStock9,txtAvStock10,txtAvStock11,txtAvStock12};
-                //	TextBox[]  tempQty = {txtTempQty1, txtTempQty2,txtTempQty3,txtTempQty4,txtTempQty5,txtTempQty6,txtTempQty7,txtTempQty8,txtTempQty9,txtTempQty10,txtTempQty11,txtTempQty12}; 
-                //	TextBox[]  tempSchQty = {txtTempSchQty1,txtTempSchQty2,txtTempSchQty3,txtTempSchQty4,txtTempSchQty5,txtTempSchQty6,txtTempSchQty7,txtTempSchQty8 ,txtTempSchQty9,txtTempSchQty10,txtTempSchQty11,txtTempSchQty12};
-                //	HtmlInputHidden[] tmpQty = {tmpQty1,tmpQty2,tmpQty3,tmpQty4,tmpQty5,tmpQty6,tmpQty7,tmpQty8,tmpQty9,tmpQty10,tmpQty11,tmpQty12};
-                //	HtmlInputHidden[] tmpSchType = {tmpSchType1, tmpSchType2, tmpSchType3, tmpSchType4, tmpSchType5, tmpSchType6, tmpSchType7, tmpSchType8, tmpSchType9, tmpSchType10, tmpSchType11, tmpSchType12};
-                //	HtmlInputHidden[] tmpFoeType = {tmpFoeType1, tmpFoeType2, tmpFoeType3, tmpFoeType4, tmpFoeType5, tmpFoeType6, tmpFoeType7, tmpFoeType8, tmpFoeType9, tmpFoeType10, tmpFoeType11, tmpFoeType12};
-                //	HtmlInputHidden[]  SchSPType = {tmpSecSPType1,tmpSecSPType2,tmpSecSPType3,tmpSecSPType4,tmpSecSPType5,tmpSecSPType6,tmpSecSPType7,tmpSecSPType8,tmpSecSPType9,tmpSecSPType10,tmpSecSPType11,tmpSecSPType12};
-                //	HtmlInputHidden[]  SchSP = {txtTempSecSP1,txtTempSecSP2,txtTempSecSP3,txtTempSecSP4,txtTempSecSP5,txtTempSecSP6,txtTempSecSP7,txtTempSecSP8,txtTempSecSP9,txtTempSecSP10,txtTempSecSP11,txtTempSecSP12};
-                //	//****
-                //	TextBox[] pid={txtpname1,txtpname2,txtpname3,txtpname4,txtpname5,txtpname6,txtpname7,txtpname8,txtpname9,txtpname10,txtpname11,txtpname12};
-                //	TextBox[] pid1={txtmwid1,txtmwid2,txtmwid3,txtmwid4,txtmwid5,txtmwid6,txtmwid7,txtmwid8,txtmwid9,txtmwid10,txtmwid11,txtmwid12};
-                //	TextBox[]  scheme = {txtsch1,txtsch2,txtsch3,txtsch4,txtsch5,txtsch6,txtsch7,txtsch8,txtsch9,txtsch10,txtsch11,txtsch12};
-                //	//****************************
-                //	TextBox[]  foe = {txtfoe1,txtfoe2,txtfoe3,txtfoe4,txtfoe5,txtfoe6,txtfoe7,txtfoe8,txtfoe9,txtfoe10,txtfoe11,txtfoe12};
-                //	//***************************
-                //	//*************************
-                //	TextBox[] ProdType1={txtTypesch1, txtTypesch2, txtTypesch3, txtTypesch4, txtTypesch5, txtTypesch6, txtTypesch7, txtTypesch8, txtTypesch9, txtTypesch10, txtTypesch11, txtTypesch12}; 
-                //	//**TextBox[] ProdName1={txtProdsch1, txtProdsch2, txtProdsch3, txtProdsch4, txtProdsch5, txtProdsch6, txtProdsch7, txtProdsch8, txtProdsch9, txtProdsch10, txtProdsch11, txtProdsch12}; 
-                //	//**TextBox[] PackType1={txtPacksch1, txtPacksch2, txtPacksch3, txtPacksch4, txtPacksch5, txtPacksch6, txtPacksch7, txtPacksch8, txtPacksch9, txtPacksch10, txtPacksch11, txtPacksch12}; 
-                //	TextBox[] Qty1={txtQtysch1, txtQtysch2, txtQtysch3, txtQtysch4, txtQtysch5, txtQtysch6, txtQtysch7, txtQtysch8, txtQtysch9, txtQtysch10, txtQtysch11, txtQtysch12}; 
-                //	TextBox[] stk1={txtstk1, txtstk2, txtstk3, txtstk4, txtstk5, txtstk6, txtstk7, txtstk8, txtstk9, txtstk10, txtstk11, txtstk12}; 
-                //	//**************************
-
-                //	//**********end*************
-                //	InventoryClass  obj=new InventoryClass ();
-                //	InventoryClass  obj1=new InventoryClass ();
-                //	SqlDataReader SqlDtr;
-                //	string sql,sql1;
-                //	SqlDataReader rdr=null,rdr1=null,rdr2=null,rdr3=null;
-                //	int i=0;
-                //	FlagPrint=false;
-                //	Button1.CausesValidation=true;
-
-                //	#region Get Data from Sales Master Table regarding Invoice No.
-                //	if(FromDate!="")
-                //		//sql="select * from Sales_Master where Invoice_No='"+int.Parse(FromDate)+ToDate+dropInvoiceNo.SelectedItem.Value +"'" ;
-                //		sql="select * from Sales_Master sm,employee e where Under_SalesMan=emp_id and Invoice_No='"+int.Parse(FromDate)+ToDate+dropInvoiceNo.SelectedItem.Value +"'" ;
-                //	else
-                //	{
-                //		MessageBox.Show("Please Fill The Organisation Form First");
-                //		return;
-                //	}
-                //	SqlDtr=obj.GetRecordSet(sql); 
-                //	while(SqlDtr.Read())
-                //	{
-                //		Invoice_Date = SqlDtr.GetValue(1).ToString();
-                //		string strDate = SqlDtr.GetValue(1).ToString().Trim();
-                //		int pos = strDate.IndexOf(" ");
-                //		if(pos != -1)
-                //		{
-                //			strDate = strDate.Substring(0,pos);
-                //		}
-                //		else
-                //		{
-                //			strDate = "";					
-                //		}
-                //		lblInvoiceDate.Text =GenUtil.str2DDMMYYYY(strDate);
-                //		tempInvoiceDate.Value=GenUtil.str2DDMMYYYY(strDate);
-                //		DropSalesType.SelectedIndex=(DropSalesType.Items.IndexOf((DropSalesType.Items.FindByValue (SqlDtr.GetValue(2).ToString()))));
-                //		//DropUnderSalesMan.SelectedIndex=(DropUnderSalesMan.Items.IndexOf((DropUnderSalesMan.Items.FindByValue(SqlDtr.GetValue(4).ToString()))));
-                //		DropUnderSalesMan.SelectedIndex=(DropUnderSalesMan.Items.IndexOf((DropUnderSalesMan.Items.FindByValue(SqlDtr["Emp_Name"].ToString()))));
-                //		if(getCustomerVehicles(SqlDtr["Cust_ID"].ToString()) == true)
-                //		{
-                //			DropVehicleNo.SelectedIndex = DropVehicleNo.Items.IndexOf(DropVehicleNo.Items.FindByValue(SqlDtr.GetValue(5).ToString().Trim()));
-                //		}
-                //		else
-                //		{
-                //			txtVehicleNo.Text=SqlDtr.GetValue(5).ToString();
-                //		}
-                //		//txtGrandTotal.Text=SqlDtr.GetValue(6).ToString();
-                //		//txtGrandTotal.Text = GenUtil.strNumericFormat(txtGrandTotal.Text.ToString()); 
-                //		txtDisc.Text=SqlDtr.GetValue(7).ToString(); 
-                //		txtDisc.Text = GenUtil.strNumericFormat(txtDisc.Text.ToString()); 
-                //		DropDiscType.SelectedIndex= DropDiscType.Items.IndexOf((DropDiscType.Items.FindByValue(SqlDtr.GetValue(8).ToString())));
-                //		txtNetAmount.Text =SqlDtr.GetValue(9).ToString(); 
-                //		txtNetAmount.Text = GenUtil.strNumericFormat(txtNetAmount.Text.ToString());
-                //		tempNetAmount.Value=SqlDtr.GetValue(9).ToString();                               //Add by vikas 14.07.09
-                //		tempNetAmount.Value=GenUtil.strNumericFormat(tempNetAmount.Value.ToString());     //Add by vikas 14.07.09
-
-                //		NetAmount=GenUtil.strNumericFormat(txtNetAmount.Text.ToString());
-                //		txtPromoScheme.Text= SqlDtr.GetValue(10).ToString(); 
-                //		txtRemark.Text=SqlDtr.GetValue(11).ToString();  
-                //		lblEntryBy.Text=SqlDtr.GetValue(12).ToString();  
-                //		lblEntryTime.Text= SqlDtr.GetValue(13).ToString();  
-                //		txtSecondrySpDisc.Text=SqlDtr["SecSPDisc"].ToString();
-                //                    //******************
-                //                    if (SqlDtr["Discount_type"].ToString() == "Per")
-                //                    {
-                //                        txtDiscount.Text = System.Convert.ToString((double.Parse(SqlDtr["Grand_Total"].ToString()) - double.Parse(SqlDtr["schdiscount"].ToString())) * double.Parse(SqlDtr["discount"].ToString()) / 100);
-                //                        txtDiscount.Text = System.Convert.ToString(Math.Round(double.Parse(txtDiscount.Text), 2));
-                //                    }
-                //                    else
-                //                    {
-                //                        double Discount = double.Parse(GenUtil.strNumericFormat(SqlDtr["Discount"].ToString())) * double.Parse(GenUtil.strNumericFormat(SqlDtr["totalqtyltr"].ToString()));
-                //                        txtDiscount.Text = GenUtil.strNumericFormat(Discount.ToString());
-                //                    }
-
-
-                //                    if (SqlDtr["cash_Disc_type"].ToString() == "Per")
-                //                    {
-                //                        double tot = 0;
-                //                        if (txtDiscount.Text != "")
-                //                            tot = double.Parse(SqlDtr["Grand_Total"].ToString()) - (double.Parse(SqlDtr["schdiscount"].ToString()) + double.Parse(SqlDtr["foediscount"].ToString()) + double.Parse(txtDiscount.Text));
-                //                        else
-                //                            tot = double.Parse(SqlDtr["Grand_Total"].ToString()) - (double.Parse(SqlDtr["schdiscount"].ToString()) + double.Parse(SqlDtr["foediscount"].ToString()));
-                //                        txtCashDiscount.Text = System.Convert.ToString(tot * double.Parse(SqlDtr["Cash_Discount"].ToString()) / 100);
-                //                        txtCashDiscount.Text = System.Convert.ToString(Math.Round(double.Parse(txtCashDiscount.Text), 2));
-                //                        tempcashdis.Value = txtCashDiscount.Text;
-                //                    }
-                //                    else
-                //                    {
-                //                        double cashDiscount = double.Parse(GenUtil.strNumericFormat(SqlDtr["Cash_Discount"].ToString())) * double.Parse(GenUtil.strNumericFormat(SqlDtr["totalqtyltr"].ToString()));
-                //                        txtCashDiscount.Text = GenUtil.strNumericFormat(cashDiscount.ToString());
-                //                    }
-
-                //                    txtCashDisc.Text=SqlDtr.GetValue(15).ToString();
-                //		txtCashDisc.Text = GenUtil.strNumericFormat(txtCashDisc.Text.ToString());
-                //		DropCashDiscType.SelectedIndex= DropCashDiscType.Items.IndexOf((DropCashDiscType.Items.FindByValue(SqlDtr.GetValue(16).ToString())));
-                //		txtVAT.Text =  SqlDtr.GetValue(17).ToString();
-                //		txtschemetotal.Text=SqlDtr.GetValue(18).ToString();
-                //		txtfleetoediscount.Text=SqlDtr.GetValue(19).ToString();
-                //		dropfleetoediscount.SelectedIndex= dropfleetoediscount.Items.IndexOf((dropfleetoediscount.Items.FindByValue(SqlDtr.GetValue(20).ToString())));
-                //		txtfleetoediscountRs.Text=SqlDtr.GetValue(21).ToString();
-                //		txtliter.Text=SqlDtr.GetValue(22).ToString();
-                //                    Textcgst.Text = SqlDtr.GetValue(27).ToString();
-                //                    Textsgst.Text = SqlDtr.GetValue(26).ToString();
-                //		if(SqlDtr["ChallanNo"].ToString()=="0")
-                //			txtChallanNo.Text="";
-                //		else
-                //			txtChallanNo.Text=SqlDtr["ChallanNo"].ToString();
-                //		if(GenUtil.trimDate(SqlDtr["ChallanDate"].ToString())=="1/1/1900")
-                //			txtChallanDate.Text="";
-                //		else
-                //			txtChallanDate.Text=GenUtil.str2DDMMYYYY(GenUtil.trimDate(SqlDtr["ChallanDate"].ToString()));
-                //		if(txtVAT.Text.Trim() == "0")
-                //		{
-                //			Yes.Checked = false;
-                //			No.Checked = true;
-                //		}
-                //		else
-                //		{
-                //			No.Checked = false;
-                //			Yes.Checked = true;
-                //		}
-                //	}
-                //	SqlDtr.Close();
-                //	#endregion
-
-                //	#region Get Customer name and place regarding Customer ID
-                //	//*****add Cust_type
-                //	//coment by vikas 7.11.2012 sql="select Cust_Name, City,CR_Days,Op_Balance,Curr_Credit,Cust_Type,c.Cust_ID from Customer as c, sales_master as s where c.Cust_ID= s.Cust_ID and s.Invoice_No='"+FromDate+ToDate+dropInvoiceNo.SelectedValue +"'";
-                //	sql="select Cust_Name, City,CR_Days,Op_Balance,Curr_Credit,Cust_Type,c.Cust_ID,ct.group_name from Customer as c, sales_master as s,customertype as ct where c.Cust_ID= s.Cust_ID and c.cust_type=ct.customertypename and s.Invoice_No='"+FromDate+ToDate+dropInvoiceNo.SelectedValue +"'";
-                //	SqlDtr=obj.GetRecordSet(sql);
-                //	while(SqlDtr.Read())
-                //	{
-                //		//**DropCustName.SelectedIndex=DropCustName.Items.IndexOf(DropCustName.Items.FindByValue(SqlDtr.GetValue(0).ToString()));
-
-                //		//texthidden1.Value=SqlDtr.GetValue(0).ToString(); //Comment by vikas sharma 27.04.09
-                //		//text1.Value=SqlDtr.GetValue(0).ToString(); //Comment by vikas sharma 27.04.09
-
-                //		texthidden1.Value=SqlDtr.GetValue(0).ToString()+":"+SqlDtr.GetValue(1).ToString(); //Add by vikas sharma 27.04.09
-                //		text1.Value=SqlDtr.GetValue(0).ToString()+":"+SqlDtr.GetValue(1).ToString(); //Add by vikas sharma 27.04.09
-
-                //		//Cache["CustName"]=SqlDtr.GetValue(0).ToString();
-                //		CustID=SqlDtr["Cust_ID"].ToString();
-
-                //		lblPlace.Value=SqlDtr.GetValue(1).ToString();
-                //		DateTime duedate=DateTime.Now.AddDays(System.Convert.ToDouble(SqlDtr.GetValue(2).ToString()));
-                //		string duedatestr=(duedate.ToShortDateString());
-                //		lblDueDate.Value =GenUtil.str2DDMMYYYY(duedatestr);
-                //		lblCurrBalance.Value=GenUtil.strNumericFormat(SqlDtr.GetValue(3).ToString());
-                //		TxtCrLimit.Value = SqlDtr.GetValue(4).ToString();
-                //		lblCreditLimit.Value  = SqlDtr.GetValue(4).ToString();
-                //		txtcusttype.Text = SqlDtr.GetValue(5).ToString();
-                //		/***Add by vikas 10.11.2012 *********************/
-                //		if(SqlDtr["Group_Name"].ToString()!=null && SqlDtr["Group_Name"].ToString()!="")
-                //			tempCustGroup.Value=SqlDtr["Group_Name"].ToString();
-                //		/*********************************************/
-                //	}
-                //	SqlDtr.Close();
-
-                //	//Coment by vikas 06.08.09 sql="select top 1 balance,balancetype  from CustomerLedgerTable as c, sales_master as s where c.CustID= s.Cust_ID and s.Invoice_No='"+FromDate+ToDate+dropInvoiceNo.SelectedValue+"' order by entrydate desc";
-                //	sql="select top 1 Balance,BalanceType from customerledgertable where CustID="+CustID+" order by EntryDate Desc";
-                //	SqlDtr=obj.GetRecordSet(sql);
-                //	while(SqlDtr.Read())
-                //	{
-                //		lblCurrBalance.Value=GenUtil.strNumericFormat(SqlDtr.GetValue(0).ToString())+" "+SqlDtr.GetValue(1).ToString();
-                //	}
-                //	SqlDtr.Close();
-
-                //	#endregion
-
-                //	#region Get Customer Slip
-                //	/* Mahesh
-                //	sql="select start_no, end_no from slip,  sales_master as sm where slip.Cust_ID = sm.Cust_ID and Invoice_No='"+dropInvoiceNo.SelectedValue +"'";
-                //	SqlDtr=obj.GetRecordSet(sql);
-                //	if(SqlDtr.Read())
-                //	{
-
-                //		Txtstart.Value = SqlDtr.GetValue(0).ToString();
-                //		TxtEnd.Value  =  SqlDtr.GetValue(1).ToString();
-                //		//*bhal*	txtSlipNo.Visible=false;
-                //	}
-                //	else
-                //	{
-                //		Txtstart.Value = "0";
-                //		TxtEnd.Value  =  "0";
-                //	//*bhal*	txtSlipNo.Visible=false;
-                //	}
-                //	SqlDtr.Close();
-                //	Mahesh */
-                //	#endregion
-
-                //	#region Get Data from Sales Details Table regarding Invoice No.
-                //	//					sql="select	p.Category,p.Prod_Name,p.Pack_Type,	sd.qty,sd.rate,sd.amount,p.Prod_ID,p.unit,sd.scheme1,sd.foe"+
-                //	//						" from Products p, sales_Details sd"+
-                //	//						" where p.Prod_ID=sd.prod_id and sd.Rate >0 and sd.Amount > 0 and sd.invoice_no='"+FromDate+ToDate+dropInvoiceNo.SelectedItem.Value +"' order by sd.sno" ;
-
-                //	/* **************Start Comment By Vikas Sharma 21.04.09***************************************************
-                //	 sql="select	p.Category,p.Prod_Name,p.Pack_Type,	sd.qty,sd.rate,sd.amount,p.Prod_ID,p.unit,sd.scheme1,sd.foe,sd.invoice_no,sm.invoice_date,sm.cust_id,sd.SchType,sd.FoeType,sd.SPDiscType,sd.SPDisc"+
-                //		" from Products p, sales_Details sd,sales_master sm"+
-                //		" where p.Prod_ID=sd.prod_id and sd.invoice_no=sm.invoice_no and sd.Rate >0 and sd.Amount > 0 and sd.invoice_no='"+FromDate+ToDate+dropInvoiceNo.SelectedItem.Value +"' order by sd.sno" ;
-                //		************end************************************************/
-                //	/* **************Start Add By Vikas Sharma 21.04.09***/
-                //	sql="select	p.Category,p.Prod_Name,p.Pack_Type,	sd.qty,sd.rate,sd.amount,p.Prod_ID,p.unit,sd.scheme1,sd.foe,sd.invoice_no,sm.invoice_date,sm.cust_id,sd.SchType,sd.FoeType,sd.SPDiscType,sd.SPDisc,p.Prod_Code"+
-                //		" from Products p, sales_Details sd,sales_master sm"+
-                //		" where p.Prod_ID=sd.prod_id and sd.invoice_no=sm.invoice_no and sd.Rate >0 and sd.Amount > 0 and sd.invoice_no='"+FromDate+ToDate+dropInvoiceNo.SelectedItem.Value +"' order by sd.sno" ;
-                //	/* **********end***************************************/
-
-
-                //	SqlDtr=obj.GetRecordSet(sql);
-                //	while(SqlDtr.Read())
-                //	{
-                //		//ProdType[i].Enabled = true;
-                //		//**ProdName[i].Enabled = true;
-                //		//**PackType[i].Enabled = true;
-                //		Qty[i].Enabled = true;
-
-                //		Rate[i].Enabled = true;
-                //		Amount[i].Enabled = true;
-                //		AvStock[i].Enabled = true;
-                //		//**ProdType[i].SelectedIndex=ProdType[i].Items.IndexOf(ProdType[i].Items.FindByValue(SqlDtr.GetValue(0).ToString ()));
-                //		//ProdType[i].SelectedIndex=ProdType[i].Items.IndexOf(ProdType[i].Items.FindByValue(SqlDtr.GetValue(1).ToString ()+":"+SqlDtr.GetValue(2).ToString ()));
-
-                //		//ProdType[i].Value=SqlDtr.GetValue(1).ToString ()+":"+SqlDtr.GetValue(2).ToString ();  //Comment by vikas sharma 21.04.09
-                //		ProdType[i].Value=SqlDtr.GetValue(17).ToString ()+":"+SqlDtr.GetValue(1).ToString ()+":"+SqlDtr.GetValue(2).ToString ();  //Add by vikas sharma 21.04.09
-
-                //		//**Type_Changed(ProdType[i] ,ProdName[i] ,PackType[i] );  
-                //		//**ProdName[i].SelectedIndex=ProdName[i].Items.IndexOf(ProdName[i].Items.FindByValue(SqlDtr.GetValue(1).ToString ()));
-                //		//**Prod_Changed(ProdType[i], ProdName[i] ,PackType[i] ,Rate[i]);    
-                //		//**Name[i].Value=SqlDtr.GetValue(1).ToString();   
-                //		//**PackType[i].SelectedIndex=PackType[i].Items.IndexOf(PackType[i].Items.FindByValue(SqlDtr.GetValue(2).ToString ()));
-                //		//**Type[i].Value=SqlDtr.GetValue(2).ToString();   
-                //		Qty[i].Text=SqlDtr.GetValue(3).ToString();
-                //		//*************
-                //		ProductType[i]=SqlDtr.GetValue(0).ToString ();
-                //		ProductName[i]=SqlDtr.GetValue(1).ToString ();
-                //		ProductPack[i]=SqlDtr.GetValue(2).ToString ();
-                //		ProductQty[i]=SqlDtr.GetValue(3).ToString();
-                //		//string pt=ProductType[i];
-                //		//string pn=ProductName[i];
-                //		//string pp=ProductPack[i];
-                //		//string pq=ProductQty[i];
-                //		//*************
-                //		tempQty[i].Text   = Qty[i].Text ;
-                //		tmpQty[i].Value  = SqlDtr.GetValue(3).ToString();  
-                //		Rate[i].Text=SqlDtr.GetValue(4).ToString();
-                //		Amount[i].Text=SqlDtr.GetValue(5).ToString();
-                //		//********
-                //		pid[i].Text=SqlDtr.GetValue(6).ToString();
-                //		pid1[i].Text=SqlDtr.GetValue(6).ToString();
-                //		/*bhal*/			scheme[i].Text=SqlDtr.GetValue(8).ToString();
-                //		foe[i].Text=SqlDtr.GetValue(9).ToString();
-                //		//********
-                //		sql1="select top 1 Closing_Stock from Stock_Master where productid="+SqlDtr.GetValue(6).ToString()+" order by stock_date desc";
-                //		dbobj.SelectQuery(sql1,ref rdr); 
-                //		if(rdr.Read())
-                //		{
-                //			AvStock [i].Text =rdr["Closing_Stock"]+" "+SqlDtr.GetValue(7).ToString();
-                //		}	
-                //		else
-                //		{
-                //			AvStock [i].Text ="0"+" "+SqlDtr.GetValue(7).ToString();
-                //		}
-                //		Qty[i].ToolTip = "Actual Available Stock = "+Qty[i].Text.ToString()+" + "+ AvStock[i].Text.ToString();
-                //		//rdr.Close();
-                //		//string strstrste="select o.DiscountType,o.Discount from sales_details sd,oilscheme o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and o.schname='Secondry SP(LTRSP Scheme)' and cast(floor(cast(o.datefrom as float)) as datetime)>='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)<='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+SqlDtr["Prod_ID"].ToString()+"'";
-                //		if(SqlDtr["SPDiscType"].ToString()=="")
-                //		{
-                //			rdr3 = obj1.GetRecordSet("select o.DiscountType,o.Discount from sales_details sd,oilscheme o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and o.schname='Secondry SP(LTRSP Scheme)' and cast(floor(cast(o.datefrom as float)) as datetime)<='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)>='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+SqlDtr["Prod_ID"].ToString()+"'");
-                //			if(rdr3.HasRows)
-                //			{
-                //				if(rdr3.Read())
-                //				{
-                //					SchSPType[i].Value=rdr3.GetValue(0).ToString();
-                //					SchSP[i].Value=rdr3.GetValue(1).ToString();
-                //				}
-                //			}
-                //			rdr3.Close();
-                //		}
-                //		else
-                //		{
-                //			SchSPType[i].Value=SqlDtr["SPDiscType"].ToString();
-                //			SchSP[i].Value=SqlDtr["SPDisc"].ToString();
-                //		}
-                //		//strstrste="select distinct o.distype from sales_details sd,foe o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and custid=cust_id and custid='1470' and sd.prod_id='1037' and cast(floor(cast(o.datefrom as float)) as datetime)<='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)>='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"'";
-                //		if(SqlDtr["FoeType"].ToString()=="")
-                //		{
-                //			rdr3 = obj1.GetRecordSet("select distinct o.distype from sales_details sd,foe o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and custid=cust_id and custid='"+SqlDtr["Cust_ID"].ToString()+"' and sd.prod_id='"+SqlDtr["Prod_ID"].ToString()+"' and cast(floor(cast(o.datefrom as float)) as datetime)<='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)>='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"'");
-                //			if(rdr3.HasRows)
-                //			{
-                //				if(rdr3.Read())
-                //				{
-                //					tmpFoeType[i].Value=rdr3.GetValue(0).ToString();
-                //				}
-                //			}
-                //			rdr3.Close();
-                //		}
-                //		else
-                //			tmpFoeType[i].Value=SqlDtr["FoeType"].ToString();
-                //		//*************
-                //		if(SqlDtr["SchType"].ToString()=="")
-                //		{
-                //			string ssssss="select o.discounttype from sales_details sd,oilscheme o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and (o.schname='Primary(LTR&% Scheme)' or o.schname='Secondry(LTR Scheme)') and cast(floor(cast(o.datefrom as float)) as datetime)<='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)>='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+SqlDtr["Prod_ID"].ToString()+"'";
-                //			//rdr3 = obj1.GetRecordSet("select o.discounttype from sales_details sd,oilscheme o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and o.schname='Primary(LTR&% Scheme)' and cast(floor(cast(o.datefrom as float)) as datetime)>='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)<='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+rdr2["Prod_ID"].ToString()+"'");
-                //			rdr3 = obj1.GetRecordSet("select o.discounttype from sales_details sd,oilscheme o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and (o.schname='Primary(LTR&% Scheme)' or o.schname='Secondry(LTR Scheme)') and cast(floor(cast(o.datefrom as float)) as datetime)<='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)>='"+GenUtil.trimDate(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+SqlDtr["Prod_ID"].ToString()+"'");
-                //			if(rdr3.HasRows)
-                //			{
-                //				if(rdr3.Read())
-                //				{
-                //					tmpSchType[i].Value=rdr3.GetValue(0).ToString();
-                //				}
-                //			}
-                //			rdr3.Close();
-                //		}
-                //		else
-                //			tmpSchType[i].Value=SqlDtr["SchType"].ToString();
-                //		//*************
-                //		string	sql11="select	p.Category,p.Prod_Name,p.Pack_Type,	sd.qty,p.Prod_ID,p.unit"+
-                //			" from Products p, sales_Details sd"+
-                //			" where p.Prod_ID=sd.prod_id and sd.Rate =0 and sd.Amount = 0 and sno="+i+" and sd.invoice_no='"+FromDate+ToDate+dropInvoiceNo.SelectedItem.Value +"'" ;
-                //		dbobj.SelectQuery(sql11,ref rdr2);
-
-                //		if(rdr2.HasRows)
-                //		{
-                //			while(rdr2.Read())
-                //			{
-                //				//ProdType1[i].Text=rdr2.GetValue(0).ToString();
-                //				ProdType1[i].Text=rdr2.GetValue(1).ToString()+":"+rdr2.GetValue(2).ToString();
-                //				//**ProdName1[i].Text=rdr2.GetValue(1).ToString();
-                //				//**PackType1[i].Text=rdr2.GetValue(2).ToString();
-                //				Qty1[i].Text=rdr2.GetValue(3).ToString();
-                //				//*************
-                //				SchProductType[i]=rdr2.GetValue(0).ToString();
-                //				SchProductName[i]=rdr2.GetValue(1).ToString();
-                //				SchProductPack[i]=rdr2.GetValue(2).ToString();
-                //				SchProductQty[i]=rdr2.GetValue(3).ToString();
-                //				//**************
-                //				tempSchQty[i].Text=rdr2.GetValue(3).ToString();
-                //				string sql12="select top 1 Closing_Stock from Stock_Master where productid="+rdr2.GetValue(4).ToString()+" order by stock_date desc";
-                //				dbobj.SelectQuery(sql12,ref rdr1); 
-                //				if(rdr1.Read())
-                //				{
-                //					stk1[i].Text =rdr1["Closing_Stock"]+" "+rdr2.GetValue(5).ToString();
-                //				}	
-                //				else
-                //				{
-                //					stk1[i].Text ="0"+" "+rdr2.GetValue(5).ToString();
-                //				}
-                //				/************
-                //				if(SqlDtr["SchType"].ToString()=="")
-                //				{
-                //					string ssssss="select o.discounttype from sales_details sd,oilscheme o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and o.schname='Primary(LTR&% Scheme)' and cast(floor(cast(o.datefrom as float)) as datetime)>='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)<='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+rdr2["Prod_ID"].ToString()+"'";
-                //					rdr3 = obj1.GetRecordSet("select o.discounttype from sales_details sd,oilscheme o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and o.schname='Primary(LTR&% Scheme)' and cast(floor(cast(o.datefrom as float)) as datetime)>='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)<='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+rdr2["Prod_ID"].ToString()+"'");
-                //					if(rdr3.HasRows)
-                //					{
-                //						if(rdr3.Read())
-                //						{
-                //							tmpSchType[i].Value=rdr3.GetValue(0).ToString();
-                //						}
-                //					}
-                //					rdr3.Close();
-                //				}
-                //				else
-                //					tmpSchType[i].Value=SqlDtr["SchType"].ToString();
-                //				******/
-                //				rdr3 = obj1.GetRecordSet("select o.distype from sales_details sd,foe o,sales_master sm where o.prodid=sd.prod_id and sm.invoice_no=sd.invoice_no and sd.invoice_no='"+SqlDtr["invoice_No"].ToString()+"' and cast(floor(cast(o.datefrom as float)) as datetime)<='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime)>='"+GenUtil.str2DDMMYYYY(SqlDtr["Invoice_Date"].ToString())+"' and sd.prod_id='"+rdr2["Prod_ID"].ToString()+"'");
-                //				if(rdr3.HasRows)
-                //				{
-                //					if(rdr3.Read())
-                //					{
-                //						tmpFoeType[i].Value=rdr3.GetValue(0).ToString();
-                //					}
-                //				}
-                //				rdr3.Close();
-                //				//j++;
-                //			}
-                //			rdr1.Close();
-                //		}
-                //		rdr2.Close();
-                //		rdr.Close();
-                //		//string mahesh=tmpSchType[i].Value;
-                //		//*************
-                //		i++;
-                //	}
-
-                //	SqlDtr.Close();
-                //	#endregion
-
-                //}
-
-
-
-                //            //string strInvoiceNo = FromDate + ToDate + dropInvoiceNo.SelectedItem.Value;
-                //            using (var client = new HttpClient())
-                //            {
-                //                client.BaseAddress = new Uri("http://localhost:55251/api/roles");
-                //                client.DefaultRequestHeaders.Accept.Clear();
-                //                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                //                //HttpResponseMessage response = await client.GetAsync("http://localhost:55251/api/roles/GetDataSelectedSalesInvoice/");
-                //                var response = client.GetAsync("http://localhost:55251/api/sales/GetDataSelectedSalesInvoice?id=" + dropInvoiceNo.SelectedItem.Value).Result;
-                //                string res = "";
-
-                //                if (response.IsSuccessStatusCode)
-                //                {
-                //                    using (HttpContent content = response.Content)
-                //                    {
-                //                        // ... Read the string.
-                //                        Task<string> result = content.ReadAsStringAsync();
-                //                        res = result.Result;
-
-                //                        sales = JsonConvert.DeserializeObject<SalesModel>(res);
-                //                    }
-                //                }
-                //            }
-                //            txtGrandTotal.Text = GenUtil.strNumericFormat(sales.Grand_Total);
-                //            //txt
-
-                //            CreateLogFiles.ErrorLog("Form:Sales Invoisee.aspx,Method:dropInvoiceNo_SelectedIndexChanged " +" Sales invoice is viewed for invoice no: "+dropInvoiceNo.SelectedItem.Value.ToString()+" userid "+"   "+"   "+uid);
+                DropInvoiceNo_Selected();                
             }
             catch (Exception ex)
             {
@@ -5260,13 +4005,11 @@ namespace Servosms.Module.Inventory
                     Clear();
 
                     using (var client = new HttpClient())
-                    {
-                        //client.BaseAddress = new Uri("http://localhost:55251/api/roles");
+                    {                        
                         client.BaseAddress = new Uri(baseUri);
                         client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                        //HttpResponseMessage response = await client.GetAsync("http://localhost:55251/api/roles/GetDataSelectedSalesInvoice/");
-                        //var response = client.GetAsync("http://localhost:55251/api/sales/GetDataSelectedSalesInvoice?id=" + dropInvoiceNo.SelectedItem.Value).Result;
+                        
                         var response = client.GetAsync("/api/sales/GetDataSelectedSalesInvoice?id=" + dropInvoiceNo.SelectedItem.Value).Result;
                         string res = "";
 
@@ -5290,6 +4033,8 @@ namespace Servosms.Module.Inventory
                                 //sales = JsonConvert.DeserializeObject<SalesModel>(res);
                             }
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
 
                     HtmlInputText[] ProdType = { DropType1, DropType2, DropType3, DropType4, DropType5, DropType6, DropType7, DropType8, DropType9, DropType10, DropType11, DropType12 };
@@ -5901,6 +4646,8 @@ namespace Servosms.Module.Inventory
                             //sales = JsonConvert.DeserializeObject<SalesModel>(res);
                         }
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 if (vehNos != null && vehNos.Count > 1)
@@ -5957,82 +4704,82 @@ namespace Servosms.Module.Inventory
             return true;
         }
 
-        /// <summary>
-        /// This method fatch the customer vehicle info. according to passing value.
-        /// </summary>
-        /// <param name="cust_id"></param>
-        /// <returns></returns>
-        public bool getCustomerVehiclesNos(string cust_id)
-        {
-            //VehicleNo vehNos = new VehicleNo();
-            //using (var client = new HttpClient())
-            //{
-            //    client.BaseAddress = new Uri("http://localhost:55251/api/roles");
-            //    client.DefaultRequestHeaders.Accept.Clear();
-            //    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+        ///// <summary>
+        ///// This method fatch the customer vehicle info. according to passing value.
+        ///// </summary>
+        ///// <param name="cust_id"></param>
+        ///// <returns></returns>
+        //public bool getCustomerVehiclesNos(string cust_id)
+        //{
+        //    //VehicleNo vehNos = new VehicleNo();
+        //    //using (var client = new HttpClient())
+        //    //{
+        //    //    client.BaseAddress = new Uri("http://localhost:55251/api/roles");
+        //    //    client.DefaultRequestHeaders.Accept.Clear();
+        //    //    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            //    var response = client.GetAsync("http://localhost:55251/api/sales/GetCustomerVehicles?id=" + cust_id).Result;
-            //    string res = "";
+        //    //    var response = client.GetAsync("http://localhost:55251/api/sales/GetCustomerVehicles?id=" + cust_id).Result;
+        //    //    string res = "";
 
-            //    if (response.IsSuccessStatusCode)
-            //    {
-            //        using (HttpContent content = response.Content)
-            //        {
-            //            // ... Read the string.
-            //            Task<string> result = content.ReadAsStringAsync();
-            //            res = result.Result;
+        //    //    if (response.IsSuccessStatusCode)
+        //    //    {
+        //    //        using (HttpContent content = response.Content)
+        //    //        {
+        //    //            // ... Read the string.
+        //    //            Task<string> result = content.ReadAsStringAsync();
+        //    //            res = result.Result;
 
-            //            vehNos = JsonConvert.DeserializeObject<VehicleNo>(res);
-            //        }
-            //    }
-            //}
+        //    //            vehNos = JsonConvert.DeserializeObject<VehicleNo>(res);
+        //    //        }
+        //    //    }
+        //    //}
 
-            //try
-            //{
-            //    SqlDataReader SqlDtr = null;
-            //    dbobj.SelectQuery("Select * from Customer_Vehicles where Cust_ID =" + cust_id, ref SqlDtr);
-            //    if (vehNos.VehicleNos == null)
-            //    {
-            //        DropVehicleNo.Visible = false;
-            //        txtVehicleNo.Visible = true;
-            //        RequiredFieldValidator1.Visible = true;
-            //        RequiredFieldValidator3.Visible = false;
-            //        txtVehicleNo.Text = "";
-            //        return false;
-            //    }
-            //    else if (vehNos.VehicleNos.Count > 0)
-            //    {
-            //        DropVehicleNo.Visible = true;
-            //        txtVehicleNo.Visible = false;
-            //        RequiredFieldValidator1.Visible = false;
-            //        RequiredFieldValidator3.Visible = true;
-            //        DropVehicleNo.Items.Clear();
-            //        DropVehicleNo.Items.Add("Select");
-            //        int i = 0;
-            //        while (i < vehNos.VehicleNos.Count)
-            //        {
-            //            DropVehicleNo.Items.Add(vehNos.VehicleNos[i].ToString());
-            //            i++;
-            //        }
-            //        SqlDtr.Close();
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        DropVehicleNo.Visible = false;
-            //        txtVehicleNo.Visible = true;
-            //        RequiredFieldValidator1.Visible = true;
-            //        RequiredFieldValidator3.Visible = false;
-            //        txtVehicleNo.Text = "";
-            //        return false;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    CreateLogFiles.ErrorLog("Form:Sales Invoice.aspx,Method:getCustomerVehicles().  EXCEPTION  " + ex.Message + "  userid " + "   " + "   " + uid);
-            //}
-            return true;
-        }
+        //    //try
+        //    //{
+        //    //    SqlDataReader SqlDtr = null;
+        //    //    dbobj.SelectQuery("Select * from Customer_Vehicles where Cust_ID =" + cust_id, ref SqlDtr);
+        //    //    if (vehNos.VehicleNos == null)
+        //    //    {
+        //    //        DropVehicleNo.Visible = false;
+        //    //        txtVehicleNo.Visible = true;
+        //    //        RequiredFieldValidator1.Visible = true;
+        //    //        RequiredFieldValidator3.Visible = false;
+        //    //        txtVehicleNo.Text = "";
+        //    //        return false;
+        //    //    }
+        //    //    else if (vehNos.VehicleNos.Count > 0)
+        //    //    {
+        //    //        DropVehicleNo.Visible = true;
+        //    //        txtVehicleNo.Visible = false;
+        //    //        RequiredFieldValidator1.Visible = false;
+        //    //        RequiredFieldValidator3.Visible = true;
+        //    //        DropVehicleNo.Items.Clear();
+        //    //        DropVehicleNo.Items.Add("Select");
+        //    //        int i = 0;
+        //    //        while (i < vehNos.VehicleNos.Count)
+        //    //        {
+        //    //            DropVehicleNo.Items.Add(vehNos.VehicleNos[i].ToString());
+        //    //            i++;
+        //    //        }
+        //    //        SqlDtr.Close();
+        //    //        return true;
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        DropVehicleNo.Visible = false;
+        //    //        txtVehicleNo.Visible = true;
+        //    //        RequiredFieldValidator1.Visible = true;
+        //    //        RequiredFieldValidator3.Visible = false;
+        //    //        txtVehicleNo.Text = "";
+        //    //        return false;
+        //    //    }
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    CreateLogFiles.ErrorLog("Form:Sales Invoice.aspx,Method:getCustomerVehicles().  EXCEPTION  " + ex.Message + "  userid " + "   " + "   " + uid);
+        //    //}
+        //    return true;
+        //}
 
         /// <summary>
         /// This method clears the form.
@@ -6428,6 +5175,8 @@ namespace Servosms.Module.Inventory
                             lblInvoiceNo.Text = res;
                         }
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //            InventoryClass  obj=new InventoryClass ();
@@ -6640,6 +5389,8 @@ namespace Servosms.Module.Inventory
                             sales = JsonConvert.DeserializeObject<SalesModel>(res);
                         }
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 lblMessage.Text = sales.Message;
@@ -6780,6 +5531,8 @@ namespace Servosms.Module.Inventory
                             temptext13.Value = res;
                         }
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //InventoryClass  obj=new InventoryClass ();
@@ -6831,6 +5584,8 @@ namespace Servosms.Module.Inventory
                             //sales = JsonConvert.DeserializeObject<SalesModel>(res);
                         }
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
             }
             catch (Exception ex)
@@ -6867,6 +5622,8 @@ namespace Servosms.Module.Inventory
                             temptext12.Value = res;
                         }
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //InventoryClass  obj=new InventoryClass ();
@@ -6954,39 +5711,9 @@ namespace Servosms.Module.Inventory
                             temptextSecSP.Value = res;
                         }
                     }
-                }
-
-                //            InventoryClass  obj=new InventoryClass();
-                //SqlDataReader SqlDtr;
-                //string sql;
-                //string str="";
-                ////SqlDataReader rdr=null; 
-
-                ////sql="select p.category cat,p.prod_name pname,p.pack_type ptype,o.onevery one,o.freepack free,o.schprodid sch,o.datefrom df,o.dateto dt,o.discount dis  from products p,oilscheme o where p.prod_id=o.prodid and";
-                ////sql="select p.category cat,p.prod_name pname,p.pack_type ptype,o.datefrom df,o.dateto dt,o.discount dis,o.schname scheme  from products p,oilscheme o where p.prod_id=o.prodid and o.schname='Secondry(LTR Scheme)' or o.schname='Primary(LTR Scheme)' and cast(floor(cast(o.datefrom as float)) as datetime) <= '"+GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim())+"' and cast(floor(cast(o.dateto as float)) as datetime) >= Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103)";
-                ////Mahesh11.04.007 
-
-                ////coment by vikas 26.10.2012 sql="select p.category cat,p.prod_name pname,p.pack_type ptype,o.datefrom df,o.dateto dt,o.discount dis,o.schname scheme,o.discounttype distype  from products p,oilscheme o where p.prod_id=o.prodid and o.schname in ('Secondry SP(LTRSP Scheme)') and cast(floor(cast(o.datefrom as float)) as datetime) <= '"+GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim())+"' and cast(floor(cast(o.dateto as float)) as datetime) >= Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["lblInvoiceDate"].ToString()) + "',103)";
-                //sql= "select p.category cat,p.prod_name pname,p.pack_type ptype,o.datefrom df,o.dateto dt,o.discount dis,o.schname scheme,o.discounttype distype,o.group_name gname,o.unit from products p,oilscheme o where p.prod_id=o.prodid and o.schname in ('Primary(LTR&% Addl Scheme)','Secondry SP(LTRSP Scheme)') and cast(floor(cast(o.datefrom as float)) as datetime) <= '" + GenUtil.str2MMDDYYYY(lblInvoiceDate.Text.Trim())+"' and cast(floor(cast(o.dateto as float)) as datetime) >= Convert(datetime,'" + GenUtil.str2DDMMYYYY(lblInvoiceDate.Text.Trim()) + "',103)";       //add by vikas 26.10.2012
-
-                ////sql="select p.category cat,p.prod_name pname,p.pack_type ptype,o.datefrom df,o.dateto dt,o.discount dis,o.schname scheme  from products p,oilscheme o where p.prod_id=o.prodid and o.schname in ('Secondry(LTR Scheme)','Primary(LTR Scheme)') and cast(floor(cast(o.datefrom as float)) as datetime) <= '"+GenUtil.str2DDMMYYYY(Session["CurrentDate"].ToString())+"' and cast(floor(cast(o.dateto as float)) as datetime) >= '"+GenUtil.str2DDMMYYYY(Session["CurrentDate"].ToString()) +"'";
-                //SqlDtr=obj.GetRecordSet(sql);
-                //while(SqlDtr.Read())
-                //{
-                //	//coment by vikas 26.10.2012 str=str+":"+SqlDtr["cat"]+":"+SqlDtr["pname"]+":"+SqlDtr["ptype"]+":"+SqlDtr["dis"]+":"+SqlDtr["scheme"]+":"+SqlDtr["distype"]+",";
-
-                //	/*************Add by vikas 26.10.2012******************/
-                //	str=str+":"+SqlDtr["cat"]+":"+SqlDtr["pname"]+":"+SqlDtr["ptype"]+":"+SqlDtr["dis"]+":"+SqlDtr["scheme"]+":"+SqlDtr["distype"];
-
-                //	if(SqlDtr["gname"].ToString().Trim()!= null && SqlDtr["gname"].ToString().Trim()!= "")
-                //		str=str+":"+SqlDtr["gname"]+",";
-                //	else
-                //		str=str+":"+0+",";
-                //	/**********End*********************/
-
-                //}
-                //SqlDtr.Close();
-                //temptextSecSP.Value=str;
+                    else
+                        response.EnsureSuccessStatusCode();
+                }                
             }
             catch (Exception ex)
             {
@@ -7095,6 +5822,8 @@ namespace Servosms.Module.Inventory
                         var date = Res.Content.ReadAsStringAsync().Result;
                         InDate = JsonConvert.DeserializeObject<string>(date);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
 
                 //            if (lblInvoiceNo.Visible==true)
@@ -7168,6 +5897,8 @@ namespace Servosms.Module.Inventory
                             var product = Res.Content.ReadAsStringAsync().Result;
                             sales = JsonConvert.DeserializeObject<List<string>>(product);
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     ProdCode[p] = sales[0].ToString();
@@ -7215,6 +5946,8 @@ namespace Servosms.Module.Inventory
                             schProdCode[p1] = JsonConvert.DeserializeObject<string>(product);
                             p1++;
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     //               str ="select Prod_Code from Products where Prod_Name='"+arrProdSchType[0].ToString()+"' and Pack_Type='"+arrProdSchType[1].ToString()+"'"; 
@@ -7325,6 +6058,8 @@ namespace Servosms.Module.Inventory
                                     var id = Res.Content.ReadAsStringAsync().Result;
                                     btQty = JsonConvert.DeserializeObject<List<string>>(id);
                                 }
+                                else
+                                    Res.EnsureSuccessStatusCode();
                             }
                             //str = "select b.batch_no,bt.qty from batch_transaction bt,batchno b where b.prod_id=bt.prod_id and b.prod_id=(select prod_id from products where Prod_Code='" + ProdCode[p].ToString() + "' and Prod_Name='" + arrProdCat[1].ToString() + "' and Pack_Type='" + arrProdCat[2].ToString() + "') and b.batch_id=bt.batch_id and bt.trans_id='" + lblInvoiceNo.Text + "' and trans_type='Sales Invoice'";
                         }
@@ -7342,6 +6077,8 @@ namespace Servosms.Module.Inventory
                                     var id = Res.Content.ReadAsStringAsync().Result;
                                     btQty = JsonConvert.DeserializeObject<List<string>>(id);
                                 }
+                                else
+                                    Res.EnsureSuccessStatusCode();
                             }
 
                             // str = "select b.batch_no,bt.qty from batch_transaction bt,batchno b where b.prod_id=bt.prod_id and b.prod_id=(select prod_id from products where Prod_Code='" + ProdCode[p].ToString() + "' and Prod_Name='" + arrProdCat[1].ToString() + "' and Pack_Type='" + arrProdCat[2].ToString() + "') and b.batch_id=bt.batch_id and bt.trans_id='" + dropInvoiceNo.SelectedItem.Text + "' and trans_type='Sales Invoice'";
@@ -7465,6 +6202,8 @@ namespace Servosms.Module.Inventory
                                     var id = Res.Content.ReadAsStringAsync().Result;
                                     btQty = JsonConvert.DeserializeObject<List<string>>(id);
                                 }
+                                else
+                                    Res.EnsureSuccessStatusCode();
                             }
                             //str = "select b.batch_no,bt.qty from batch_transaction bt,batchno b where b.prod_id=bt.prod_id and b.prod_id=(select prod_id from products where Prod_Code='" + schProdCode[p].ToString() + "' and Prod_Name='" + arrschProdCat[0].ToString() + "' and Pack_Type='" + arrschProdCat[1].ToString() + "') and b.batch_id=bt.batch_id and bt.trans_id='" + lblInvoiceNo.Text + "' and trans_type='Sales Invoice'";
                         }
@@ -7483,6 +6222,8 @@ namespace Servosms.Module.Inventory
                                     var id = Res.Content.ReadAsStringAsync().Result;
                                     btQty = JsonConvert.DeserializeObject<List<string>>(id);
                                 }
+                                else
+                                    Res.EnsureSuccessStatusCode();
                             }
                             //str = "select b.batch_no,bt.qty from batch_transaction bt,batchno b where b.prod_id=bt.prod_id and b.prod_id=(select prod_id from products where Prod_Code='" + schProdCode[p].ToString() + "' and Prod_Name='" + arrschProdCat[0].ToString() + "' and Pack_Type='" + arrschProdCat[1].ToString() + "') and b.batch_id=bt.batch_id and bt.trans_id='" + dropInvoiceNo.SelectedItem.Text + "' and trans_type='Sales Invoice'";
                         }
@@ -7599,6 +6340,8 @@ namespace Servosms.Module.Inventory
                             ssc = cust[1].ToString();
                             TinNo = cust[2].ToString();
                         }
+                        else
+                            Res.EnsureSuccessStatusCode();
                     }
 
                     //               dbobj.SelectQuery("select * from customer where cust_name='"+txtval+"'",ref SqlDtr);
@@ -9063,6 +7806,8 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
             }
             catch (Exception ex)
@@ -9092,40 +7837,9 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
-                }
-
-                //            SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-                //InventoryClass obj = new InventoryClass();
-                //SqlDataReader rdr;
-                //SqlCommand cmd;
-                ////coment by vikas 18.06.09 rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+dropInvoiceNo.SelectedItem.Text+"'");
-                //rdr = obj.GetRecordSet("select * from Batch_transaction where trans_id='"+dropInvoiceNo.SelectedItem.Text+"' and trans_type='Sales Invoice'");
-                //while(rdr.Read())
-                //{
-                //	//******************************
-                //	string s="update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'";
-                //	Con.Open();
-                //	cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
-                //	//cmd = new SqlCommand("update StockMaster_Batch set Sales=Sales-"+rdr["Qty"].ToString()+",Closing_Stock=Closing_Stock+"+rdr["Qty"].ToString()+" where ProductID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"' and stock_date=Convert(datetime,'" + GenUtil.str2DDMMYYYY(Request.Form["tempInvoiceDate"].ToString()) + "',103)",Con);
-                //	cmd.ExecuteNonQuery();
-                //	cmd.Dispose();
-                //	Con.Close();
-
-                //	/*******Add by vikas 19.06.09**********************/
-                //	Con.Open();
-                //	cmd = new SqlCommand("update BatchNo set Qty=Qty+"+rdr["Qty"].ToString()+" where Prod_ID='"+rdr["Prod_ID"].ToString()+"' and Batch_ID='"+rdr["Batch_ID"].ToString()+"'",Con);
-                //	cmd.ExecuteNonQuery();
-                //	cmd.Dispose();
-                //	Con.Close();
-                //	/************************************************/
-                //}
-                //rdr.Close();
-                //Con.Open();
-                //cmd = new SqlCommand("delete Batch_Transaction where Trans_ID='"+dropInvoiceNo.SelectedItem.Text+"' and Trans_Type='Sales Invoice'",Con);
-                //cmd.ExecuteNonQuery();
-                //cmd.Dispose();
-                //Con.Close();
-
+                    else
+                        response.EnsureSuccessStatusCode();
+                }               
             }
             catch (Exception ex)
             {
@@ -9152,6 +7866,8 @@ namespace Servosms.Module.Inventory
                 {
                     string responseString = response.Content.ReadAsStringAsync().Result;
                 }
+                else
+                    response.EnsureSuccessStatusCode();
             }
         }
 
@@ -9546,6 +8262,8 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //            InventoryClass obj = new InventoryClass();
@@ -9716,6 +8434,8 @@ namespace Servosms.Module.Inventory
                     {
                         string responseString = response.Content.ReadAsStringAsync().Result;
                     }
+                    else
+                        response.EnsureSuccessStatusCode();
                 }
 
                 //            rdr = obj.GetRecordSet("select top 1 Entry_Date from AccountsLedgerTable where Ledger_ID=(select Ledger_ID from Ledger_Master l,Customer c where Cust_Name=Ledger_Name and Cust_ID='"+CustID+"') and Entry_Date<='"+ GenUtil.str2MMDDYYYY(Invoice_Date) + "' order by entry_date desc");
@@ -9943,6 +8663,8 @@ namespace Servosms.Module.Inventory
                                 sales = JsonConvert.DeserializeObject<SalesModel>(res);
                             }
                         }
+                        else
+                            response.EnsureSuccessStatusCode();
                     }
 
                     //if (Count == 1)
