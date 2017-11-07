@@ -31,6 +31,7 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Servo_API.Models;
+using System.Collections.Generic;
 
 namespace Servosms.Module.Inventory
 {
@@ -874,85 +875,122 @@ namespace Servosms.Module.Inventory
 		{
 			try
 			{
-				InventoryClass obj = new InventoryClass();
-				InventoryClass obj1 = new InventoryClass();
-				DBUtil dbobj1=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
-				SqlDataReader rdr1 = null;
-				int SNo=0;
-				rdr1 = obj1.GetRecordSet("select max(SNo)+1 from Batch_Transaction");
-				if(rdr1.Read())
-				{
-					if(rdr1.GetValue(0).ToString()!="" && rdr1.GetValue(0).ToString()!=null)
-						SNo=int.Parse(rdr1.GetValue(0).ToString());
-					else
-						SNo=1;
-				}
-				else
-					SNo=1;
-				rdr1.Close();
-				SqlDataReader rdr = obj.GetRecordSet("select * from stockmaster_batch where productid=(select prod_id from products where prod_name='"+Prod+"' and Pack_Type='"+PackType+"') order by stock_date");
-				int count=0;
-				if(Qty!="")
-					count=int.Parse(Qty);
-				int x=0;
-				double cl_sk=0;
-				while(rdr.Read())
-				{
-					if(double.Parse(rdr["closing_stock"].ToString())>0)
-						cl_sk=double.Parse(rdr["closing_stock"].ToString());
-					else
-						continue;
-					if(count>0)
-					{
-						if(int.Parse(rdr["closing_stock"].ToString())>0)
-						{
-							if(count<=int.Parse(rdr["closing_stock"].ToString()))
-							{
-								cl_sk-=count;
-								
-								dbobj1.Insert_or_Update("update stockmaster_batch set sales=sales+"+count+",closing_stock=closing_stock-"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								if(lblSAV_ID.Visible==true)
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
-								else
-									//22.06.09 dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
-								
-								
-								//***********add by vikas 19.06.09 *****************
-								
-								dbobj1.Insert_or_Update("update batchno set qty=qty-"+count+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								//****************************
-								count=0;
-								break;
-							}
-							else
-							{
-								cl_sk-=double.Parse(rdr["closing_stock"].ToString());
-								//dbobj1.Insert_or_Update("update batchno set qty=0 where prod_id='"+rdr["prod_id"].ToString()+"' and trans_no='"+rdr["trans_no"].ToString()+"' and Batch_No='"+rdr["Batch_No"].ToString()+"' and Date='"+rdr["Date"].ToString()+"'",ref x);
-								dbobj1.Insert_or_Update("update stockmaster_batch set sales=sales+"+double.Parse(rdr["closing_stock"].ToString())+",closing_stock=closing_stock-"+double.Parse(rdr["closing_stock"].ToString())+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								if(lblSAV_ID.Visible==true)
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+rdr["closing_stock"].ToString()+"',"+cl_sk.ToString()+")",ref x);
-								else
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+rdr["closing_stock"].ToString()+"',"+cl_sk.ToString()+")",ref x);
-								//count-=int.Parse(rdr["qty"].ToString());
+                StockAdjustmentModel stockAdjust = new StockAdjustmentModel();
 
-								//***********add by vikas 19.06.09 *****************
-								dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								//****************************
+                stockAdjust.Prod = Prod;
+                stockAdjust.PackType = PackType;
+                stockAdjust.Qty = Qty;                
 
-								count-=int.Parse(rdr["closing_stock"].ToString());
+                if (lblSAV_ID.Visible == true)
+                {
+                    stockAdjust.SAV_ID = lblSAV_ID.Text;
+                    stockAdjust.SAV_ID_Visible = true;
+                }                    
+                else
+                {
+                    stockAdjust.SAV_ID = DropSavID.SelectedItem.Text;
+                    stockAdjust.SAV_ID_Visible = false;
+                }
 
-								//*****Add by vikas 10.06.09*********
-								if(lblSAV_ID.Visible==true)
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','0','"+count.ToString()+"',"+cl_sk.ToString()+")",ref x);
-								else
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','0','"+count.ToString()+"',"+cl_sk.ToString()+")",ref x);
-								//*****end*********
-							}
-						}
-					}
-				}
-				rdr.Close();
+                stockAdjust.Date = txtDate.Text;                
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(stockAdjust);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/StockAdjustment/InsertBatchNo", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+
+    //            InventoryClass obj = new InventoryClass();
+				//InventoryClass obj1 = new InventoryClass();
+				//DBUtil dbobj1=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
+				//SqlDataReader rdr1 = null;
+				//int SNo=0;
+				//rdr1 = obj1.GetRecordSet("select max(SNo)+1 from Batch_Transaction");
+				//if(rdr1.Read())
+				//{
+				//	if(rdr1.GetValue(0).ToString()!="" && rdr1.GetValue(0).ToString()!=null)
+				//		SNo=int.Parse(rdr1.GetValue(0).ToString());
+				//	else
+				//		SNo=1;
+				//}
+				//else
+				//	SNo=1;
+				//rdr1.Close();
+				//SqlDataReader rdr = obj.GetRecordSet("select * from stockmaster_batch where productid=(select prod_id from products where prod_name='"+Prod+"' and Pack_Type='"+PackType+"') order by stock_date");
+				//int count=0;
+				//if(Qty!="")
+				//	count=int.Parse(Qty);
+				//int x=0;
+				//double cl_sk=0;
+				//while(rdr.Read())
+				//{
+				//	if(double.Parse(rdr["closing_stock"].ToString())>0)
+				//		cl_sk=double.Parse(rdr["closing_stock"].ToString());
+				//	else
+				//		continue;
+				//	if(count>0)
+				//	{
+				//		if(int.Parse(rdr["closing_stock"].ToString())>0)
+				//		{
+				//			if(count<=int.Parse(rdr["closing_stock"].ToString()))
+				//			{
+				//				cl_sk-=count;
+								
+				//				dbobj1.Insert_or_Update("update stockmaster_batch set sales=sales+"+count+",closing_stock=closing_stock-"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				if(lblSAV_ID.Visible==true)
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
+				//				else
+				//					//22.06.09 dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
+								
+								
+				//				//***********add by vikas 19.06.09 *****************
+								
+				//				dbobj1.Insert_or_Update("update batchno set qty=qty-"+count+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				//****************************
+				//				count=0;
+				//				break;
+				//			}
+				//			else
+				//			{
+				//				cl_sk-=double.Parse(rdr["closing_stock"].ToString());
+				//				//dbobj1.Insert_or_Update("update batchno set qty=0 where prod_id='"+rdr["prod_id"].ToString()+"' and trans_no='"+rdr["trans_no"].ToString()+"' and Batch_No='"+rdr["Batch_No"].ToString()+"' and Date='"+rdr["Date"].ToString()+"'",ref x);
+				//				dbobj1.Insert_or_Update("update stockmaster_batch set sales=sales+"+double.Parse(rdr["closing_stock"].ToString())+",closing_stock=closing_stock-"+double.Parse(rdr["closing_stock"].ToString())+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				if(lblSAV_ID.Visible==true)
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+rdr["closing_stock"].ToString()+"',"+cl_sk.ToString()+")",ref x);
+				//				else
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+rdr["closing_stock"].ToString()+"',"+cl_sk.ToString()+")",ref x);
+				//				//count-=int.Parse(rdr["qty"].ToString());
+
+				//				//***********add by vikas 19.06.09 *****************
+				//				dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				//****************************
+
+				//				count-=int.Parse(rdr["closing_stock"].ToString());
+
+				//				//*****Add by vikas 10.06.09*********
+				//				if(lblSAV_ID.Visible==true)
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','0','"+count.ToString()+"',"+cl_sk.ToString()+")",ref x);
+				//				else
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','0','"+count.ToString()+"',"+cl_sk.ToString()+")",ref x);
+				//				//*****end*********
+				//			}
+				//		}
+				//	}
+				//}
+				//rdr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -965,234 +1003,248 @@ namespace Servosms.Module.Inventory
 		{
 			try
 			{
-				InventoryClass obj = new InventoryClass();
-				InventoryClass obj1 = new InventoryClass();
-				DBUtil dbobj1=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
-				SqlDataReader rdr1 = null;
-				int SNo=0,BatID=0;;
-				rdr1 = obj1.GetRecordSet("select max(SNo)+1 from Batch_Transaction");
-				if(rdr1.Read())
-				{
-					if(rdr1.GetValue(0).ToString()!="" && rdr1.GetValue(0).ToString()!=null)
-						SNo=int.Parse(rdr1.GetValue(0).ToString());
-					else
-						SNo=1;
-				}
-				else
-					SNo=1;
-				rdr1.Close();
-				rdr1 = obj.GetRecordSet("select max(Batch_ID) from BatchNo");
-				if(rdr1.Read())
-				{
-					if(rdr1.GetValue(0).ToString() != null && rdr1.GetValue(0).ToString()!="")
-						BatID=int.Parse(rdr1.GetValue(0).ToString());
-					else
-						BatID=0;
-				}
-				else
-					BatID=0;
-				rdr1.Close();
+                StockAdjustmentModel stockAdjust = new StockAdjustmentModel();
+
+                stockAdjust.Prod = Prod;
+                stockAdjust.PackType = PackType;
+                stockAdjust.Qty = Qty;                
+
+                stockAdjust.Prod1 = Prod1;
+                stockAdjust.PackType1 = PackType1;
+                stockAdjust.Qty1 = Qty1;
+
+                if (lblSAV_ID.Visible == true)
+                {
+                    stockAdjust.SAV_ID = lblSAV_ID.Text;
+                    stockAdjust.SAV_ID_Visible = true;
+                }
+                else
+                {
+                    stockAdjust.SAV_ID = DropSavID.SelectedItem.Text;
+                    stockAdjust.SAV_ID_Visible = false;
+                }
+
+                stockAdjust.Date = txtDate.Text;
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    var myContent = JsonConvert.SerializeObject(stockAdjust);
+                    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                    var byteContent = new ByteArrayContent(buffer);
+                    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync("api/StockAdjustment/InsertBatchNoIn", byteContent).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = response.Content.ReadAsStringAsync().Result;
+                    }
+                    else
+                        response.EnsureSuccessStatusCode();
+                }
+
+    //            InventoryClass obj = new InventoryClass();
+				//InventoryClass obj1 = new InventoryClass();
+				//DBUtil dbobj1=new DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
+				//SqlDataReader rdr1 = null;
+				//int SNo=0,BatID=0;;
+				//rdr1 = obj1.GetRecordSet("select max(SNo)+1 from Batch_Transaction");
+				//if(rdr1.Read())
+				//{
+				//	if(rdr1.GetValue(0).ToString()!="" && rdr1.GetValue(0).ToString()!=null)
+				//		SNo=int.Parse(rdr1.GetValue(0).ToString());
+				//	else
+				//		SNo=1;
+				//}
+				//else
+				//	SNo=1;
+				//rdr1.Close();
+				//rdr1 = obj.GetRecordSet("select max(Batch_ID) from BatchNo");
+				//if(rdr1.Read())
+				//{
+				//	if(rdr1.GetValue(0).ToString() != null && rdr1.GetValue(0).ToString()!="")
+				//		BatID=int.Parse(rdr1.GetValue(0).ToString());
+				//	else
+				//		BatID=0;
+				//}
+				//else
+				//	BatID=0;
+				//rdr1.Close();
 	
-				SqlDataReader rdr = obj.GetRecordSet("select * from stockmaster_batch where productid=(select prod_id from products where prod_name='"+Prod+"' and Pack_Type='"+PackType+"') order by stock_date");
-				int count=0;
-				if(Qty!="")
-					count=int.Parse(Qty);
-				int x=0;
-				double cl_sk=0;
-				string batch_name="";
-				while(rdr.Read())
-				{
-					if(double.Parse(rdr["closing_stock"].ToString())>0)
-					{
-						cl_sk=double.Parse(rdr["closing_stock"].ToString());
-					}
-					else
-					{
-						/*******Add by vikas 24.06.09 ****************************/
+				//SqlDataReader rdr = obj.GetRecordSet("select * from stockmaster_batch where productid=(select prod_id from products where prod_name='"+Prod+"' and Pack_Type='"+PackType+"') order by stock_date");
+				//int count=0;
+				//if(Qty!="")
+				//	count=int.Parse(Qty);
+				//int x=0;
+				//double cl_sk=0;
+				//string batch_name="";
+				//while(rdr.Read())
+				//{
+				//	if(double.Parse(rdr["closing_stock"].ToString())>0)
+				//	{
+				//		cl_sk=double.Parse(rdr["closing_stock"].ToString());
+				//	}
+				//	else
+				//	{
+				//		/*******Add by vikas 24.06.09 ****************************/
 
-						rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and pack_type='"+PackType1+"')");
-						if(rdr1.Read())
-						{
-							batch_name=rdr1.GetValue(1).ToString();
-						}
-						rdr1.Close();
+				//		rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and pack_type='"+PackType1+"')");
+				//		if(rdr1.Read())
+				//		{
+				//			batch_name=rdr1.GetValue(1).ToString();
+				//		}
+				//		rdr1.Close();
 					
-						cl_sk+=count;
+				//		cl_sk+=count;
 					
-						string prod_id="";
-						rdr1 = obj1.GetRecordSet("select prod_id from products where prod_name='"+Prod+"' and pack_type='"+PackType+"'");
-						if(rdr1.Read())
-						{
-							prod_id=rdr1.GetValue(0).ToString();
-						}
-						rdr1.Close();
+				//		string prod_id="";
+				//		rdr1 = obj1.GetRecordSet("select prod_id from products where prod_name='"+Prod+"' and pack_type='"+PackType+"'");
+				//		if(rdr1.Read())
+				//		{
+				//			prod_id=rdr1.GetValue(0).ToString();
+				//		}
+				//		rdr1.Close();
 
-						string batch_id="";
-						rdr1 = obj1.GetRecordSet("select batch_id from batchno where batch_no='"+batch_name+"' and prod_id='"+prod_id+"'");
-						if(rdr1.Read())
-						{
-							batch_id=rdr1.GetValue(0).ToString();
-						}
-						rdr1.Close();
+				//		string batch_id="";
+				//		rdr1 = obj1.GetRecordSet("select batch_id from batchno where batch_no='"+batch_name+"' and prod_id='"+prod_id+"'");
+				//		if(rdr1.Read())
+				//		{
+				//			batch_id=rdr1.GetValue(0).ToString();
+				//		}
+				//		rdr1.Close();
 
-						//24.06.09 dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+prod_id.ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
-						//24.06.09 dbobj1.Insert_or_Update("insert into stockmaster_batch values("+prod_id.ToString()+","+BatID.ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0)",ref x);
+				//		//24.06.09 dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+prod_id.ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
+				//		//24.06.09 dbobj1.Insert_or_Update("insert into stockmaster_batch values("+prod_id.ToString()+","+BatID.ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0)",ref x);
 
-						//dbobj.Insert_or_Update("update BatchNo set qty="+count.ToString()+", '"+lblSAV_ID.Text+"')",ref x);
-						//dbobj1.Insert_or_Update("update stockmaster_batch values("+prod_id.ToString()+","+BatID.ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0)",ref x);
+				//		//dbobj.Insert_or_Update("update BatchNo set qty="+count.ToString()+", '"+lblSAV_ID.Text+"')",ref x);
+				//		//dbobj1.Insert_or_Update("update stockmaster_batch values("+prod_id.ToString()+","+BatID.ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0)",ref x);
 
-						dbobj1.Insert_or_Update("update batchno set qty="+count.ToString()+" where prod_id='"+prod_id.ToString()+"' and batch_id='"+batch_id.ToString()+"'",ref x);
-						dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+prod_id.ToString()+"' and batch_id='"+batch_id.ToString()+"'",ref x);
+				//		dbobj1.Insert_or_Update("update batchno set qty="+count.ToString()+" where prod_id='"+prod_id.ToString()+"' and batch_id='"+batch_id.ToString()+"'",ref x);
+				//		dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+prod_id.ToString()+"' and batch_id='"+batch_id.ToString()+"'",ref x);
 
 								
-						if(lblSAV_ID.Visible==true)
-							dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+BatID.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
-						else
-							dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+batch_id.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
+				//		if(lblSAV_ID.Visible==true)
+				//			dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+BatID.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
+				//		else
+				//			dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+batch_id.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
 														
-						count=0;
+				//		count=0;
 
-						/*******End ****************************/
-						continue;
-					}
+				//		/*******End ****************************/
+				//		continue;
+				//	}
 
-					/*******Add by vikas 23.06.09***********************/
-					rdr1 = obj1.GetRecordSet("select * from batchno where prod_id="+rdr["productid"].ToString()+" and batch_id="+rdr["batch_id"].ToString());
-					if(rdr1.Read())
-					{
-						batch_name=rdr1.GetValue(1).ToString();
-					}
-					rdr1.Close();
-					/*******End***********************/
+				//	/*******Add by vikas 23.06.09***********************/
+				//	rdr1 = obj1.GetRecordSet("select * from batchno where prod_id="+rdr["productid"].ToString()+" and batch_id="+rdr["batch_id"].ToString());
+				//	if(rdr1.Read())
+				//	{
+				//		batch_name=rdr1.GetValue(1).ToString();
+				//	}
+				//	rdr1.Close();
+				//	/*******End***********************/
 
-					if(count>0)
-					{
-						if(int.Parse(rdr["closing_stock"].ToString())>0)
-						{
-							if(count<=int.Parse(rdr["closing_stock"].ToString()))
-							{
-								cl_sk+=count;
+				//	if(count>0)
+				//	{
+				//		if(int.Parse(rdr["closing_stock"].ToString())>0)
+				//		{
+				//			if(count<=int.Parse(rdr["closing_stock"].ToString()))
+				//			{
+				//				cl_sk+=count;
 								
-								//23.06.09 dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				//23.06.09 dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
 
-								/*******Add by vikas 23.06.09***********************/
+				//				/*******Add by vikas 23.06.09***********************/
 								
-								rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and Pack_Type='"+PackType1+"') and batch_no='"+batch_name+"'");
-								//23.06.09 rdr1 = obj1.GetRecordSet("select * from batchno where prod_id="+rdr["productid"].ToString()+" and batch_no='"+batch_name+"'");
-								if(rdr1.HasRows)
-								{
-									dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-									dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								}
-								else
-								{
-									dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+rdr["productid"].ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
-									dbobj1.Insert_or_Update("insert into stockmaster_batch values("+rdr["productid"].ToString()+","+rdr["batch_id"].ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0",ref x);
-								}
-								rdr1.Close();
-								/*******End***********************/
+				//				rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and Pack_Type='"+PackType1+"') and batch_no='"+batch_name+"'");
+				//				//23.06.09 rdr1 = obj1.GetRecordSet("select * from batchno where prod_id="+rdr["productid"].ToString()+" and batch_no='"+batch_name+"'");
+				//				if(rdr1.HasRows)
+				//				{
+				//					dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//					dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				}
+				//				else
+				//				{
+				//					dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+rdr["productid"].ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
+				//					dbobj1.Insert_or_Update("insert into stockmaster_batch values("+rdr["productid"].ToString()+","+rdr["batch_id"].ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0",ref x);
+				//				}
+				//				rdr1.Close();
+				//				/*******End***********************/
 
 
-								if(lblSAV_ID.Visible==true)
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
-								else
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
+				//				if(lblSAV_ID.Visible==true)
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
+				//				else
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
 															
-								count=0;
-								break;
-							}
-							else
-							{
+				//				count=0;
+				//				break;
+				//			}
+				//			else
+				//			{
 
-								cl_sk+=count;
+				//				cl_sk+=count;
 								
-								//23.06.09 dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				//23.06.09 dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
 
-								/*******Add by vikas 23.06.09***********************/
+				//				/*******Add by vikas 23.06.09***********************/
 								
-								rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and Pack_Type='"+PackType1+"') and batch_no='"+batch_name+"'");
-								//23.06.09 rdr1 = obj1.GetRecordSet("select * from batchno where prod_id="+rdr["productid"].ToString()+" and batch_no='"+batch_name+"'");
-								if(rdr1.HasRows)
-								{
-									dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-									dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								}
-								else
-								{
-									dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+rdr["productid"].ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
-									dbobj1.Insert_or_Update("insert into stockmaster_batch values("+rdr["productid"].ToString()+","+rdr["batch_id"].ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0",ref x);
-								}
-								rdr1.Close();
-								/*******End***********************/
+				//				rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and Pack_Type='"+PackType1+"') and batch_no='"+batch_name+"'");
+				//				//23.06.09 rdr1 = obj1.GetRecordSet("select * from batchno where prod_id="+rdr["productid"].ToString()+" and batch_no='"+batch_name+"'");
+				//				if(rdr1.HasRows)
+				//				{
+				//					dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//					dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+count+",closing_stock=closing_stock+"+count+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
+				//				}
+				//				else
+				//				{
+				//					dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+rdr["productid"].ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
+				//					dbobj1.Insert_or_Update("insert into stockmaster_batch values("+rdr["productid"].ToString()+","+rdr["batch_id"].ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0",ref x);
+				//				}
+				//				rdr1.Close();
+				//				/*******End***********************/
 
-								if(lblSAV_ID.Visible==true)
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
-								else
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
-
-
-								/*
-								cl_sk+=double.Parse(rdr["closing_stock"].ToString());
-								dbobj1.Insert_or_Update("update stockmaster_batch set receipt=receipt+"+double.Parse(rdr["closing_stock"].ToString())+",closing_stock=closing_stock+"+double.Parse(rdr["closing_stock"].ToString())+" where productid='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								if(lblSAV_ID.Visible==true)
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+rdr["closing_stock"].ToString()+"',"+cl_sk.ToString()+")",ref x);
-								else
-									dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (OUT)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+rdr["closing_stock"].ToString()+"',"+cl_sk.ToString()+")",ref x);
-
-								//*******Add by vikas 23.06.09***********************
-								//23.06.09 rdr1 = obj1.GetRecordSet("select * from batchno where prod_id="+rdr["productid"].ToString()+" and batch_id="+rdr["batch_id"].ToString()+" and batch_no="+batch_name);
-								rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and Pack_Type='"+PackType1+"') and batch_no='"+batch_name+"'");
-								if(rdr1.HasRows)
-									dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								else
-									dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+rdr["productid"].ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+cl_sk.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
-								
-								rdr1.Close();
-								//*******End**********************
-
-								//23.06.09 dbobj1.Insert_or_Update("update batchno set qty="+cl_sk+" where prod_id='"+rdr["productid"].ToString()+"' and batch_id='"+rdr["batch_id"].ToString()+"'",ref x);
-								
-
-								count-=int.Parse(rdr["closing_stock"].ToString());
-								*/
-								
-							}
-						}
-					}
-				}
-				if(!rdr.HasRows)
-				{
-					rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and pack_type='"+PackType1+"')");
-					if(rdr1.Read())
-					{
-						batch_name=rdr1.GetValue(1).ToString();
-					}
-					rdr1.Close();
+				//				if(lblSAV_ID.Visible==true)
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
+				//				else
+				//					dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+rdr["ProductID"].ToString()+"','"+rdr["Batch_ID"].ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);									
+				//			}
+				//		}
+				//	}
+				//}
+				//if(!rdr.HasRows)
+				//{
+				//	rdr1 = obj1.GetRecordSet("select * from batchno where prod_id=(select prod_id from products where prod_name='"+Prod1+"' and pack_type='"+PackType1+"')");
+				//	if(rdr1.Read())
+				//	{
+				//		batch_name=rdr1.GetValue(1).ToString();
+				//	}
+				//	rdr1.Close();
 					
-					if(batch_name!="")
-					{
-						cl_sk+=count;
+				//	if(batch_name!="")
+				//	{
+				//		cl_sk+=count;
 					
-						string prod_id="";
-						rdr1 = obj1.GetRecordSet("select prod_id from products where prod_name='"+Prod+"' and pack_type='"+PackType+"'");
-						if(rdr1.Read())
-						{
-							prod_id=rdr1.GetValue(0).ToString();
-						}
-						rdr1.Close();
+				//		string prod_id="";
+				//		rdr1 = obj1.GetRecordSet("select prod_id from products where prod_name='"+Prod+"' and pack_type='"+PackType+"'");
+				//		if(rdr1.Read())
+				//		{
+				//			prod_id=rdr1.GetValue(0).ToString();
+				//		}
+				//		rdr1.Close();
 
-						dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+prod_id.ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
-						dbobj1.Insert_or_Update("insert into stockmaster_batch values("+prod_id.ToString()+","+BatID.ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0)",ref x);
+				//		dbobj.Insert_or_Update("insert into BatchNo values("+(++BatID)+",'"+batch_name.ToString()+"','"+prod_id.ToString()+"','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',"+count.ToString()+",'"+lblSAV_ID.Text+"')",ref x);
+				//		dbobj1.Insert_or_Update("insert into stockmaster_batch values("+prod_id.ToString()+","+BatID.ToString()+",'"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"',0,"+count.ToString()+",0,"+count.ToString()+",0,0)",ref x);
 								
-						if(lblSAV_ID.Visible==true)
-							dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+BatID.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
-						else
-							dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+BatID.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
+				//		if(lblSAV_ID.Visible==true)
+				//			dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+lblSAV_ID.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+BatID.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);
+				//		else
+				//			dbobj1.Insert_or_Update("insert into batch_transaction values("+(SNo++)+",'"+DropSavID.SelectedItem.Text+"','Stock Adjustment (IN)','"+System.Convert.ToDateTime(GenUtil.str2MMDDYYYY(txtDate.Text)+" "+DateTime.Now.TimeOfDay.ToString())+"','"+prod_id.ToString()+"','"+BatID.ToString()+"','"+count+"',"+cl_sk.ToString()+")",ref x);	
 														
-						count=0;
-					}				
-				}
-				rdr.Close();
+				//		count=0;
+				//	}				
+				//}
+				//rdr.Close();
 			}
 			catch(Exception ex)
 			{
@@ -1359,18 +1411,44 @@ namespace Servosms.Module.Inventory
 			DropSavID.Visible=true;
 			btnEdit.Visible=false;
 			btnPrint.Text="Update";
-			InventoryClass obj = new InventoryClass();
-			SqlDataReader rdr = obj.GetRecordSet("select distinct sav_id from stock_adjustment order by sav_id");
-			DropSavID.Items.Clear();
-			DropSavID.Items.Add("Select");
-			if(rdr.HasRows)
-			{
-				while(rdr.Read())
-				{
-					DropSavID.Items.Add(rdr.GetValue(0).ToString());
-				}
-			}
-			rdr.Close();
+
+            List<string> lstStockAdjustmentIDs = new List<string>();
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(baseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var Res = client.GetAsync("api/StockAdjustment/GetStockAdjustmentIds").Result;
+                if (Res.IsSuccessStatusCode)
+                {
+                    var id = Res.Content.ReadAsStringAsync().Result;
+                    lstStockAdjustmentIDs = JsonConvert.DeserializeObject<List<string>>(id);
+                }
+                else
+                    Res.EnsureSuccessStatusCode();
+            }
+
+            if (lstStockAdjustmentIDs != null)
+            {
+                DropSavID.Items.Clear();
+                DropSavID.Items.Add("Select");
+                foreach (var ID in lstStockAdjustmentIDs)
+                    DropSavID.Items.Add(ID);
+            }
+
+            //InventoryClass obj = new InventoryClass();
+            //SqlDataReader rdr = obj.GetRecordSet("select distinct sav_id from stock_adjustment order by sav_id");
+   //         DropSavID.Items.Clear();
+			//DropSavID.Items.Add("Select");
+			//if(rdr.HasRows)
+			//{
+			//	while(rdr.Read())
+			//	{
+			//		DropSavID.Items.Add(rdr.GetValue(0).ToString());
+			//	}
+			//}
+			//rdr.Close();
 		}
 
 		/// <summary>
