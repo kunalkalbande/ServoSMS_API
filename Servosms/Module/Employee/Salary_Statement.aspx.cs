@@ -25,6 +25,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Text;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Servosms.Module.Employee
 {
@@ -36,12 +39,12 @@ namespace Servosms.Module.Employee
 		DBOperations.DBUtil dbobj=new DBOperations.DBUtil(System.Configuration.ConfigurationSettings.AppSettings["Servosms"],true);
 		TimeSpan sp = DateTime.Now.Subtract(new DateTime(DateTime.Now.Year ,DateTime.Now.Month,1));
 		string uid;
-
-		/// <summary>
-		/// This method is used for setting the Session variable for userId
-		/// and also check accessing priviledges for particular user
-		/// </summary>
-		protected void Page_Load(object sender, System.EventArgs e)
+        string BaseUri = "http://localhost:64862";
+        /// <summary>
+        /// This method is used for setting the Session variable for userId
+        /// and also check accessing priviledges for particular user
+        /// </summary>
+        protected void Page_Load(object sender, System.EventArgs e)
 		{
 			try
 			{
@@ -141,15 +144,31 @@ namespace Servosms.Module.Employee
 				/************End*************************/ 
 
 				EmployeeClass  obj=new EmployeeClass();
-				SqlDataReader SqlDtr;
-				string sql;
-				sql="select sum(cast(status as integer)) Total_Present from attandance_register where cast(floor(cast(cast(att_date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex+"' and cast(floor(cast(cast(att_date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(dropyear.SelectedIndex,DropMonth.SelectedIndex) +"/"+dropyear.SelectedIndex+"' ";	
-				SqlDtr =obj.GetRecordSet(sql);
-				if(SqlDtr != null)
-				{
-					while(SqlDtr.Read())
-					{
-						if(SqlDtr.GetValue(0).ToString().Equals("NULLS") || !SqlDtr.GetValue(0).ToString().Trim().Equals("") )
+				
+                string str1,str2,str3="";               
+                str1 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedIndex;
+                str2 = DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(dropyear.SelectedIndex, DropMonth.SelectedIndex) + "/" + dropyear.SelectedIndex;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/BindTheData?str1="+str1+ "&str2="+str2).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        str3 = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+    //            sql ="select sum(cast(status as integer)) Total_Present from attandance_register where cast(floor(cast(cast(att_date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex+"' and cast(floor(cast(cast(att_date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(dropyear.SelectedIndex,DropMonth.SelectedIndex) +"/"+dropyear.SelectedIndex+"' ";	
+				//SqlDtr =obj.GetRecordSet(sql);
+                
+				if(str3 != null)
+				{					
+						if(str3.Equals("NULLS") || !str3.Trim().Equals("") )
 						{
 							GridMachineReport.Visible = true;
 						}
@@ -158,10 +177,9 @@ namespace Servosms.Module.Employee
 							GridMachineReport.Visible = false;
 							MessageBox.Show("Details not available");
 							return;
-						}
-					}
+						}					
 				}
-				SqlDtr.Close();
+				//SqlDtr.Close();
 
 				//Fetch the employee id and its salary details ad bind the data grid.
 
@@ -179,11 +197,28 @@ namespace Servosms.Module.Employee
 				SqlDtr.Close();*/
 
 				SqlConnection sqlcon=new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
-				sql="select emp_id,emp_name, salary, ot_compensation from employee where status='1'";
-				SqlDataAdapter da=new SqlDataAdapter(sql,sqlcon);
-				DataSet ds=new DataSet();	
-				da.Fill(ds,"stkmv");
-				DataTable dtcustomer=ds.Tables["stkmv"];
+                DataSet DA = new DataSet();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/GetData").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        DA = JsonConvert.DeserializeObject<DataSet>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+
+                //sql ="select emp_id,emp_name, salary, ot_compensation from employee where status='1'";
+				SqlDataAdapter da=new SqlDataAdapter();
+                
+				//DataSet ds=new DataSet();	
+				//da.Fill(ds,"stkmv");
+				DataTable dtcustomer=DA.Tables["stkmv"];
 				DataView dv=new DataView(dtcustomer);
 				dv.Sort=strorderby;
 				Cache["strorderby"]=strorderby;
@@ -308,46 +343,96 @@ namespace Servosms.Module.Employee
 				else
 				{
 					int leave = 0;
-					/*4*/				sql = "select sum(datediff(day,date_from,dateadd(day,1,date_to))) from leave_register where cast(floor(cast(Date_From  as float))as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(date_to as float)) as datetime) <= '"+from_date+"' and emp_id = '"+ emp_id +"' and isSanction = 1";
-					SqlDtr =obj.GetRecordSet(sql);
-					if(SqlDtr.HasRows )
-					{
-						if(SqlDtr.Read())
-						{
-							if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))
-								leave = System.Convert.ToInt32(SqlDtr.GetValue(0).ToString()) ;
-						}
-					}
-					SqlDtr.Close();
-					
-					//sql = "select sum(datediff(day,date_from,dateadd(day,1,'"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(DateTime.Now.Year,DropMonth.SelectedIndex)+"/"+DateTime.Now.Year +"'))) from leave_register where cast(floor(cast(date_from as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(DateTime.Now.Year,DropMonth.SelectedIndex)+"/"+DateTime.Now.Year +"' and cast(floor(cast(date_to as float)) as datetime) > '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(DateTime.Now.Year,DropMonth.SelectedIndex)+"/"+DateTime.Now.Year +"'and emp_id = '"+ emp_id +"'";
-					sql = "select sum(datediff(day,date_from,dateadd(day,1,'"+from_date +"'))) from leave_register where cast(floor(cast(date_from as float)) as datetime) <= '"+from_date +"' and cast(floor(cast(date_to as float)) as datetime) > '"+from_date+"'and emp_id = '"+ emp_id +"' and isSanction = 1 and datepart(month,date_from) = datepart(month,'"+from_date +"')";
-					//if(emp_id.Equals("1002")) 
-					//Response.Write(sql+"<br><br>");
-					SqlDtr =obj.GetRecordSet(sql);
-					if(SqlDtr.HasRows  )
-					{
-						if(SqlDtr.Read())
-						{
-							if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))
-								leave += System.Convert.ToInt32(SqlDtr.GetValue(0).ToString()) ;
-						}
-					}
-					SqlDtr.Close();
-					//date_to
-					/*5*/		sql = "select case when cast(floor(cast(date_to as float)) as datetime) >= '"+from_date +"' then sum(datediff(day,'"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"',dateadd(day,1,'"+from_date +"'))) else sum(datediff(day,'"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"',dateadd(day,1,date_to))) end from leave_register where cast(floor(cast(date_from as float)) as datetime) < '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(date_to as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"'and emp_id = '"+ emp_id +"' and isSanction = 1 group by date_to";
-					//if(emp_id.Equals("1002")) 
-					//	Response.Write(sql+"<br><br>");
-					SqlDtr =obj.GetRecordSet(sql);
-					if(SqlDtr.HasRows )
-					{
-						if(SqlDtr.Read())
-						{
-							if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))
-								leave += System.Convert.ToInt32(SqlDtr.GetValue(0).ToString()) ;
-						}
-					}
-					SqlDtr.Close();
+                    /*4*/
+                    int leaveno = 0;
+                    string str1 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedIndex;                        
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/FindLeaves?str1=" + str1+ "&from_date="+ from_date + "&emp_id="+ emp_id).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            leaveno = JsonConvert.DeserializeObject<int>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+     //               sql = "select sum(datediff(day,date_from,dateadd(day,1,date_to))) from leave_register where cast(floor(cast(Date_From  as float))as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(date_to as float)) as datetime) <= '"+from_date+"' and emp_id = '"+ emp_id +"' and isSanction = 1";
+					//SqlDtr =obj.GetRecordSet(sql);
+					//if(SqlDtr.HasRows )
+					//{
+					//	if(SqlDtr.Read())
+					//	{
+					//		if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))
+					//			leave = System.Convert.ToInt32(SqlDtr.GetValue(0).ToString()) ;
+					//	}
+					//}
+					//SqlDtr.Close();
+                    leave = leaveno;
+                    //sql = "select sum(datediff(day,date_from,dateadd(day,1,'"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(DateTime.Now.Year,DropMonth.SelectedIndex)+"/"+DateTime.Now.Year +"'))) from leave_register where cast(floor(cast(date_from as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(DateTime.Now.Year,DropMonth.SelectedIndex)+"/"+DateTime.Now.Year +"' and cast(floor(cast(date_to as float)) as datetime) > '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(DateTime.Now.Year,DropMonth.SelectedIndex)+"/"+DateTime.Now.Year +"'and emp_id = '"+ emp_id +"'";
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/FindDays?from_date=" + from_date + "&emp_id=" + emp_id).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            leaveno = JsonConvert.DeserializeObject<int>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    leave += leaveno;
+                    //               sql = "select sum(datediff(day,date_from,dateadd(day,1,'"+from_date +"'))) from leave_register where cast(floor(cast(date_from as float)) as datetime) <= '"+from_date +"' and cast(floor(cast(date_to as float)) as datetime) > '"+from_date+"'and emp_id = '"+ emp_id +"' and isSanction = 1 and datepart(month,date_from) = datepart(month,'"+from_date +"')";
+                    ////if(emp_id.Equals("1002")) 
+                    ////Response.Write(sql+"<br><br>");
+                    //SqlDtr =obj.GetRecordSet(sql);
+                    //if(SqlDtr.HasRows  )
+                    //{
+                    //	if(SqlDtr.Read())
+                    //	{
+                    //		if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))
+                    //			leave += System.Convert.ToInt32(SqlDtr.GetValue(0).ToString()) ;
+                    //	}
+                    //}
+                    //SqlDtr.Close();
+                    //date_to
+                    /*5*/
+                    str1 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedIndex;
+                        
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/SelectCase?from_date=" + from_date + "&emp_id=" + emp_id + "&str1="+ str1).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            leaveno = JsonConvert.DeserializeObject<int>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    leave += leaveno;
+     //               sql = "select case when cast(floor(cast(date_to as float)) as datetime) >= '"+from_date +"' then sum(datediff(day,'"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"',dateadd(day,1,'"+from_date +"'))) else sum(datediff(day,'"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"',dateadd(day,1,date_to))) end from leave_register where cast(floor(cast(date_from as float)) as datetime) < '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(date_to as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"'and emp_id = '"+ emp_id +"' and isSanction = 1 group by date_to";
+					////if(emp_id.Equals("1002")) 
+					////	Response.Write(sql+"<br><br>");
+					//SqlDtr =obj.GetRecordSet(sql);
+					//if(SqlDtr.HasRows )
+					//{
+					//	if(SqlDtr.Read())
+					//	{
+					//		if(!SqlDtr.GetValue(0).ToString().Trim().Equals(""))
+					//			leave += System.Convert.ToInt32(SqlDtr.GetValue(0).ToString()) ;
+					//	}
+					//}
+					//SqlDtr.Close();
 
 					/*Coment by vikas 18.11.2012 
 					 * if(!e.Item.Cells[5].Text.ToString().Equals("Leave"))    
@@ -356,50 +441,83 @@ namespace Servosms.Module.Employee
 						e.Item.Cells[3].Text = leave.ToString(); 
 
 					string Present="0";
-					#region Bind Total Present Regarding Each Item				
-					/*6*/			sql="select sum(cast(status as integer)) Total_Present from attandance_register where cast(floor(cast(cast(att_date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(cast(att_date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(dropyear.SelectedIndex,DropMonth.SelectedIndex)+"/"+dropyear.SelectedIndex +"' and emp_id='"+ emp_id +"'";
-					SqlDtr =obj.GetRecordSet(sql);
-					if(SqlDtr.HasRows )
+                    #region Bind Total Present Regarding Each Item				
+                    /*6*/
+                    string str2, str3,sum="";
+                    str2 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedIndex;
+                    str3 = DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(dropyear.SelectedIndex, DropMonth.SelectedIndex) + "/" + dropyear.SelectedIndex;
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/SelectSum?str2=" + str2 + "&str3=" + str3 + "&emp_id=" + emp_id).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            sum = JsonConvert.DeserializeObject<string>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+
+                    //sql ="select sum(cast(status as integer)) Total_Present from attandance_register where cast(floor(cast(cast(att_date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(cast(att_date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(dropyear.SelectedIndex,DropMonth.SelectedIndex)+"/"+dropyear.SelectedIndex +"' and emp_id='"+ emp_id +"'";
+					//SqlDtr =obj.GetRecordSet(sql);
+					if(sum!= null )
 					{
-						while(SqlDtr.Read())
-						{
-							if(!SqlDtr.GetValue(0).ToString().Equals("NULL") ||!SqlDtr.GetValue(0).ToString().Equals("")|| SqlDtr.GetValue(0).ToString() != null)
+						
+							if(!sum.Equals("NULL") ||!sum.Equals("")|| sum != null)
 							{
 								//coment by vikas 18.11.2012 e.Item.Cells[6].Text=SqlDtr.GetValue(0).ToString() ;
 								if(!e.Item.Cells[2].Text.ToString().Equals("Working Days")) 
-									e.Item.Cells[2].Text=SqlDtr.GetValue(0).ToString() ;
-								Present=SqlDtr.GetValue(0).ToString();
+									e.Item.Cells[2].Text= sum;
+								Present= sum;
 							}	
-						}
+						
 					}
 					totpresenttot += System.Convert.ToDouble(e.Item.Cells[6].Text.ToString()) ;
 					totpresenttot1=totpresenttot;
-					SqlDtr.Close();
+					//SqlDtr.Close();
 					#endregion
 
 					/*******Add by vikas 18.11.2012*******************/
 					e.Item.Cells[5].Text=Convert.ToString((double.Parse(Present.ToString())-leave));
 
-					/*******End*******************/
+                    /*******End*******************/
 
-					#region Bind Total OverTime Hours Regarding Each Item
-					/*7*/			string	Sql1 ="select sum(datepart(hour,Ot_To)-datepart(hour,Ot_From)) OT_Hour,sum(datepart(minute,Ot_To)-datepart(minute,Ot_From)) OT_Minute from OverTime_Register where cast(floor(cast(OT_Date as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(OT_Date as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(dropyear.SelectedIndex,DropMonth.SelectedIndex)+"/"+dropyear.SelectedIndex +"' and emp_id='"+ emp_id+"'";
+                    #region Bind Total OverTime Hours Regarding Each Item
+                    /*7*/
+                    SalaryStatementModel salary = new SalaryStatementModel();
+                    str2 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedIndex;
+                    str3 = DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(dropyear.SelectedIndex, DropMonth.SelectedIndex) + "/" + dropyear.SelectedIndex;
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/SelectSumAndTime?str2=" + str2 + "&str3=" + str3 + "&emp_id=" + emp_id).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            salary = JsonConvert.DeserializeObject<SalaryStatementModel>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    //string	Sql1 ="select sum(datepart(hour,Ot_To)-datepart(hour,Ot_From)) OT_Hour,sum(datepart(minute,Ot_To)-datepart(minute,Ot_From)) OT_Minute from OverTime_Register where cast(floor(cast(OT_Date as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedIndex +"' and cast(floor(cast(OT_Date as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(dropyear.SelectedIndex,DropMonth.SelectedIndex)+"/"+dropyear.SelectedIndex +"' and emp_id='"+ emp_id+"'";
 					//Response.Write(Sql1+"<br>"); 
 					float hr=0;
 					float mn1=0;
-					SqlDtr = obj.GetRecordSet(Sql1);
-					if(SqlDtr != null)
+					//SqlDtr = obj.GetRecordSet(Sql1);
+					if(salary.hour != null)
 					{
-						if(SqlDtr.HasRows)
-						{
-							if (SqlDtr.Read())
-							{
-								string	strh11=SqlDtr.GetValue(0).ToString();
+						
+								string	strh11= salary.hour;
 								if(strh11==null||strh11.Equals(""))
 								{
 									strh11="0";
 								}
-								string	strm11=SqlDtr.GetValue(1).ToString();
+								string	strm11= salary.min;
 								if(strm11==null || strm11.Equals(""))
 								{
 									strm11="0";
@@ -427,10 +545,9 @@ namespace Servosms.Module.Employee
 								e.Item.Cells[7].Text=Convert.ToString(Math.Round(double.Parse(hr2.ToString())));
 								othtot+=double.Parse(GenUtil.strNumericFormat(hr2));
 								othtot1=othtot;
-							}
-						}
+							
 					}
-					SqlDtr.Close();
+					//SqlDtr.Close();
 					#endregion
 					#region Calculate Net Salary
 					Monthly_Salary=System.Convert.ToDouble(e.Item.Cells[2].Text.ToString());
@@ -476,53 +593,98 @@ namespace Servosms.Module.Employee
 				//****************
 				#region Bind Total Advance Regarding Each Employee
 				//**sql="select sum(cast(status as integer)) Total_Present from attandance_register where cast(floor(cast(cast(att_date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+DateTime.Now.Year +"' and cast(floor(cast(cast(att_date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(DateTime.Now.Year,DropMonth.SelectedIndex)+"/"+DateTime.Now.Year +"' and emp_id='"+ emp_id +"'";
-				string Ledger_ID="",str11="",str12="",str="";
+				string Ledger_ID="",str11="",str12="",str="",Ledger="";
 				SqlDtr = null;
-				Ledger_ID="Select Ledger_ID from Ledger_Master where Ledger_Name ='"+e.Item.Cells[1].Text.ToString()+"'";
-				dbobj.SelectQuery("Select Ledger_ID from Ledger_Master where Ledger_Name ='"+e.Item.Cells[1].Text.ToString()+"'",ref SqlDtr);
-				if(SqlDtr.Read())
-				{
-					Ledger_ID = SqlDtr["Ledger_ID"].ToString(); 
-				}
-				SqlDtr.Close();
+                string evalue = e.Item.Cells[1].Text.ToString();
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/SelectLedgerId?evalue=" + evalue).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        Ledger = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                Ledger_ID = Ledger;
+                //Ledger_ID ="Select Ledger_ID from Ledger_Master where Ledger_Name ='"+e.Item.Cells[1].Text.ToString()+"'";
+    //            dbobj.SelectQuery("Select Ledger_ID from Ledger_Master where Ledger_Name ='"+e.Item.Cells[1].Text.ToString()+"'",ref SqlDtr);
+				//if(SqlDtr.Read())
+				//{
+				//	Ledger_ID = SqlDtr["Ledger_ID"].ToString(); 
+				//}
+				//SqlDtr.Close();
 				if(Ledger_ID!="")
 				{
-					sql="select sum(cast(Debit_Amount as float)) advance from AccountsLedgerTable where cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"' and particulars like ('Payment%') and Ledger_ID="+Ledger_ID;
-					SqlDtr =obj.GetRecordSet(sql);
-					if(SqlDtr.HasRows )
-					{
-						while(SqlDtr.Read())
-						{
-							if(!SqlDtr.GetValue(0).ToString().Equals("NULL") ||!SqlDtr.GetValue(0).ToString().Equals("")|| SqlDtr.GetValue(0).ToString() != null)
+                    string str1, str2,SumAdvance="";
+                    str1 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedItem.Text;
+                    str2 = DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text), DropMonth.SelectedIndex) + "/" + dropyear.SelectedItem.Text;
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/SelectSumAdvance?str1=" + str1+"&str2="+str2+ "&Ledger_ID="+ Ledger_ID).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            SumAdvance = JsonConvert.DeserializeObject<string>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    //sql ="select sum(cast(Debit_Amount as float)) advance from AccountsLedgerTable where cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"' and particulars like ('Payment%') and Ledger_ID="+Ledger_ID;
+					//SqlDtr =obj.GetRecordSet(sql);
+					if(SumAdvance != "" || SumAdvance != null)
+					{						
+							if(!SumAdvance.Equals("NULL") ||!SumAdvance.Equals("")|| SumAdvance != null)
 							{
-								str11=SqlDtr.GetValue(0).ToString();
-							}
-						}
+								str11= SumAdvance;
+							}						
 					}
 					else
 					{
 						str11="0";
 					}
-					SqlDtr.Close();
-
-					sql="select Balance from AccountsLedgerTable where particulars like ('Opening%') and Ledger_ID="+Ledger_ID+" and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'";
-					SqlDtr =obj.GetRecordSet(sql);
-					if(SqlDtr.HasRows )
+                    //SqlDtr.Close();
+                    string str3, str4, Balance = "";
+                    str3 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedItem.Text;
+                    str4 = DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text), DropMonth.SelectedIndex) + "/" + dropyear.SelectedItem.Text;
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/SelectBalance?str3=" + str3 + "&str4=" + str4 + "&Ledger_ID=" + Ledger_ID).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            Balance = JsonConvert.DeserializeObject<string>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    //sql ="select Balance from AccountsLedgerTable where particulars like ('Opening%') and Ledger_ID="+Ledger_ID+" and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'";
+					//SqlDtr =obj.GetRecordSet(sql);
+					if(Balance!="")
 					{
-						while(SqlDtr.Read())
-						{
-							if(!SqlDtr.GetValue(0).ToString().Equals("NULL") ||!SqlDtr.GetValue(0).ToString().Equals("")|| SqlDtr.GetValue(0).ToString() != null)
+						
+							if(!Balance.Equals("NULL") ||!Balance.Equals("")|| Balance != null)
 							{
-								str12=SqlDtr.GetValue(0).ToString();
+								str12= Balance;
 							}
-						}
-						SqlDtr.Close();
+						
 					}
 					else
 					{
 						str12="0";
 					}
-					SqlDtr.Close();
+					//SqlDtr.Close();
 				}
 				//**SqlDtr.Close();
 				if(str12 != "" && str11 != "")
@@ -559,51 +721,136 @@ namespace Servosms.Module.Employee
 
 				/***************************************************************/
 				double bounce=0;
-				rdr = obj.GetRecordSet("select sum(DebitAmount) from customerledgertable where custid in(select cust_id from customer where ssr='"+emp_id+"') and particular like'voucher(5%' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
-				if(rdr.Read())
-				{
-					if(rdr.GetValue(0).ToString()!="")
-						bounce = double.Parse(rdr.GetValue(0).ToString());
-					else
-						bounce=0;
-				}
-				rdr.Close();
-				TotalReceipt-=bounce;
+                string str5, str6, Bounce="";
+                str5=DropMonth.SelectedIndex + "/1/" + dropyear.SelectedItem.Text;                     
+                str6 =DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text), DropMonth.SelectedIndex) + "/" + dropyear.SelectedItem.Text;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/SelectBounce?str5=" + str5 + "&str6=" + str6 + "&emp_id=" + emp_id).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        Bounce = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                if (Bounce != "")
+                {
+                    bounce = double.Parse(Bounce);
+                }
+                else
+                {
+                    bounce = 0;
+                }
+
+                //            rdr = obj.GetRecordSet("select sum(DebitAmount) from customerledgertable where custid in(select cust_id from customer where ssr='"+emp_id+"') and particular like'voucher(5%' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
+                //if(rdr.Read())
+                //{
+                //	if(rdr.GetValue(0).ToString()!="")
+                //		bounce = double.Parse(rdr.GetValue(0).ToString());
+                //	else
+                //		bounce=0;
+                //}
+                //rdr.Close();
+                TotalReceipt -=bounce;
 				//TotalAmount[4]+=bounce;
 				//return GenUtil.strNumericFormat(bounce.ToString());
 
 				double cd =0;
-				rdr = obj.GetRecordSet("select sum(credit_amount) from Accountsledgertable where Ledger_id in(select Ledger_id from ledger_master,customer where ledger_name=cust_name and ssr='"+emp_id+"') and particulars like 'Receipt_cd%' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
-				if(rdr.Read())
-				{
-					if(rdr.GetValue(0).ToString()!="")
-						cd=double.Parse(rdr.GetValue(0).ToString());
-				}
-				rdr.Close();
-				TotalReceipt-=cd;
+                string creditAmt = "";
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/SelectCreditAmt?str5=" + str5 + "&str6=" + str6 + "&emp_id=" + emp_id).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        creditAmt = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                if (creditAmt != "")
+                {
+                    cd = double.Parse(creditAmt);
+                }                
+    //            rdr = obj.GetRecordSet("select sum(credit_amount) from Accountsledgertable where Ledger_id in(select Ledger_id from ledger_master,customer where ledger_name=cust_name and ssr='"+emp_id+"') and particulars like 'Receipt_cd%' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
+				//if(rdr.Read())
+				//{
+				//	if(rdr.GetValue(0).ToString()!="")
+				//		cd=double.Parse(rdr.GetValue(0).ToString());
+				//}
+				//rdr.Close();
+				//TotalReceipt-=cd;
 				//TotalAmount[1]+=cd;
 				//return GenUtil.strNumericFormat(cd.ToString());
 
 				double cn=0;
-				rdr = obj.GetRecordSet("select sum(creditamount) from customerledgertable where custid in(select cust_id from customer where ssr='"+emp_id+"') and particular like 'voucher(3%' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
-				if(rdr.Read())
-				{
-					if(rdr.GetValue(0).ToString()!="")
-						cn=double.Parse(rdr.GetValue(0).ToString());
-				}
-				rdr.Close();
+                string SumOfcreditAmt = "";
+                str5 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedItem.Text;
+                str6 = DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text), DropMonth.SelectedIndex) + "/" + dropyear.SelectedItem.Text;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/SelectSumOfCreditAmt?str5=" + str5 + "&str6=" + str6 + "&emp_id=" + emp_id).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        SumOfcreditAmt = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                if (SumOfcreditAmt != "")
+                {
+                    cn = double.Parse(SumOfcreditAmt);
+                }
+    //            rdr = obj.GetRecordSet("select sum(creditamount) from customerledgertable where custid in(select cust_id from customer where ssr='"+emp_id+"') and particular like 'voucher(3%' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entrydate as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
+				//if(rdr.Read())
+				//{
+				//	if(rdr.GetValue(0).ToString()!="")
+				//		cn=double.Parse(rdr.GetValue(0).ToString());
+				//}
+				//rdr.Close();
 				TotalReceipt-=cn;
 				//TotalAmount[3]+=cn;
 
 				double sd =0;
-				//SqlDataReader rdr = obj.GetRecordSet("select sum(credit_amount) from Accountsledgertable where Ledger_id in(select Ledger_id from ledger_master,customer where ledger_name=cust_name and ssr='"+Emp_ID+"') and particulars like 'Receipt_sd%' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(txtDateFrom.Text)+"' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)<='"+GenUtil.str2MMDDYYYY(txtDateTo.Text)+"'");
-				rdr = obj.GetRecordSet("select sum(credit_amount) from Accountsledgertable where Ledger_id in(select Ledger_id from ledger_master,customer where ledger_name=cust_name and ssr='"+emp_id+"') and (particulars like 'Receipt_sd%' or particulars like 'Receipt_fd%' or particulars like 'Receipt_dd%') and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
-				if(rdr.Read())
-				{
-					if(rdr.GetValue(0).ToString()!="")
-						sd=double.Parse(rdr.GetValue(0).ToString());
-				}
-				rdr.Close();
+                string SumOfCreAmt="";
+                //SqlDataReader rdr = obj.GetRecordSet("select sum(credit_amount) from Accountsledgertable where Ledger_id in(select Ledger_id from ledger_master,customer where ledger_name=cust_name and ssr='"+Emp_ID+"') and particulars like 'Receipt_sd%' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)>='"+GenUtil.str2MMDDYYYY(txtDateFrom.Text)+"' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)<='"+GenUtil.str2MMDDYYYY(txtDateTo.Text)+"'");
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/SelectSumOfCreAmt?str5=" + str5 + "&str6=" + str6 + "&emp_id=" + emp_id).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        SumOfCreAmt = JsonConvert.DeserializeObject<string>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                if (SumOfCreAmt != "")
+                {
+                    sd = double.Parse(SumOfCreAmt);
+                }
+    //            rdr = obj.GetRecordSet("select sum(credit_amount) from Accountsledgertable where Ledger_id in(select Ledger_id from ledger_master,customer where ledger_name=cust_name and ssr='"+emp_id+"') and (particulars like 'Receipt_sd%' or particulars like 'Receipt_fd%' or particulars like 'Receipt_dd%') and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)>='"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(entry_date as datetime) as float)) as datetime)<='"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"'");
+				//if(rdr.Read())
+				//{
+				//	if(rdr.GetValue(0).ToString()!="")
+				//		sd=double.Parse(rdr.GetValue(0).ToString());
+				//}
+				//rdr.Close();
 				TotalReceipt-=sd;
 				//TotalAmount[2]+=sd;
 				//GenUtil.strNumericFormat(sd.ToString());
@@ -612,17 +859,32 @@ namespace Servosms.Module.Employee
 
 				SqlDataReader dtr=null;
 				double ssrinc=0;
-				sql="select * from setDis";
+                SalaryStatementModel salary1 = new SalaryStatementModel();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(BaseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/SalaryStatement/SelectSSRincentive").Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        salary1 = JsonConvert.DeserializeObject<SalaryStatementModel>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                //sql ="select * from setDis";
 				//InventoryClass obj2 = new InventoryClass();
-				dtr=obj1.GetRecordSet(sql);
-				while(dtr.Read())
-				{
-					if(dtr["SSRincentiveStatus"].ToString()!="0")
-						ssrinc=double.Parse(dtr["SSRincentive"].ToString());
+				//dtr=obj1.GetRecordSet(sql);
+				//while(dtr.Read())
+				//{
+					if(salary1.SSRincentiveStatus!="0")
+						ssrinc=double.Parse(salary1.SSRincentive);
 					else
 						ssrinc=0;
-				}
-				dtr.Close();
+				//}
+				//dtr.Close();
 
 				double totInc=Math.Round(TotalReceipt*ssrinc/100);
 				//double totInc=TotalReceipt*ssrinc/100;
@@ -641,29 +903,44 @@ namespace Servosms.Module.Employee
 				/************Ad by vikas 21.11.2012*****************************/
 				if(Ledger_ID!="")
 				{
-					sql="select sum(cast(Debit_Amount as float)) advance from AccountsLedgerTable where cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"' and particulars like ('Journal%') and Ledger_ID="+Ledger_ID;
-					SqlDtr =obj.GetRecordSet(sql);
-					if(SqlDtr.HasRows )
-					{
-						while(SqlDtr.Read())
-						{
+                    string str1, str2,sum="";
+                    str1 = DropMonth.SelectedIndex + "/1/" + dropyear.SelectedItem.Text;
+                    str2 = DropMonth.SelectedIndex + "/" + DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text), DropMonth.SelectedIndex) + "/" + dropyear.SelectedItem.Text;
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(BaseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/SalaryStatement/SelectSumAdv?str1=" + str1 + "&str2=" + str2 + "&Ledger_ID=" + Ledger_ID).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            sum = JsonConvert.DeserializeObject<string>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    //sql ="select sum(cast(Debit_Amount as float)) advance from AccountsLedgerTable where cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) >= '"+DropMonth.SelectedIndex+"/1/"+dropyear.SelectedItem.Text+"' and cast(floor(cast(cast(Entry_Date as datetime) as float)) as datetime) <= '"+DropMonth.SelectedIndex+"/"+DateTime.DaysInMonth(int.Parse(dropyear.SelectedItem.Text),DropMonth.SelectedIndex)+"/"+dropyear.SelectedItem.Text+"' and particulars like ('Journal%') and Ledger_ID="+Ledger_ID;
+					//SqlDtr =obj.GetRecordSet(sql);
+					if(sum!="")
+					{						
 							//if(!SqlDtr.GetValue(0).ToString().Equals("NULL") ||!SqlDtr.GetValue(0).ToString().Equals("")|| SqlDtr.GetValue(0).ToString() != null)
-							if(!SqlDtr.GetValue(0).ToString().Equals("NULL") && !SqlDtr.GetValue(0).ToString().Equals("") && SqlDtr.GetValue(0).ToString() != null)
+							if(!sum.Equals("NULL") && !sum.Equals("") && sum != null)
 							{
-								str11=SqlDtr.GetValue(0).ToString();
+								str11= sum;
 							}
 							else
 							{
 								str11="0";
 							}
 						
-						}
+						
 					}
 					else
 					{
 						str11="0";
 					}
-					SqlDtr.Close();
+					//SqlDtr.Close();
 				
 					if(!e.Item.Cells[11].Text.ToString().Equals("TA/DA"))
 						e.Item.Cells[11].Text=str11.ToString();

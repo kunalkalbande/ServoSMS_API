@@ -88,9 +88,27 @@ namespace Servosms.Module.Employee
 			//GridSearch.CurrentPageIndex=0;
 			DataSet ds=new DataSet();
 			EmployeeClass  obj=new EmployeeClass();
-			ds=obj.ShowEmployeeInfo(txtEmpID.Text.Trim ().ToString(),txtName.Text.Trim ().ToString() , txtDesig.Text.Trim ().ToString());
-			//****
-			DataTable dt=ds.Tables[0];
+
+            DataSet dataset = new DataSet();
+            string ID1 = txtEmpID.Text.Trim().ToString();
+            string name1 = txtName.Text.Trim().ToString();
+            string desig1 = txtDesig.Text.Trim().ToString();
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(BaseUri);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var Res = client.GetAsync("api/EmployeeClass/ShowEmployeeInfo1?ID1=" + ID1 + "&name1=" + name1 + "&desig1=" + desig1).Result;
+                if (Res.IsSuccessStatusCode)
+                {
+                    var id = Res.Content.ReadAsStringAsync().Result;
+                    dataset = JsonConvert.DeserializeObject<DataSet>(id);
+                }
+            }
+            //ds =obj.ShowEmployeeInfo(txtEmpID.Text.Trim ().ToString(),txtName.Text.Trim ().ToString() , txtDesig.Text.Trim ().ToString());
+            //             
+                ds = dataset;
+            DataTable dt=ds.Tables[0];
 			DataView dv=new DataView(dt);
 			dv.Sort=System.Convert.ToString(Cache["strorderby"]);
 			//****
