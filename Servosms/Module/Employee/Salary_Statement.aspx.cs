@@ -2117,6 +2117,8 @@ namespace Servosms.Module.Employee
                         var id = Res.Content.ReadAsStringAsync().Result;
                         salary = JsonConvert.DeserializeObject<SalaryStatementModel>(id);
                     }
+                    else
+                        Res.EnsureSuccessStatusCode();
                 }
                 //            sql ="select emp_id,emp_name, salary, ot_compensation from employee where status='1' ";
 

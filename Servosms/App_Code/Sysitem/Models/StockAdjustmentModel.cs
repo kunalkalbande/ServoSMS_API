@@ -34,5 +34,11 @@ namespace Servo_API.Models
         public string Date { get; set; }
 
         public string SAV_ID { get; set; }
+        public List<string> opening_stock { get; set; }
+        public List<string> receipt { get; set; }
+        public List<string> sales { get; set; }
+        public List<string> salesfoc { get; set; }
+        public List<string> Productid { get; set; }
+        public List<string> stock_date { get; set; }
     }
 }

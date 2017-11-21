@@ -309,7 +309,7 @@ namespace Servosms.Module.Inventory
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		protected void btnPrint_Click(object sender, System.EventArgs e)
-		{
+		 {
 			//DropDownList[] Products = {DropOutProd1,DropOutProd2,DropOutProd3,DropOutProd4,DropInProd1,DropInProd2,DropInProd3,DropInProd4};
 			HtmlInputText[] Products = {DropOutProd1,DropOutProd2,DropOutProd3,DropOutProd4,DropInProd1,DropInProd2,DropInProd3,DropInProd4};
 			TextBox[] QtyPack = {txtOutQtyPack1 ,txtOutQtyPack2,txtOutQtyPack3 ,txtOutQtyPack4 ,txtInQtyPack1 ,txtInQtyPack2 ,txtInQtyPack3 ,txtInQtyPack4 };
@@ -375,7 +375,21 @@ namespace Servosms.Module.Inventory
 					UpdateProductQty();
 					sav_id=DropSavID.SelectedItem.Text;
 					int x=0;
-					dbobj.Insert_or_Update("delete from stock_adjustment where sav_id='"+DropSavID.SelectedItem.Text+"'",ref x);
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/StockAdjustment/DeleteStockAdj?sav_id=" + sav_id).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            //receipt = JsonConvert.DeserializeObject<double>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    //dbobj.Insert_or_Update("delete from stock_adjustment where sav_id='"+DropSavID.SelectedItem.Text+"'",ref x);
 				}
 				
 				if(lblSAV_ID.Visible!=true)
@@ -611,8 +625,24 @@ namespace Servosms.Module.Inventory
 		{
 			try
 			{
-				object obj = null;
-				dbobj.ExecProc(OprType.Insert,"ProInsertStockAdjustment",ref obj,"@SAV_ID",sav_id,"@Out_Product",prod_name1,"@pack1",pack1,"@Store1",store1,"@Type1",type1,"@Out_Qty",qty1,"@In_Product",prod_name2,"@Pack2",pack2 ,"@Store2",store2,"@Type2",type2,"@In_Qty",qty2,"@Entry_By",uid,"@Nar",txtNarration.Text,"@Stock_Date",GenUtil.str2MMDDYYYY(txtDate.Text));
+				//object obj = null;
+                string str1 = txtNarration.Text;
+                string str2= GenUtil.str2MMDDYYYY(txtDate.Text);
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/StockAdjustment/SaveStockAdj?sav_id=" + sav_id + "&prod_name1=" + prod_name1 + "&pack1=" + pack1 + "&store1=" + store1 + "&type1=" + type1 + "&qty1=" + qty1 + "&prod_name2=" + prod_name2 + "&pack2=" + pack2 + "&store2=" + store2 + "&type2=" + type2 + "&qty2=" + qty2 + "&uid=" + uid + "&str1=" + str1 + "&str2=" + str2).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        //receipt = JsonConvert.DeserializeObject<double>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                    //dbobj.ExecProc(OprType.Insert, "ProInsertStockAdjustment", ref obj, "@SAV_ID", sav_id, "@Out_Product", prod_name1, "@pack1", pack1, "@Store1", store1, "@Type1", type1, "@Out_Qty", qty1, "@In_Product", prod_name2, "@Pack2", pack2, "@Store2", store2, "@Type2", type2, "@In_Qty", qty2, "@Entry_By", uid, "@Nar", txtNarration.Text, "@Stock_Date", GenUtil.str2MMDDYYYY(txtDate.Text));
 			}
 			catch(Exception ex)
 			{
@@ -1513,8 +1543,28 @@ namespace Servosms.Module.Inventory
 			int x=0;
 			for(int i=0;i<ProductID.Count;i++)
 			{
-				dbobj.Insert_or_Update("update stock_master set sales=sales-"+ProductQty[i]+",closing_stock=closing_stock+"+ProductQty[i]+" where productid='"+ProductID[i]+"' and cast(floor(cast(stock_date as float)) as datetime)=Convert(datetime,'"+ tempDate + "',103)",ref x);
-				dbobj.Insert_or_Update("update stock_master set receipt=receipt-"+ProductQty[++i]+",closing_stock=closing_stock-"+ProductQty[i]+" where productid='"+ProductID[i]+ "' and cast(floor(cast(stock_date as float)) as datetime)=Convert(datetime,'" + tempDate + "',103)",ref x);
+                string str1 = txtNarration.Text;
+                string str2 = GenUtil.str2MMDDYYYY(txtDate.Text);
+                using (var client = new HttpClient())
+                {
+                     str1 = ProductQty[i].ToString();
+                     str2 = ProductID[i].ToString();
+                    string str3 = tempDate;
+                    string str4 = ProductQty[++i].ToString();
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/StockAdjustment/UpdateStockAdj?str1=" + str1 + "&str2=" + str2 + "&str3=" + str3 + "&str4=" + str4).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        //receipt = JsonConvert.DeserializeObject<double>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+            //dbobj.Insert_or_Update("update stock_master set sales=sales-"+ProductQty[i]+",closing_stock=closing_stock+"+ProductQty[i]+" where productid='"+ProductID[i]+"' and cast(floor(cast(stock_date as float)) as datetime)=Convert(datetime,'"+ tempDate + "',103)",ref x);
+			//dbobj.Insert_or_Update("update stock_master set receipt=receipt-"+ProductQty[++i]+",closing_stock=closing_stock-"+ProductQty[i]+" where productid='"+ProductID[i]+ "' and cast(floor(cast(stock_date as float)) as datetime)=Convert(datetime,'" + tempDate + "',103)",ref x);
 			}
 		}
 
@@ -1527,28 +1577,94 @@ namespace Servosms.Module.Inventory
 			SqlCommand cmd;
 			SqlConnection Con = new SqlConnection(System.Configuration.ConfigurationSettings.AppSettings["Servosms"]);
 			SqlDataReader rdr1=null;
+
 			for(int i=0;i<ProductID.Count;i++)
 			{
-				string str="select * from Stock_Master where Productid='"+ProductID[i].ToString()+"' order by Stock_date";
-				rdr1=obj.GetRecordSet(str);
+                StockAdjustmentModel stkadj = new StockAdjustmentModel();
+                string str1 = ProductID[i].ToString();                
+                
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUri);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var Res = client.GetAsync("api/StockAdjustment/SeqStockMaster?str1=" + str1).Result;
+                    if (Res.IsSuccessStatusCode)
+                    {
+                        var id = Res.Content.ReadAsStringAsync().Result;
+                        stkadj = JsonConvert.DeserializeObject<StockAdjustmentModel>(id);
+                    }
+                    else
+                        Res.EnsureSuccessStatusCode();
+                }
+                List<string> controlopening_stock = new List<string>();
+                List<string> controlreceipt = new List<string>();
+                List<string> controlsales = new List<string>();
+                List<string> controlsalesfoc = new List<string>();
+                List<string> controlProductid = new List<string>();
+                List<string> controlstock_date = new List<string>();
+                foreach (var id in stkadj.opening_stock)
+                {
+                    controlopening_stock = stkadj.opening_stock;
+                }
+                foreach (var id in stkadj.receipt)
+                {
+                    controlreceipt = stkadj.receipt;
+                }
+                foreach (var id in stkadj.sales)
+                {
+                    controlsales = stkadj.sales;
+                }
+                foreach (var id in stkadj.salesfoc)
+                {
+                    controlsalesfoc = stkadj.salesfoc;
+                }
+                foreach (var id in stkadj.Productid)
+                {
+                    controlProductid = stkadj.Productid;
+                }
+                foreach (var id in stkadj.stock_date)
+                {
+                    controlstock_date = stkadj.stock_date;
+                }
+                
+                //string str="select * from Stock_Master where Productid='"+ProductID[i].ToString()+"' order by Stock_date";
+				//rdr1=obj.GetRecordSet(str);
 				double OS=0,CS=0,k=0;
-				while(rdr1.Read())
-				{
+                int count = stkadj.opening_stock.Count;
+                for (int p = 0; p <= count - 1; p++)
+                {
 					if(k==0)
 					{
-						OS=double.Parse(rdr1["opening_stock"].ToString());
+						OS=double.Parse(controlopening_stock[p].ToString());
 						k++;
 					}
 					else
 						OS=CS;
-					CS=OS+double.Parse(rdr1["receipt"].ToString())-(double.Parse(rdr1["sales"].ToString())+double.Parse(rdr1["salesfoc"].ToString()));
-					Con.Open();
-					cmd = new SqlCommand("update Stock_Master set opening_stock='"+OS.ToString()+"', Closing_Stock='"+CS.ToString()+"' where ProductID='"+rdr1["Productid"].ToString()+"' and Stock_Date=Convert(datetime,'"+rdr1["stock_date"].ToString()+"',103)",Con);
-					cmd.ExecuteNonQuery();
-					cmd.Dispose();
-					Con.Close();
+					CS=OS+double.Parse(controlreceipt[p].ToString())-(double.Parse(controlsales[p].ToString()) +double.Parse(controlsalesfoc[p].ToString()));
+					//Con.Open();
+                    string str7 = controlProductid[p].ToString();
+                    string str8 = controlstock_date[p].ToString();
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseUri);
+                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var Res = client.GetAsync("api/StockAdjustment/UpdateSeqStockMaster?OS=" + OS + "&CS=" + CS + "&str7=" + str7 + "&str8=" + str8).Result;
+                        if (Res.IsSuccessStatusCode)
+                        {
+                            var id = Res.Content.ReadAsStringAsync().Result;
+                            //stkadj = JsonConvert.DeserializeObject<StockAdjustmentModel>(id);
+                        }
+                        else
+                            Res.EnsureSuccessStatusCode();
+                    }
+                    //cmd = new SqlCommand("update Stock_Master set opening_stock='"+OS.ToString()+"', Closing_Stock='"+CS.ToString()+"' where ProductID='"+ controlProductid[p].ToString()+"' and Stock_Date=Convert(datetime,'"+ controlstock_date[p].ToString() + "',103)",Con);
+					//cmd.ExecuteNonQuery();
+					//cmd.Dispose();
+					//Con.Close();
 				}
-				rdr1.Close();
+				//rdr1.Close();
 			}
 		}
 	}
